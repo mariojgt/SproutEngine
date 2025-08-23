@@ -17,6 +17,8 @@ set(OLD_GLOB
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Systems.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Theme.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/TinyImGui.cpp"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/UnrealEditor.cpp"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/UnrealEditorSimple.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/VSGraph.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/World.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/main.cpp"
@@ -46,6 +48,8 @@ set(OLD_GLOB
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Theme.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/TinyImGui.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Transform.h"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/UnrealEditor.h"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/UnrealEditorSimple.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/VSGraph.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/World.h"
   )

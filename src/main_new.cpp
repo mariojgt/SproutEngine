@@ -33,9 +33,9 @@ void SetupExampleBlueprints() {
     rotatingCubeBP->AddDefaultComponent("Collision");
     rotatingCubeBP->AddProperty("RotationSpeed", "float", "90.0");
     rotatingCubeBP->AddProperty("RotationAxis", "vector3", "0,1,0");
-    
+
     BlueprintManager::Get().RegisterBlueprint("RotatingCube_BP", std::move(rotatingCubeBP));
-    
+
     // Create a character blueprint
     auto characterBP = std::make_unique<BlueprintClass>("MyCharacter_BP");
     characterBP->AddDefaultComponent("MeshRenderer");
@@ -43,9 +43,9 @@ void SetupExampleBlueprints() {
     characterBP->AddDefaultComponent("Camera");
     characterBP->AddProperty("WalkSpeed", "float", "600.0");
     characterBP->AddProperty("JumpHeight", "float", "420.0");
-    
+
     BlueprintManager::Get().RegisterBlueprint("MyCharacter_BP", std::move(characterBP));
-    
+
     std::cout << "Example blueprints registered!" << std::endl;
 }
 
@@ -66,7 +66,7 @@ int main(){
     // Create scene with new Actor system
     Scene scene("MainLevel");
     World* world = scene.GetWorld();
-    
+
     std::cout << "=== SproutEngine - Unreal-like Game Engine Demo ===" << std::endl;
     std::cout << "Features implemented:" << std::endl;
     std::cout << "- Actor/Component system (like Unreal's AActor)" << std::endl;
@@ -80,41 +80,41 @@ int main(){
 
     // Setup example blueprints
     SetupExampleBlueprints();
-    
+
     // Spawn a GameMode to manage the game
     GameMode* gameMode = world->SpawnActor<GameMode>("MainGameMode");
-    
+
     // Create some example actors using the new system
-    
+
     // 1. Rotating cube actor (demonstrates custom actor behavior)
     RotatingCube* rotatingCube = world->SpawnActor<RotatingCube>("DemoCube");
     rotatingCube->SetActorLocation(glm::vec3(2, 0, 0));
     rotatingCube->RotationSpeed = 45.0f; // 45 degrees per second
-    
+
     // 2. Another cube with different rotation
     RotatingCube* rotatingCube2 = world->SpawnActor<RotatingCube>("DemoCube2");
     rotatingCube2->SetActorLocation(glm::vec3(-2, 0, 0));
     rotatingCube2->RotationSpeed = -60.0f;
     rotatingCube2->RotationAxis = glm::vec3(1, 0, 1); // Rotate around X+Z axis
-    
+
     // 3. Create a character (controlled by GameMode's PlayerController)
     // The GameMode will automatically create this, but we can also create additional ones
     Character* npcCharacter = world->SpawnActor<Character>("NPCCharacter");
     npcCharacter->SetActorLocation(glm::vec3(0, 0, 3));
-    
+
     // 4. Create some lights
     auto lightActor = world->SpawnActor<Actor>("MainLight");
     auto lightComponent = lightActor->CreateComponent<LightComponent>(LightComponent::LightType::Directional);
     lightComponent->SetColor(glm::vec3(1.0f, 0.9f, 0.8f));
     lightComponent->SetIntensity(2.0f);
     lightActor->SetActorRotation(glm::vec3(-45, 30, 0));
-    
+
     // Create some legacy entities for compatibility testing
     auto legacyCube = scene.createEntity("LegacyCube");
     scene.registry.emplace<MeshCube>(legacyCube);
     auto& legacyTransform = scene.registry.get<Transform>(legacyCube);
     legacyTransform.position = {0, 0, -3};
-    
+
     // Create a HUD entity (legacy system)
     auto hudE = scene.createEntity("HUD");
     scene.registry.emplace<HUDComponent>(hudE, HUDComponent{85.0f, 60.0f, 420, "SproutEngine HUD"});
@@ -140,7 +140,7 @@ int main(){
     while(!glfwWindowShouldClose(window)){
         glfwPollEvents();
 
-        int width, height; 
+        int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         renderer.beginFrame(width, height);
 
@@ -152,7 +152,7 @@ int main(){
         if(playMode){
             // Update new Actor system
             scene.Tick(dt);
-            
+
             // Update legacy systems for compatibility
             scripting.update(scene.registry, dt);
             Systems::UpdateTransform(scene.registry, dt);
@@ -170,18 +170,18 @@ int main(){
                 if (auto* meshComp = actor->GetComponent<MeshRendererComponent>()) {
                     if (meshComp->IsVisible()) {
                         glm::mat4 M = glm::mat4(1.0f);
-                        
+
                         // Get transform from actor
                         glm::vec3 pos = actor->GetActorLocation();
                         glm::vec3 rot = actor->GetActorRotation();
                         glm::vec3 scale = actor->GetActorScale();
-                        
+
                         M = glm::translate(M, pos);
                         M = glm::rotate(M, glm::radians(rot.x), glm::vec3(1, 0, 0));
                         M = glm::rotate(M, glm::radians(rot.y), glm::vec3(0, 1, 0));
                         M = glm::rotate(M, glm::radians(rot.z), glm::vec3(0, 0, 1));
                         M = glm::scale(M, scale);
-                        
+
                         glm::mat4 MVP = P * V * M;
                         renderer.drawCube(MVP); // For now, all meshes render as cubes
                     }
@@ -203,25 +203,25 @@ int main(){
 
         editor.drawDockspace();
         editor.drawPanels(scene.registry, renderer, scripting, playMode);
-        
+
         // Add a new panel showing our Actor system
         if (ImGui::Begin("Actor System")) {
             ImGui::Text("SproutEngine Actor System");
             ImGui::Separator();
-            
+
             if (world) {
                 ImGui::Text("Total Actors: %zu", world->GetActorCount());
                 ImGui::Spacing();
-                
+
                 if (ImGui::CollapsingHeader("Actors in World")) {
                     const auto& actors = world->GetAllActors();
                     for (const auto& actor : actors) {
                         ImGui::PushID(actor.get());
-                        
+
                         if (ImGui::Selectable(actor->GetName().c_str())) {
                             editor.selected = actor->GetEntity();
                         }
-                        
+
                         // Show actor details
                         if (ImGui::IsItemHovered()) {
                             ImGui::BeginTooltip();
@@ -230,30 +230,30 @@ int main(){
                             ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
                             ImGui::EndTooltip();
                         }
-                        
+
                         ImGui::PopID();
                     }
                 }
-                
+
                 if (ImGui::CollapsingHeader("Spawn New Actors")) {
                     if (ImGui::Button("Spawn Rotating Cube")) {
                         RotatingCube* newCube = world->SpawnActor<RotatingCube>("NewRotatingCube");
                         newCube->SetActorLocation(glm::vec3(
-                            (rand() % 10) - 5, 
-                            (rand() % 5), 
+                            (rand() % 10) - 5,
+                            (rand() % 5),
                             (rand() % 10) - 5
                         ));
                     }
-                    
+
                     if (ImGui::Button("Spawn Character")) {
                         Character* newChar = world->SpawnActor<Character>("NewCharacter");
                         newChar->SetActorLocation(glm::vec3(
-                            (rand() % 6) - 3, 
-                            0, 
+                            (rand() % 6) - 3,
+                            0,
                             (rand() % 6) - 3
                         ));
                     }
-                    
+
                     if (ImGui::Button("Spawn Light")) {
                         auto lightActor = world->SpawnActor<Actor>("NewLight");
                         auto lightComp = lightActor->CreateComponent<LightComponent>(LightComponent::LightType::Point);
@@ -277,7 +277,7 @@ int main(){
         if (ImGui::Begin("Blueprint System")) {
             ImGui::Text("Blueprint Manager");
             ImGui::Separator();
-            
+
             if (ImGui::Button("Create RotatingCube from Blueprint")) {
                 Actor* blueprintActor = BlueprintManager::Get().CreateBlueprintInstance("RotatingCube_BP", world);
                 if (blueprintActor) {
@@ -288,7 +288,7 @@ int main(){
                     ));
                 }
             }
-            
+
             if (ImGui::Button("Create Character from Blueprint")) {
                 Actor* blueprintActor = BlueprintManager::Get().CreateBlueprintInstance("MyCharacter_BP", world);
                 if (blueprintActor) {
@@ -312,7 +312,7 @@ int main(){
 
     // Clean shutdown
     scene.EndPlay();
-    
+
     editor.shutdown(window);
     scripting.shutdown();
     renderer.shutdown();

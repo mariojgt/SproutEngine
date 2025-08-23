@@ -63,7 +63,7 @@ void Character::Jump() {
         glm::vec3 currentLocation = GetActorLocation();
         SetActorLocation(currentLocation + glm::vec3(0, JumpVelocity * 0.01f, 0));
         bCanJump = false;
-        
+
         // TODO: Reset bCanJump when landing (needs physics integration)
     }
 }
@@ -73,12 +73,12 @@ void Character::SetupComponents() {
     meshComponent = CreateComponent<MeshRendererComponent>();
     meshComponent->SetMesh("assets/meshes/character.fbx");
     meshComponent->SetMaterial("assets/materials/character_mat.json");
-    
+
     // Create collision component
     capsuleComponent = CreateComponent<CollisionComponent>(CollisionComponent::CollisionType::Capsule);
     capsuleComponent->SetCapsuleRadius(0.5f);
     capsuleComponent->SetCapsuleHeight(2.0f);
-    
+
     // Create camera component
     cameraComponent = CreateComponent<CameraComponent>();
     cameraComponent->SetRelativeLocation(glm::vec3(0, 0, 1.8f)); // Eye level
@@ -92,7 +92,7 @@ void Controller::Possess(Pawn* inPawn) {
     if (possessedPawn) {
         UnPossess();
     }
-    
+
     possessedPawn = inPawn;
     if (possessedPawn) {
         possessedPawn->PossessedBy(this);
@@ -130,7 +130,7 @@ void PlayerController::ProcessInput(float deltaTime) {
     if (auto* character = dynamic_cast<Character*>(GetPawn())) {
         character->MoveForward(moveForwardValue);
         character->MoveRight(moveRightValue);
-        
+
         if (bJumpPressed) {
             character->Jump();
             bJumpPressed = false;
@@ -155,10 +155,10 @@ void PlayerController::OnMouseMove(float deltaX, float deltaY) {
         glm::vec3 currentRotation = pawn->GetActorRotation();
         currentRotation.y += deltaX * mouseSensitivity;
         currentRotation.x += deltaY * mouseSensitivity;
-        
+
         // Clamp pitch
         currentRotation.x = glm::clamp(currentRotation.x, -90.0f, 90.0f);
-        
+
         pawn->SetActorRotation(currentRotation);
     }
 }
@@ -176,7 +176,7 @@ void GameMode::StartPlay() {
     if (!bMatchStarted) {
         bMatchStarted = true;
         std::cout << "Game match started!" << std::endl;
-        
+
         // Create default player controller and pawn
         PlayerController* playerController = CreatePlayerController();
         if (playerController) {
@@ -234,7 +234,7 @@ void RotatingCube::BeginPlay() {
 
 void RotatingCube::Tick(float deltaTime) {
     Actor::Tick(deltaTime);
-    
+
     // Rotate the cube
     glm::vec3 currentRotation = GetActorRotation();
     glm::vec3 rotationDelta = RotationAxis * RotationSpeed * deltaTime;

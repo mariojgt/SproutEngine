@@ -8,20 +8,26 @@ struct Transform {
     glm::vec3 scale{1.0f};
 };
 
+struct NameComponent {
+    std::string name{"Entity"};
+};
+
 struct Tag { std::string name{"Entity"}; };
 
-struct MeshCube { /* marker for a unit cube */ };
+struct MeshCube {
+    bool enabled = true; // Dummy member to avoid zero-size struct issues
+};
 
 struct Script {
-    std::string path;            // e.g. assets/scripts/Rotate.lua
-    double      lastWriteTime{}; // hot-reload tracking
-    bool loaded{false};
+    std::string filePath;        // e.g. assets/scripts/Rotate.lua
+    double      lastUpdateTime{0.0}; // hot-reload tracking
+    bool needsUpdate{false};
 };
 
 
 struct HUDComponent {
-    float health{100.0f};
-    float mana{100.0f};
-    int score{0};
-    std::string title{"Game HUD"};
+    float x{100.0f};
+    float y{100.0f};
+    int width{200};
+    std::string text{"HUD Text"};
 };

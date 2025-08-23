@@ -29,7 +29,7 @@ public:
     ActorID GetActorID() const { return actorId; }
     const std::string& GetName() const { return name; }
     void SetName(const std::string& newName) { name = newName; }
-    
+
     World* GetWorld() const { return world; }
     entt::entity GetEntity() const { return entity; }
 
@@ -40,7 +40,7 @@ public:
     void SetActorRotation(const glm::vec3& rotation);
     glm::vec3 GetActorScale() const;
     void SetActorScale(const glm::vec3& scale);
-    
+
     // Transform helpers
     glm::vec3 GetForwardVector() const;
     glm::vec3 GetRightVector() const;
@@ -55,13 +55,13 @@ public:
     // Component system
     template<typename T, typename... Args>
     T* CreateComponent(Args&&... args);
-    
+
     template<typename T>
     T* GetComponent() const;
-    
+
     template<typename T>
     bool HasComponent() const;
-    
+
     template<typename T>
     void RemoveComponent();
 
@@ -74,14 +74,14 @@ public:
     // Event system
     template<typename EventType>
     void BindEvent(std::function<void(const EventType&)> callback);
-    
+
     template<typename EventType>
     void TriggerEvent(const EventType& event);
 
     // Blueprint/Script integration
     void SetBlueprintClass(const std::string& blueprintPath);
     const std::string& GetBlueprintClass() const { return blueprintClass; }
-    
+
     // Serialization support
     virtual void Serialize(class JsonWriter& writer) const;
     virtual void Deserialize(const class JsonReader& reader);
@@ -90,7 +90,7 @@ public:
     bool IsValid() const { return world != nullptr && entity != entt::null; }
     void MarkForDestroy() { pendingDestroy = true; }
     bool IsPendingDestroy() const { return pendingDestroy; }
-    
+
     // Static class info (for blueprint system)
     static std::string StaticClass() { return "Actor"; }
 
@@ -100,17 +100,17 @@ protected:
     ActorID actorId;
     std::string name;
     std::string blueprintClass;
-    
+
     // Hierarchy
     Actor* parent = nullptr;
     std::vector<Actor*> children;
-    
+
     // Component management
     std::unordered_map<std::type_index, std::unique_ptr<ActorComponent>> components;
-    
+
     // Event bindings
     std::unordered_map<std::type_index, std::vector<std::function<void(const void*)>>> eventBindings;
-    
+
     // State
     bool pendingDestroy = false;
     bool hasBegunPlay = false;
@@ -163,10 +163,10 @@ public:
     // Local transform
     glm::vec3 GetRelativeLocation() const { return relativeLocation; }
     void SetRelativeLocation(const glm::vec3& location) { relativeLocation = location; }
-    
+
     glm::vec3 GetRelativeRotation() const { return relativeRotation; }
     void SetRelativeRotation(const glm::vec3& rotation) { relativeRotation = rotation; }
-    
+
     glm::vec3 GetRelativeScale() const { return relativeScale; }
     void SetRelativeScale(const glm::vec3& scale) { relativeScale = scale; }
 
@@ -200,20 +200,20 @@ protected:
 template<typename T, typename... Args>
 T* Actor::CreateComponent(Args&&... args) {
     static_assert(std::is_base_of_v<ActorComponent, T>, "T must derive from ActorComponent");
-    
+
     auto component = std::make_unique<T>(this, std::forward<Args>(args)...);
     T* ptr = component.get();
-    
+
     std::type_index typeIndex(typeid(T));
     components[typeIndex] = std::move(component);
-    
+
     return ptr;
 }
 
 template<typename T>
 T* Actor::GetComponent() const {
     static_assert(std::is_base_of_v<ActorComponent, T>, "T must derive from ActorComponent");
-    
+
     std::type_index typeIndex(typeid(T));
     auto it = components.find(typeIndex);
     if (it != components.end()) {

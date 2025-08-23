@@ -132,6 +132,14 @@ build CMakeFiles/SproutEngine.dir/src/Engine/VSGraph.cpp.o: CXX_COMPILER__Sprout
   OBJECT_DIR = CMakeFiles/SproutEngine.dir
   OBJECT_FILE_DIR = CMakeFiles/SproutEngine.dir/src/Engine
 
+build CMakeFiles/SproutEngine.dir/src/Engine/UnrealEditorSimple.cpp.o: CXX_COMPILER__SproutEngine_unscanned_ /Users/mariotarosso/Downloads/SproutEngine/src/Engine/UnrealEditorSimple.cpp || cmake_object_order_depends_target_SproutEngine
+  DEFINES = -DIMGUI_IMPL_OPENGL_LOADER_GLAD -DLUA_USE_DLOPEN -DSE_ASSETS_DIR=\"/Users/mariotarosso/Downloads/SproutEngine/assets\"
+  DEP_FILE = CMakeFiles/SproutEngine.dir/src/Engine/UnrealEditorSimple.cpp.o.d
+  FLAGS = -std=gnu++20 -arch arm64
+  INCLUDES = -I/Users/mariotarosso/Downloads/SproutEngine/src -I/Users/mariotarosso/Downloads/SproutEngine/external/imnodes_stub -isystem /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include
+  OBJECT_DIR = CMakeFiles/SproutEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles/SproutEngine.dir/src/Engine
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target SproutEngine
@@ -140,7 +148,7 @@ build CMakeFiles/SproutEngine.dir/src/Engine/VSGraph.cpp.o: CXX_COMPILER__Sprout
 #############################################
 # Link the executable SproutEngine
 
-build SproutEngine: CXX_EXECUTABLE_LINKER__SproutEngine_ CMakeFiles/SproutEngine.dir/src/main.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Renderer.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Scene.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Systems.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Scripting.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Editor.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/HUD.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/FileUtil.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Theme.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/TinyImGui.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/VSGraph.cpp.o | vcpkg_installed/arm64-osx/debug/lib/libglad.a vcpkg_installed/arm64-osx/debug/lib/libglfw3.a vcpkg_installed/arm64-osx/debug/lib/libimguid.a vcpkg_installed/arm64-osx/debug/lib/liblua.a vcpkg_installed/arm64-osx/debug/lib/libglfw3.a
+build SproutEngine: CXX_EXECUTABLE_LINKER__SproutEngine_ CMakeFiles/SproutEngine.dir/src/main.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Renderer.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Scene.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Systems.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Scripting.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Editor.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/HUD.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/FileUtil.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/Theme.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/TinyImGui.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/VSGraph.cpp.o CMakeFiles/SproutEngine.dir/src/Engine/UnrealEditorSimple.cpp.o | vcpkg_installed/arm64-osx/debug/lib/libglad.a vcpkg_installed/arm64-osx/debug/lib/libglfw3.a vcpkg_installed/arm64-osx/debug/lib/libimguid.a vcpkg_installed/arm64-osx/debug/lib/liblua.a vcpkg_installed/arm64-osx/debug/lib/libglfw3.a
   FLAGS = -arch arm64
   LINK_FLAGS = -Wl,-search_paths_first -Wl,-headerpad_max_install_names
   LINK_LIBRARIES = vcpkg_installed/arm64-osx/debug/lib/libglad.a  vcpkg_installed/arm64-osx/debug/lib/libglfw3.a  vcpkg_installed/arm64-osx/debug/lib/libimguid.a  vcpkg_installed/arm64-osx/debug/lib/liblua.a  vcpkg_installed/arm64-osx/debug/lib/libglfw3.a  -framework Cocoa  -framework IOKit  -framework CoreFoundation

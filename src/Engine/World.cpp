@@ -15,7 +15,7 @@ World::~World() {
 
 void World::DestroyActor(Actor* actor) {
     if (!actor) return;
-    
+
     actor->MarkForDestroy();
     pendingDestroyActors.push_back(actor);
 }
@@ -46,7 +46,7 @@ void World::Tick(float deltaTime) {
     for (const auto& actor : actors) {
         if (!actor->IsPendingDestroy()) {
             actor->Tick(deltaTime);
-            
+
             // Tick components
             for (const auto& [typeIndex, component] : actor->components) {
                 if (component->IsTickEnabled()) {
@@ -55,22 +55,22 @@ void World::Tick(float deltaTime) {
             }
         }
     }
-    
+
     // Clean up destroyed actors
     CleanupDestroyedActors();
 }
 
 void World::BeginPlay() {
     if (hasBegunPlay) return;
-    
+
     hasBegunPlay = true;
-    
+
     // Begin play for all existing actors
     for (const auto& actor : actors) {
         if (!actor->hasBegunPlay) {
             actor->BeginPlay();
             actor->hasBegunPlay = true;
-            
+
             // Begin play for components
             for (const auto& [typeIndex, component] : actor->components) {
                 component->BeginPlay();
@@ -81,7 +81,7 @@ void World::BeginPlay() {
 
 void World::EndPlay() {
     if (!hasBegunPlay) return;
-    
+
     // End play for all actors
     for (const auto& actor : actors) {
         if (actor->hasBegunPlay) {
@@ -89,12 +89,12 @@ void World::EndPlay() {
             for (const auto& [typeIndex, component] : actor->components) {
                 component->EndPlay();
             }
-            
+
             actor->EndPlay();
             actor->hasBegunPlay = false;
         }
     }
-    
+
     hasBegunPlay = false;
 }
 
@@ -121,32 +121,32 @@ bool World::LoadWorld(const std::string& filePath) {
 
 void World::CleanupDestroyedActors() {
     if (pendingDestroyActors.empty()) return;
-    
+
     for (Actor* actor : pendingDestroyActors) {
         // Call destroyed event
         actor->Destroyed();
-        
+
         // Remove from maps and vectors
         UnregisterActor(actor->GetActorID());
-        
+
         // Remove from actors vector
-        auto it = std::find_if(actors.begin(), actors.end(), 
+        auto it = std::find_if(actors.begin(), actors.end(),
             [actor](const std::unique_ptr<Actor>& ptr) {
                 return ptr.get() == actor;
             });
-        
+
         if (it != actors.end()) {
             actors.erase(it);
         }
     }
-    
+
     pendingDestroyActors.clear();
 }
 
 void World::RegisterActor(std::unique_ptr<Actor> actor) {
     ActorID id = actor->GetActorID();
     Actor* ptr = actor.get();
-    
+
     actorMap[id] = ptr;
     actors.push_back(std::move(actor));
 }
