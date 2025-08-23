@@ -10,4 +10,8 @@ namespace TinyImGui {
     void Shutdown();
     void NewFrame();
     void RenderDrawData(ImDrawData* draw_data);
+
+    // DPI handling functions
+    void RefreshDPIScale();
+    float GetContentScale();
 }

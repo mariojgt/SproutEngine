@@ -20,9 +20,12 @@ UnrealEditor::~UnrealEditor() {
 bool UnrealEditor::Init(GLFWwindow* window) {
     editorWindow = window;
 
-    // Don't create ImGui context - TinyImGui already did that
+    // Don't create ImGui context - main.cpp already did that
     // Just store that we don't own the backends
     ownsImGuiBackends = false;
+
+    // Apply modern theme
+    ModernTheme::ApplyDarkTheme();
 
     // Initialize console with welcome message
     AddLog("=== SproutEngine Unreal-like Editor Started ===", "System");
@@ -57,8 +60,7 @@ void UnrealEditor::Update(float deltaTime) {
 }
 
 void UnrealEditor::Render(entt::registry& registry, Renderer& renderer, Scripting& scripting, bool& playMode) {
-    // Start the Dear ImGui frame using TinyImGui
-    TinyImGui::NewFrame();
+    // ImGui frame is started in main.cpp - we just draw our UI here
 
     // Draw main menu bar
     DrawMainMenuBar(registry, scripting, playMode);
@@ -80,116 +82,149 @@ void UnrealEditor::Render(entt::registry& registry, Renderer& renderer, Scriptin
     if (showDemoWindow) ImGui::ShowDemoWindow(&showDemoWindow);
     if (showMetrics) ImGui::ShowMetricsWindow(&showMetrics);
 
-    // Render using TinyImGui
-    ImGui::Render();
-    TinyImGui::RenderDrawData(ImGui::GetDrawData());
+    // Rendering is done in main.cpp
 }
 
 void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scripting, bool& playMode) {
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
+    if (ModernTheme::BeginModernMenuBar()) {
+        // File Menu
+        if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::File) + " File").c_str())) {
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Add) + " New Scene").c_str(), "Ctrl+N")) {
                 NewScene(registry);
             }
-            if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Open) + " Open Scene").c_str(), "Ctrl+O")) {
                 AddLog("Open Scene - File dialog not implemented yet", "Warning");
             }
-            if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Save) + " Save Scene").c_str(), "Ctrl+S")) {
                 SaveScene(registry, "assets/scenes/current_scene.json");
             }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Import Asset")) {
+            ModernTheme::ModernSeparator();
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Open) + " Import Asset").c_str())) {
                 AddLog("Import Asset - File dialog not implemented yet", "Warning");
             }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Exit", "Alt+F4")) {
+            ModernTheme::ModernSeparator();
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Close) + " Exit").c_str(), "Alt+F4")) {
                 glfwSetWindowShouldClose(editorWindow, GLFW_TRUE);
             }
-            ImGui::EndMenu();
+            ModernTheme::EndModernMenu();
         }
 
-        if (ImGui::BeginMenu("Edit")) {
-            if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
+        // Edit Menu
+        if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Edit) + " Edit").c_str())) {
+            if (ModernTheme::ModernMenuItem("↶ Undo", "Ctrl+Z")) {
                 AddLog("Undo - Not implemented yet", "Warning");
             }
-            if (ImGui::MenuItem("Redo", "Ctrl+Y")) {
+            if (ModernTheme::ModernMenuItem("↷ Redo", "Ctrl+Y")) {
                 AddLog("Redo - Not implemented yet", "Warning");
             }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Delete", "Del")) {
+            ModernTheme::ModernSeparator();
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Delete) + " Delete").c_str(), "Del")) {
                 if (selectedEntity != entt::null && IsEntityValid(registry, selectedEntity)) {
                     DeleteEntity(registry, selectedEntity);
                     selectedEntity = entt::null;
                 }
             }
-            if (ImGui::MenuItem("Duplicate", "Ctrl+D")) {
+            if (ModernTheme::ModernMenuItem("🔄 Duplicate", "Ctrl+D")) {
                 if (selectedEntity != entt::null && IsEntityValid(registry, selectedEntity)) {
                     DuplicateEntity(registry, selectedEntity);
                 }
             }
-            ImGui::EndMenu();
+            ModernTheme::EndModernMenu();
         }
 
-        if (ImGui::BeginMenu("View")) {
-            ImGui::MenuItem("Viewport", nullptr, &showViewport);
-            ImGui::MenuItem("Content Browser", nullptr, &showContentBrowser);
-            ImGui::MenuItem("World Outliner", nullptr, &showWorldOutliner);
-            ImGui::MenuItem("Inspector", nullptr, &showInspector);
-            ImGui::MenuItem("Blueprint Graph", nullptr, &showBlueprintGraph);
-            ImGui::MenuItem("Console", nullptr, &showConsole);
-            ImGui::MenuItem("Material Editor", nullptr, &showMaterialEditor);
-            ImGui::MenuItem("Roadmap", nullptr, &showRoadmap);
-            ImGui::Separator();
-            ImGui::MenuItem("Demo Window", nullptr, &showDemoWindow);
-            ImGui::MenuItem("Metrics", nullptr, &showMetrics);
-            ImGui::EndMenu();
+        // View Menu
+        if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Settings) + " View").c_str())) {
+            ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::World) + " Viewport").c_str(), nullptr, showViewport);
+            if (ImGui::IsItemClicked()) showViewport = !showViewport;
+
+            ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::File) + " Content Browser").c_str(), nullptr, showContentBrowser);
+            if (ImGui::IsItemClicked()) showContentBrowser = !showContentBrowser;
+
+            ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::World) + " World Outliner").c_str(), nullptr, showWorldOutliner);
+            if (ImGui::IsItemClicked()) showWorldOutliner = !showWorldOutliner;
+
+            ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Settings) + " Inspector").c_str(), nullptr, showInspector);
+            if (ImGui::IsItemClicked()) showInspector = !showInspector;
+
+            ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Blueprint) + " Blueprint Editor").c_str(), nullptr, showBlueprintGraph);
+            if (ImGui::IsItemClicked()) showBlueprintGraph = !showBlueprintGraph;
+
+            ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Console) + " Console").c_str(), nullptr, showConsole);
+            if (ImGui::IsItemClicked()) showConsole = !showConsole;
+
+            ModernTheme::ModernSeparator();
+            ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Info) + " Demo Window").c_str(), nullptr, showDemoWindow);
+            if (ImGui::IsItemClicked()) showDemoWindow = !showDemoWindow;
+
+            ModernTheme::EndModernMenu();
         }
 
-        if (ImGui::BeginMenu("Create")) {
-            if (ImGui::MenuItem("Empty Entity")) {
+        // Create Menu
+        if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Add) + " Create").c_str())) {
+            if (ModernTheme::ModernMenuItem("🎯 Empty Entity")) {
                 entt::entity entity = CreateEntity(registry, "Empty Entity");
                 selectedEntity = entity;
                 AddLog("Created new empty entity", "Info");
             }
-            if (ImGui::MenuItem("Cube")) {
+            if (ModernTheme::ModernMenuItem("📦 Cube")) {
                 entt::entity entity = CreateEntity(registry, "Cube");
                 registry.emplace<MeshCube>(entity);
                 selectedEntity = entity;
                 AddLog("Created cube entity", "Info");
             }
-            if (ImGui::MenuItem("HUD")) {
+            if (ModernTheme::ModernMenuItem("🖥️ HUD")) {
                 entt::entity entity = CreateEntity(registry, "HUD");
                 registry.emplace<HUDComponent>(entity, HUDComponent{85.0f, 60.0f, 420, "New HUD"});
                 selectedEntity = entity;
                 AddLog("Created HUD entity", "Info");
             }
-            ImGui::EndMenu();
+            ModernTheme::EndModernMenu();
         }
 
-        if (ImGui::BeginMenu("Tools")) {
-            if (ImGui::MenuItem("Reload Scripts", "F5")) {
+        // Tools Menu
+        if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Settings) + " Tools").c_str())) {
+            if (ModernTheme::ModernMenuItem("🔄 Reload Scripts", "F5")) {
                 AddLog("Reloaded all scripts", "Info");
             }
-            if (ImGui::MenuItem("Build Lighting")) {
+            if (ModernTheme::ModernMenuItem("💡 Build Lighting")) {
                 AddLog("Build Lighting - Not implemented yet", "Warning");
             }
-            if (ImGui::MenuItem("Generate Navmesh")) {
+            if (ModernTheme::ModernMenuItem("🗺️ Generate Navmesh")) {
                 AddLog("Generate Navmesh - Not implemented yet", "Warning");
             }
-            ImGui::EndMenu();
+            ModernTheme::EndModernMenu();
         }
 
-        if (ImGui::BeginMenu("Help")) {
-            if (ImGui::MenuItem("About SproutEngine")) {
-                AddLog("SproutEngine v1.0 - Unreal-like Game Engine", "Info");
+        // Help Menu
+        if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Info) + " Help").c_str())) {
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Info) + " About SproutEngine").c_str())) {
+                AddLog("SproutEngine v1.0 - Modern Game Engine", "Info");
             }
-            if (ImGui::MenuItem("Documentation")) {
+            if (ModernTheme::ModernMenuItem("📚 Documentation")) {
                 AddLog("Documentation - Opening external link", "Info");
             }
-            ImGui::EndMenu();
+            ModernTheme::EndModernMenu();
         }
 
-        ImGui::EndMainMenuBar();
+        // Right side - Play controls
+        float menuBarHeight = ImGui::GetFrameHeight();
+        ImVec2 windowSize = ImGui::GetWindowSize();
+        ImGui::SetCursorPosX(windowSize.x - 200);
+
+        // Play/Pause button
+        if (playMode) {
+            if (ModernTheme::ModernButton((std::string(ModernTheme::Icons::Pause) + " Pause").c_str(), ImVec2(80, 0), ModernTheme::Colors::Orange600)) {
+                playMode = false;
+                AddLog("Game paused", "Info");
+            }
+        } else {
+            if (ModernTheme::ModernButton((std::string(ModernTheme::Icons::Play) + " Play").c_str(), ImVec2(80, 0), ModernTheme::Colors::Green600)) {
+                playMode = true;
+                AddLog("Game started", "Info");
+            }
+        }
+
+        ModernTheme::EndModernMenuBar();
     }
 }
 

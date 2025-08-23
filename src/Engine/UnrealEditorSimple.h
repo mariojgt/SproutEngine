@@ -8,6 +8,7 @@
 #include <memory>
 #include <functional>
 #include "TinyImGui.h"
+#include "ModernTheme.h"
 
 class Renderer;
 class Scripting;

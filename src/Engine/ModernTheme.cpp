@@ -1,6 +1,7 @@
 #include "ModernTheme.h"
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <algorithm>
 
 namespace ModernTheme {
 
@@ -63,42 +64,45 @@ void ApplyDarkTheme() {
     colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
-    // Modern styling
-    style.WindowPadding     = ImVec2(12, 12);
-    style.FramePadding      = ImVec2(8, 6);
-    style.CellPadding       = ImVec2(6, 3);
-    style.ItemSpacing       = ImVec2(8, 4);
-    style.ItemInnerSpacing  = ImVec2(4, 4);
+    // Reasonable scaling for 4K displays
+    float scale = 1.3f; // Much more moderate scaling
+
+    // Properly sized UI elements for 4K visibility
+    style.WindowPadding     = ImVec2(12 * scale, 12 * scale);
+    style.FramePadding      = ImVec2(8 * scale, 6 * scale);
+    style.CellPadding       = ImVec2(6 * scale, 4 * scale);
+    style.ItemSpacing       = ImVec2(8 * scale, 4 * scale);
+    style.ItemInnerSpacing  = ImVec2(4 * scale, 4 * scale);
     style.TouchExtraPadding = ImVec2(0, 0);
-    style.IndentSpacing     = 21;
-    style.ScrollbarSize     = 14;
-    style.GrabMinSize       = 10;
+    style.IndentSpacing     = 21 * scale;
+    style.ScrollbarSize     = 14 * scale;
+    style.GrabMinSize       = 10 * scale;
 
-    // Rounded corners for modern look
-    style.WindowRounding    = 8.0f;
-    style.ChildRounding     = 6.0f;
-    style.FrameRounding     = 6.0f;
-    style.PopupRounding     = 6.0f;
-    style.ScrollbarRounding = 9.0f;
-    style.GrabRounding      = 6.0f;
-    style.LogSliderDeadzone = 4.0f;
-    style.TabRounding       = 6.0f;
+    // Moderate rounded corners
+    style.WindowRounding    = 8.0f * scale;
+    style.ChildRounding     = 6.0f * scale;
+    style.FrameRounding     = 6.0f * scale;
+    style.PopupRounding     = 6.0f * scale;
+    style.ScrollbarRounding = 9.0f * scale;
+    style.GrabRounding      = 6.0f * scale;
+    style.LogSliderDeadzone = 4.0f * scale;
+    style.TabRounding       = 6.0f * scale;
 
-    // Borders
-    style.WindowBorderSize  = 1.0f;
-    style.ChildBorderSize   = 1.0f;
-    style.PopupBorderSize   = 1.0f;
+    // Normal borders
+    style.WindowBorderSize  = 1.0f * scale;
+    style.ChildBorderSize   = 1.0f * scale;
+    style.PopupBorderSize   = 1.0f * scale;
     style.FrameBorderSize   = 0.0f;
     style.TabBorderSize     = 0.0f;
 
-    // Shadow and transparency
+    // Other settings
     style.WindowMenuButtonPosition = ImGuiDir_Left;
     style.ColorButtonPosition = ImGuiDir_Right;
     style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
     style.SelectableTextAlign = ImVec2(0.0f, 0.0f);
-    style.SeparatorTextBorderSize = 3.0f;
+    style.SeparatorTextBorderSize = 3.0f * scale;
     style.SeparatorTextAlign = ImVec2(0.0f, 0.5f);
-    style.SeparatorTextPadding = ImVec2(20.0f, 3.0f);
+    style.SeparatorTextPadding = ImVec2(20.0f * scale, 3.0f * scale);
 }
 
 bool ModernButton(const char* label, ImVec2 size, ImU32 color) {
@@ -115,9 +119,9 @@ bool ModernButton(const char* label, ImVec2 size, ImU32 color) {
         std::max(0, (int)((color >> IM_COL32_B_SHIFT) & 0xFF) - 20),
         ((color >> IM_COL32_A_SHIFT) & 0xFF)
     ));
-    
+
     bool clicked = ImGui::Button(label, size);
-    
+
     ImGui::PopStyleColor(3);
     return clicked;
 }
@@ -136,10 +140,10 @@ bool ModernButtonSecondary(const char* label, ImVec2 size) {
 
 bool ModernMenuItem(const char* label, const char* shortcut, bool selected) {
     ImGui::PushStyleColor(ImGuiCol_HeaderHovered, Colors::Blue600);
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 6));
-    
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 6)); // Normal spacing
+
     bool clicked = ImGui::MenuItem(label, shortcut, selected);
-    
+
     ImGui::PopStyleVar();
     ImGui::PopStyleColor();
     return clicked;
@@ -149,13 +153,13 @@ bool ModernSelectable(const char* label, bool selected, ImGuiSelectableFlags fla
     if (selected) {
         ImGui::PushStyleColor(ImGuiCol_Header, Colors::Blue600);
     }
-    
+
     bool clicked = ImGui::Selectable(label, selected, flags, size);
-    
+
     if (selected) {
         ImGui::PopStyleColor();
     }
-    
+
     return clicked;
 }
 
@@ -172,7 +176,7 @@ void ModernSpacing(float height) {
 bool BeginModernWindow(const char* name, bool* p_open, ImGuiWindowFlags flags) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16, 16));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 12.0f);
-    
+
     return ImGui::Begin(name, p_open, flags);
 }
 
@@ -182,9 +186,16 @@ void EndModernWindow() {
 }
 
 bool BeginModernMenuBar() {
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8, 8));
+    // Reasonable frame padding for 4K displays
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 8)); // Moderate padding
     ImGui::PushStyleColor(ImGuiCol_MenuBarBg, Colors::Gray950);
-    return ImGui::BeginMainMenuBar();
+    bool result = ImGui::BeginMainMenuBar();
+    if (!result) {
+        // If BeginMainMenuBar failed, we need to pop the styles we pushed
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+    }
+    return result;
 }
 
 void EndModernMenuBar() {
@@ -195,10 +206,16 @@ void EndModernMenuBar() {
 
 bool BeginModernMenu(const char* label) {
     ImGui::PushStyleColor(ImGuiCol_PopupBg, Colors::Gray800);
-    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 8.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 6));
-    
-    return ImGui::BeginMenu(label);
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 8.0f); // Normal rounding
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 6)); // Normal spacing
+
+    bool result = ImGui::BeginMenu(label);
+    if (!result) {
+        // If BeginMenu failed, we need to pop the styles we pushed
+        ImGui::PopStyleVar(2);
+        ImGui::PopStyleColor();
+    }
+    return result;
 }
 
 void EndModernMenu() {
