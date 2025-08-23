@@ -42,15 +42,6 @@ set(ENGINE_SOURCES
     src/Engine/VSGraph.h
     src/Engine/UnrealEditorSimple.cpp
     src/Engine/UnrealEditorSimple.h
-    # Advanced editing systems
-    src/Engine/ScriptEditor.cpp
-    src/Engine/ScriptEditor.h
-    src/Engine/BlueprintEditor.cpp
-    src/Engine/BlueprintEditor.h
-    src/Engine/SceneManipulator.cpp
-    src/Engine/SceneManipulator.h
-    src/Engine/DockingManager.cpp
-    src/Engine/DockingManager.h
     # New Actor system files (temporarily disabled until compilation issues are resolved)
     # src/Engine/Actor.cpp
     # src/Engine/Actor.h

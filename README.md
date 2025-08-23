@@ -1,30 +1,7 @@
 # SproutEngine (C++ mini “Unreal-like” starter)
 
 This repo gives you:
-- Window + ## Roadmap (towards Unreal-like workflow)
-
-### ✅ Blueprint-like visual scripting (COMPLETED!)
-- **Interactive node-based editor** similar to Unreal Engine's Blueprint system
-- **Drag-to-connect functionality**: Drag from output pins to input pins to create connections
-- **Professional node types**: Events (red), Actions (green), Math (blue), Components (yellow)
-- **Node manipulation**: Left-click to select, drag to move, Delete key to remove nodes
-- **Real-time execution**: "Run Blueprint" button to test blueprint logic flow
-- **C++ code generation**: Blueprints compile to efficient C++ code
-- **Script Editor (.sp)**: Text-based scripting with syntax highlighting and C++ compilation
-- **Dual workflow**: Both visual blueprints (.bp) and text scripts (.sp) compile to same C++ output
-
-### Scenes
-- JSON save/load of entity registry to `assets/scenes/*.json`.
-- Menu entries: **File → New / Open / Save**.
-
-### Drag-and-drop assets
-- Drop models (`.gltf/.glb`) from Finder/Explorer into viewport to spawn entities.
-- Planned: tinygltf integration in `vcpkg.json`.
-
-### HUD / Widgets
-- UI canvas rendered after 3D pass.
-- Widgets: Button, Text, ProgressBar.
-- Exposed to Lua (`UI:Find("WidgetName")`).enGL + GLAD)
+- Window + renderer (GLFW + OpenGL + GLAD)
 - ECS with EnTT
 - Editor UI with Dear ImGui (docking-ready structure)
 - Visual graph stub (imnodes) for future “Blueprint”-style logic
@@ -100,21 +77,6 @@ After build, run the produced binary. A window opens with a spinning cube.
 - In **Inspector**, edit Transform, add the `Script` component, or change the script path.
 - Modify `assets/scripts/Rotate.lua` while the app runs — it hot-reloads on save.
 
-### 🎨 Blueprint Editor Usage
-1. **Open**: Go to `View → Blueprint Editor`
-2. **Add Nodes**: Use the Node Library on the left - Events (red), Actions (green), Math (blue), Components (yellow)
-3. **Connect Nodes**: **Drag from output pins** (right side) to **input pins** (left side) - like Unreal Engine!
-4. **Move Nodes**: Left-click and drag nodes to reposition them
-5. **Select & Delete**: Left-click to select nodes, press **Delete** key to remove them
-6. **Test Blueprint**: Click **"Run Blueprint"** to execute and see results in Console
-7. **Generate C++**: Click **"Compile to C++"** to see generated C++ code
-
-### 📝 Script Editor Usage
-1. **Open**: Go to `View → Script Editor`
-2. **Write Code**: Create .sp scripts with C++-like syntax
-3. **Live Preview**: See generated C++ code in real-time
-4. **Compile**: Both .sp scripts and .bp blueprints compile to the same efficient C++ output
-
 ---
 
 ## Roadmap (towards Unreal-like workflow)
@@ -140,8 +102,7 @@ After build, run the produced binary. A window opens with a spinning cube.
 ---
 
 ## Notes
-- ✅ **Visual scripting system COMPLETE**: Full Blueprint Editor with drag-to-connect, node deletion, and C++ compilation
-- ✅ **Script Editor COMPLETE**: Text-based .sp scripting with syntax highlighting and C++ generation
+- The visual scripting panel is currently a **stub**.
 - Renderer is intentionally minimal (OpenGL 3.3). Swap to bgfx/Vulkan later.
 - Asset import is not included yet (meshes are cubes). Add tinygltf + PBR next.
 
