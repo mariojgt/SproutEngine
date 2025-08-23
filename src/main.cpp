@@ -17,6 +17,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 
 static glm::mat4 ComposeTRS(const Transform& t){
     glm::mat4 M(1.0f);
@@ -33,9 +34,31 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "SproutEngine - Game Engine Foundation", nullptr, nullptr);
+    // Get monitor resolution for adaptive sizing
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+    // Use 80% of screen size but ensure minimum editor-friendly dimensions
+    int windowWidth = std::max(1600, (int)(mode->width * 0.8));
+    int windowHeight = std::max(1000, (int)(mode->height * 0.8));
+
+    // Cap maximum size for very large monitors
+    windowWidth = std::min(windowWidth, 2560);
+    windowHeight = std::min(windowHeight, 1600);
+
+    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "SproutEngine - Game Engine Foundation", nullptr, nullptr);
     if(!window){ std::cerr<<"Failed to create window\n"; glfwTerminate(); return -1; }
+
+    // Center the window on the primary monitor
+    if (monitor && mode) {
+        glfwSetWindowPos(window,
+            (mode->width - windowWidth) / 2,
+            (mode->height - windowHeight) / 2);
+    }
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 

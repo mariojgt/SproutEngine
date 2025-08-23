@@ -54,8 +54,11 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "SproutEngine - Unreal-like Game Engine", nullptr, nullptr);
+    // Much larger window for better editor experience - 1920x1200 (good for editor layouts)
+    GLFWwindow* window = glfwCreateWindow(1920, 1200, "SproutEngine - Unreal-like Game Engine", nullptr, nullptr);
     if(!window){ std::cerr<<"Failed to create window\n"; glfwTerminate(); return -1; }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);

@@ -14,6 +14,163 @@ namespace {
     const char* GetClipboardText(void*) { return glfwGetClipboardString(g_Window); }
     void SetClipboardText(void*, const char* text) { glfwSetClipboardString(g_Window, text); }
 
+    // Event-based input callbacks for better responsiveness
+    void MouseButtonCallback(GLFWwindow*, int button, int action, int) {
+        ImGuiIO& io = ImGui::GetIO();
+        if (button >= 0 && button < ImGuiMouseButton_COUNT) {
+            io.AddMouseButtonEvent(button, action == GLFW_PRESS);
+        }
+    }
+
+    void ScrollCallback(GLFWwindow*, double, double yoffset) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseWheelEvent(0.0f, (float)yoffset);
+    }
+
+    void KeyCallback(GLFWwindow*, int key, int, int action, int mods) {
+        ImGuiIO& io = ImGui::GetIO();
+        
+        if (action != GLFW_PRESS && action != GLFW_RELEASE) return;
+        
+        // Handle modifier keys
+        io.AddKeyEvent(ImGuiMod_Ctrl, (mods & GLFW_MOD_CONTROL) != 0);
+        io.AddKeyEvent(ImGuiMod_Shift, (mods & GLFW_MOD_SHIFT) != 0);
+        io.AddKeyEvent(ImGuiMod_Alt, (mods & GLFW_MOD_ALT) != 0);
+        io.AddKeyEvent(ImGuiMod_Super, (mods & GLFW_MOD_SUPER) != 0);
+        
+        // Convert GLFW key to ImGui key
+        ImGuiKey imgui_key = ImGuiKey_None;
+        switch (key) {
+            case GLFW_KEY_TAB: imgui_key = ImGuiKey_Tab; break;
+            case GLFW_KEY_LEFT: imgui_key = ImGuiKey_LeftArrow; break;
+            case GLFW_KEY_RIGHT: imgui_key = ImGuiKey_RightArrow; break;
+            case GLFW_KEY_UP: imgui_key = ImGuiKey_UpArrow; break;
+            case GLFW_KEY_DOWN: imgui_key = ImGuiKey_DownArrow; break;
+            case GLFW_KEY_PAGE_UP: imgui_key = ImGuiKey_PageUp; break;
+            case GLFW_KEY_PAGE_DOWN: imgui_key = ImGuiKey_PageDown; break;
+            case GLFW_KEY_HOME: imgui_key = ImGuiKey_Home; break;
+            case GLFW_KEY_END: imgui_key = ImGuiKey_End; break;
+            case GLFW_KEY_INSERT: imgui_key = ImGuiKey_Insert; break;
+            case GLFW_KEY_DELETE: imgui_key = ImGuiKey_Delete; break;
+            case GLFW_KEY_BACKSPACE: imgui_key = ImGuiKey_Backspace; break;
+            case GLFW_KEY_SPACE: imgui_key = ImGuiKey_Space; break;
+            case GLFW_KEY_ENTER: imgui_key = ImGuiKey_Enter; break;
+            case GLFW_KEY_ESCAPE: imgui_key = ImGuiKey_Escape; break;
+            case GLFW_KEY_APOSTROPHE: imgui_key = ImGuiKey_Apostrophe; break;
+            case GLFW_KEY_COMMA: imgui_key = ImGuiKey_Comma; break;
+            case GLFW_KEY_MINUS: imgui_key = ImGuiKey_Minus; break;
+            case GLFW_KEY_PERIOD: imgui_key = ImGuiKey_Period; break;
+            case GLFW_KEY_SLASH: imgui_key = ImGuiKey_Slash; break;
+            case GLFW_KEY_SEMICOLON: imgui_key = ImGuiKey_Semicolon; break;
+            case GLFW_KEY_EQUAL: imgui_key = ImGuiKey_Equal; break;
+            case GLFW_KEY_LEFT_BRACKET: imgui_key = ImGuiKey_LeftBracket; break;
+            case GLFW_KEY_BACKSLASH: imgui_key = ImGuiKey_Backslash; break;
+            case GLFW_KEY_RIGHT_BRACKET: imgui_key = ImGuiKey_RightBracket; break;
+            case GLFW_KEY_GRAVE_ACCENT: imgui_key = ImGuiKey_GraveAccent; break;
+            case GLFW_KEY_CAPS_LOCK: imgui_key = ImGuiKey_CapsLock; break;
+            case GLFW_KEY_SCROLL_LOCK: imgui_key = ImGuiKey_ScrollLock; break;
+            case GLFW_KEY_NUM_LOCK: imgui_key = ImGuiKey_NumLock; break;
+            case GLFW_KEY_PRINT_SCREEN: imgui_key = ImGuiKey_PrintScreen; break;
+            case GLFW_KEY_PAUSE: imgui_key = ImGuiKey_Pause; break;
+            case GLFW_KEY_KP_0: imgui_key = ImGuiKey_Keypad0; break;
+            case GLFW_KEY_KP_1: imgui_key = ImGuiKey_Keypad1; break;
+            case GLFW_KEY_KP_2: imgui_key = ImGuiKey_Keypad2; break;
+            case GLFW_KEY_KP_3: imgui_key = ImGuiKey_Keypad3; break;
+            case GLFW_KEY_KP_4: imgui_key = ImGuiKey_Keypad4; break;
+            case GLFW_KEY_KP_5: imgui_key = ImGuiKey_Keypad5; break;
+            case GLFW_KEY_KP_6: imgui_key = ImGuiKey_Keypad6; break;
+            case GLFW_KEY_KP_7: imgui_key = ImGuiKey_Keypad7; break;
+            case GLFW_KEY_KP_8: imgui_key = ImGuiKey_Keypad8; break;
+            case GLFW_KEY_KP_9: imgui_key = ImGuiKey_Keypad9; break;
+            case GLFW_KEY_KP_DECIMAL: imgui_key = ImGuiKey_KeypadDecimal; break;
+            case GLFW_KEY_KP_DIVIDE: imgui_key = ImGuiKey_KeypadDivide; break;
+            case GLFW_KEY_KP_MULTIPLY: imgui_key = ImGuiKey_KeypadMultiply; break;
+            case GLFW_KEY_KP_SUBTRACT: imgui_key = ImGuiKey_KeypadSubtract; break;
+            case GLFW_KEY_KP_ADD: imgui_key = ImGuiKey_KeypadAdd; break;
+            case GLFW_KEY_KP_ENTER: imgui_key = ImGuiKey_KeypadEnter; break;
+            case GLFW_KEY_KP_EQUAL: imgui_key = ImGuiKey_KeypadEqual; break;
+            case GLFW_KEY_LEFT_SHIFT: imgui_key = ImGuiKey_LeftShift; break;
+            case GLFW_KEY_LEFT_CONTROL: imgui_key = ImGuiKey_LeftCtrl; break;
+            case GLFW_KEY_LEFT_ALT: imgui_key = ImGuiKey_LeftAlt; break;
+            case GLFW_KEY_LEFT_SUPER: imgui_key = ImGuiKey_LeftSuper; break;
+            case GLFW_KEY_RIGHT_SHIFT: imgui_key = ImGuiKey_RightShift; break;
+            case GLFW_KEY_RIGHT_CONTROL: imgui_key = ImGuiKey_RightCtrl; break;
+            case GLFW_KEY_RIGHT_ALT: imgui_key = ImGuiKey_RightAlt; break;
+            case GLFW_KEY_RIGHT_SUPER: imgui_key = ImGuiKey_RightSuper; break;
+            case GLFW_KEY_MENU: imgui_key = ImGuiKey_Menu; break;
+            case GLFW_KEY_0: imgui_key = ImGuiKey_0; break;
+            case GLFW_KEY_1: imgui_key = ImGuiKey_1; break;
+            case GLFW_KEY_2: imgui_key = ImGuiKey_2; break;
+            case GLFW_KEY_3: imgui_key = ImGuiKey_3; break;
+            case GLFW_KEY_4: imgui_key = ImGuiKey_4; break;
+            case GLFW_KEY_5: imgui_key = ImGuiKey_5; break;
+            case GLFW_KEY_6: imgui_key = ImGuiKey_6; break;
+            case GLFW_KEY_7: imgui_key = ImGuiKey_7; break;
+            case GLFW_KEY_8: imgui_key = ImGuiKey_8; break;
+            case GLFW_KEY_9: imgui_key = ImGuiKey_9; break;
+            case GLFW_KEY_A: imgui_key = ImGuiKey_A; break;
+            case GLFW_KEY_B: imgui_key = ImGuiKey_B; break;
+            case GLFW_KEY_C: imgui_key = ImGuiKey_C; break;
+            case GLFW_KEY_D: imgui_key = ImGuiKey_D; break;
+            case GLFW_KEY_E: imgui_key = ImGuiKey_E; break;
+            case GLFW_KEY_F: imgui_key = ImGuiKey_F; break;
+            case GLFW_KEY_G: imgui_key = ImGuiKey_G; break;
+            case GLFW_KEY_H: imgui_key = ImGuiKey_H; break;
+            case GLFW_KEY_I: imgui_key = ImGuiKey_I; break;
+            case GLFW_KEY_J: imgui_key = ImGuiKey_J; break;
+            case GLFW_KEY_K: imgui_key = ImGuiKey_K; break;
+            case GLFW_KEY_L: imgui_key = ImGuiKey_L; break;
+            case GLFW_KEY_M: imgui_key = ImGuiKey_M; break;
+            case GLFW_KEY_N: imgui_key = ImGuiKey_N; break;
+            case GLFW_KEY_O: imgui_key = ImGuiKey_O; break;
+            case GLFW_KEY_P: imgui_key = ImGuiKey_P; break;
+            case GLFW_KEY_Q: imgui_key = ImGuiKey_Q; break;
+            case GLFW_KEY_R: imgui_key = ImGuiKey_R; break;
+            case GLFW_KEY_S: imgui_key = ImGuiKey_S; break;
+            case GLFW_KEY_T: imgui_key = ImGuiKey_T; break;
+            case GLFW_KEY_U: imgui_key = ImGuiKey_U; break;
+            case GLFW_KEY_V: imgui_key = ImGuiKey_V; break;
+            case GLFW_KEY_W: imgui_key = ImGuiKey_W; break;
+            case GLFW_KEY_X: imgui_key = ImGuiKey_X; break;
+            case GLFW_KEY_Y: imgui_key = ImGuiKey_Y; break;
+            case GLFW_KEY_Z: imgui_key = ImGuiKey_Z; break;
+            case GLFW_KEY_F1: imgui_key = ImGuiKey_F1; break;
+            case GLFW_KEY_F2: imgui_key = ImGuiKey_F2; break;
+            case GLFW_KEY_F3: imgui_key = ImGuiKey_F3; break;
+            case GLFW_KEY_F4: imgui_key = ImGuiKey_F4; break;
+            case GLFW_KEY_F5: imgui_key = ImGuiKey_F5; break;
+            case GLFW_KEY_F6: imgui_key = ImGuiKey_F6; break;
+            case GLFW_KEY_F7: imgui_key = ImGuiKey_F7; break;
+            case GLFW_KEY_F8: imgui_key = ImGuiKey_F8; break;
+            case GLFW_KEY_F9: imgui_key = ImGuiKey_F9; break;
+            case GLFW_KEY_F10: imgui_key = ImGuiKey_F10; break;
+            case GLFW_KEY_F11: imgui_key = ImGuiKey_F11; break;
+            case GLFW_KEY_F12: imgui_key = ImGuiKey_F12; break;
+            default: break;
+        }
+        
+        if (imgui_key != ImGuiKey_None) {
+            io.AddKeyEvent(imgui_key, action == GLFW_PRESS);
+        }
+    }
+
+    void CharCallback(GLFWwindow*, unsigned int c) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddInputCharacter(c);
+    }
+
+    void WindowFocusCallback(GLFWwindow*, int focused) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddFocusEvent(focused != 0);
+    }
+
+    void CursorEnterCallback(GLFWwindow*, int entered) {
+        ImGuiIO& io = ImGui::GetIO();
+        if (!entered) {
+            io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+        }
+    }
+
     void CreateFontsTexture() {
         ImGuiIO& io = ImGui::GetIO();
         unsigned char* pixels; int width, height;
@@ -119,6 +276,12 @@ bool Init(GLFWwindow* window){
     io.DisplaySize = ImVec2((float)w, (float)h);
     if (w > 0 && h > 0) io.DisplayFramebufferScale = ImVec2((float)fbw / w, (float)fbh / h);
 
+    // Register event-based input callbacks for better responsiveness
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetScrollCallback(window, ScrollCallback);
+    glfwSetKeyCallback(window, KeyCallback);
+    glfwSetCharCallback(window, CharCallback);
+
     CreateDeviceObjects();
     return true;
 }
@@ -135,18 +298,15 @@ void NewFrame(){
     io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (1.0f / 60.0f);
     g_Time = current_time;
 
-    // Mouse
+    // Update window size
+    int w, h; glfwGetWindowSize(g_Window, &w, &h);
+    int fbw, fbh; glfwGetFramebufferSize(g_Window, &fbw, &fbh);
+    io.DisplaySize = ImVec2((float)w, (float)h);
+    if (w > 0 && h > 0) io.DisplayFramebufferScale = ImVec2((float)fbw / w, (float)fbh / h);
+
+    // Update mouse position (polling is fine for this)
     double mx, my; glfwGetCursorPos(g_Window, &mx, &my);
     io.AddMousePosEvent((float)mx, (float)my);
-    io.AddMouseButtonEvent(0, glfwGetMouseButton(g_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
-    io.AddMouseButtonEvent(1, glfwGetMouseButton(g_Window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
-    io.AddMouseButtonEvent(2, glfwGetMouseButton(g_Window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS);
-
-    // Modifiers (approx)
-    io.AddKeyEvent(ImGuiMod_Ctrl,  glfwGetKey(g_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(g_Window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS);
-    io.AddKeyEvent(ImGuiMod_Shift, glfwGetKey(g_Window, GLFW_KEY_LEFT_SHIFT)   == GLFW_PRESS || glfwGetKey(g_Window, GLFW_KEY_RIGHT_SHIFT)   == GLFW_PRESS);
-    io.AddKeyEvent(ImGuiMod_Alt,   glfwGetKey(g_Window, GLFW_KEY_LEFT_ALT)     == GLFW_PRESS || glfwGetKey(g_Window, GLFW_KEY_RIGHT_ALT)     == GLFW_PRESS);
-    io.AddKeyEvent(ImGuiMod_Super, glfwGetKey(g_Window, GLFW_KEY_LEFT_SUPER)   == GLFW_PRESS || glfwGetKey(g_Window, GLFW_KEY_RIGHT_SUPER)   == GLFW_PRESS);
 
     ImGui::NewFrame();
 }

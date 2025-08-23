@@ -1,5 +1,6 @@
 #include "UnrealEditorSimple.h"
 #include "Components.h"
+#include "BlueprintEditor.cpp"
 #include "Renderer.h"
 #include "Scripting.h"
 #include <imgui.h>
@@ -18,7 +19,7 @@ UnrealEditor::~UnrealEditor() {
 
 bool UnrealEditor::Init(GLFWwindow* window) {
     editorWindow = window;
-    
+
     // Don't create ImGui context - TinyImGui already did that
     // Just store that we don't own the backends
     ownsImGuiBackends = false;
@@ -632,80 +633,7 @@ void UnrealEditor::DrawInspector(entt::registry& registry, Scripting& scripting)
 // include VSGraph generator
 #include "VSGraph.h"
 
-void UnrealEditor::DrawBlueprintGraph(entt::registry& registry, Scripting& scripting) {
-    if (ImGui::Begin("Blueprint Graph")) {
-        ImGui::Text("🔧 Blueprint Visual Scripting / Code Editor");
-        ImGui::Separator();
-
-#ifdef IMNODES_AVAILABLE
-        ImGui::Text("ImNodes visual editor available (full UI in other editor)");
-#else
-        ImGui::Text("Visual node editor not available. Using code editor as fallback.");
-#endif
-
-        ImGui::Spacing();
-        if (ImGui::Button("Generate Rotate Premade")) {
-            std::string out = VSGraph::Generate("assets", VSGraph::Premade::RotateOnTick);
-            currentBlueprintPath = out;
-            std::ifstream ifs(out);
-            currentBlueprintCode.clear();
-            if (ifs) currentBlueprintCode.assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-            showBlueprintEditor = true;
-            AddLog("Generated premade blueprint: " + out, "Info");
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Generate PrintHello Premade")) {
-            std::string out = VSGraph::Generate("assets", VSGraph::Premade::PrintHelloOnStart);
-            currentBlueprintPath = out;
-            std::ifstream ifs(out);
-            currentBlueprintCode.clear();
-            if (ifs) currentBlueprintCode.assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-            showBlueprintEditor = true;
-            AddLog("Generated premade blueprint: " + out, "Info");
-        }
-
-        ImGui::Spacing();
-        if (showBlueprintEditor) {
-            ImGui::Separator();
-            ImGui::Text("Editing: %s", currentBlueprintPath.c_str());
-
-            // Ensure buffer is large enough for ImGui to edit in-place
-                // prepare char buffer
-                blueprintEditBuffer.assign(currentBlueprintCode.begin(), currentBlueprintCode.end());
-                blueprintEditBuffer.push_back('\0');
-                if (ImGui::InputTextMultiline("##blueprintcode", blueprintEditBuffer.data(), blueprintEditBuffer.size(), ImVec2(-1,300))) {
-                    currentBlueprintCode = std::string(blueprintEditBuffer.data());
-                }
-
-            if (ImGui::Button("Save")) {
-                if (!currentBlueprintPath.empty()) {
-                    std::ofstream ofs(currentBlueprintPath, std::ios::binary);
-                    ofs << currentBlueprintCode;
-                    ofs.close();
-                    AddLog("Saved blueprint: " + currentBlueprintPath, "Info");
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Apply to Selected")) {
-                if (selectedEntity != entt::null && IsEntityValid(registry, selectedEntity)) {
-                    // ensure Script component
-                    if (!registry.any_of<Script>(selectedEntity)) {
-                        registry.emplace<Script>(selectedEntity, currentBlueprintPath, 0.0, false);
-                    } else {
-                        auto& s = registry.get<Script>(selectedEntity);
-                        s.filePath = currentBlueprintPath;
-                    }
-                    scripting.loadScript(registry, selectedEntity, currentBlueprintPath);
-                    AddLog("Applied blueprint/script to entity", "Info");
-                } else {
-                    AddLog("No selected entity to apply to", "Warning");
-                }
-            }
-        }
-    }
-    ImGui::End();
-}
+// DrawBlueprintGraph implementation is now in BlueprintEditor.cpp
 
 void UnrealEditor::DrawConsole(entt::registry& registry, Scripting& scripting) {
     if (ImGui::Begin("Console")) {
