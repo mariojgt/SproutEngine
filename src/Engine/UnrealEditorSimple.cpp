@@ -181,6 +181,87 @@ void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scriptin
             ModernTheme::EndModernMenu();
         }
 
+        // Blueprint Menu
+        if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Blueprint) + " Blueprint").c_str())) {
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Add) + " New Blueprint").c_str(), "Ctrl+B")) {
+                if (selectedEntity != entt::null && IsEntityValid(registry, selectedEntity)) {
+                    if (!registry.any_of<BlueprintComponent>(selectedEntity)) {
+                        // Create new blueprint for selected entity
+                        std::string out = "assets/scripts/generated/blueprint_" + std::to_string((uint32_t)selectedEntity) + ".lua";
+                        std::ofstream ofs(out);
+                        if (ofs.is_open()) {
+                            ofs << "function OnStart(id)\n  -- Blueprint start\nend\n\nfunction OnTick(id, dt)\n  -- Blueprint tick\nend\n";
+                            ofs.close();
+                        }
+                        registry.emplace<BlueprintComponent>(selectedEntity, BlueprintComponent{out});
+                        currentBlueprintPath = out;
+                        
+                        currentBlueprintCode.clear();
+                        std::ifstream ifs(out);
+                        if (ifs.is_open()) {
+                            std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+                            currentBlueprintCode = content;
+                            ifs.close();
+                        }
+                        showBlueprintGraph = true;
+                        showBlueprintEditor = true;
+                        AddLog("Created new blueprint: " + out, "Info");
+                    } else {
+                        AddLog("Entity already has a blueprint component", "Warning");
+                    }
+                } else {
+                    AddLog("Please select an entity first to create a blueprint", "Warning");
+                }
+            }
+            
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Open) + " Open Blueprint").c_str(), "Ctrl+Shift+B")) {
+                if (selectedEntity != entt::null && IsEntityValid(registry, selectedEntity)) {
+                    if (registry.any_of<BlueprintComponent>(selectedEntity)) {
+                        // Open existing blueprint
+                        auto& blueprint = registry.get<BlueprintComponent>(selectedEntity);
+                        currentBlueprintPath = blueprint.filePath;
+                        
+                        currentBlueprintCode.clear();
+                        std::ifstream ifs(blueprint.filePath);
+                        if (ifs.is_open()) {
+                            std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+                            currentBlueprintCode = content;
+                            ifs.close();
+                        }
+                        showBlueprintGraph = true;
+                        showBlueprintEditor = true;
+                        AddLog("Opened blueprint: " + blueprint.filePath, "Info");
+                    } else {
+                        AddLog("Selected entity has no blueprint component", "Warning");
+                    }
+                } else {
+                    AddLog("Please select an entity with a blueprint", "Warning");
+                }
+            }
+
+            ModernTheme::ModernSeparator();
+            
+            if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Blueprint) + " Show Blueprint Editor").c_str(), "F4")) {
+                showBlueprintGraph = !showBlueprintGraph;
+                showBlueprintEditor = showBlueprintGraph;
+                AddLog(showBlueprintGraph ? "Opened Blueprint Editor" : "Closed Blueprint Editor", "Info");
+            }
+            
+            if (ModernTheme::ModernMenuItem("🔄 Reload All Blueprints")) {
+                // Reload all blueprint components
+                auto view = registry.view<BlueprintComponent>();
+                int reloadedCount = 0;
+                for (auto entity : view) {
+                    auto& blueprint = view.get<BlueprintComponent>(entity);
+                    scripting.loadScript(registry, entity, blueprint.filePath);
+                    reloadedCount++;
+                }
+                AddLog("Reloaded " + std::to_string(reloadedCount) + " blueprints", "Info");
+            }
+            
+            ModernTheme::EndModernMenu();
+        }
+
         // Tools Menu
         if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Settings) + " Tools").c_str())) {
             if (ModernTheme::ModernMenuItem("🔄 Reload Scripts", "F5")) {
