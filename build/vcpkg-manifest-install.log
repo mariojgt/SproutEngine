@@ -1,6 +1,6 @@
 Detecting compiler hash for triplet arm64-osx...
 Compiler found: /usr/bin/c++
-The following packages will be built and installed:
+The following packages are already installed:
   * egl-registry:arm64-osx@2024-01-25
     entt:arm64-osx@3.15.0
     glad[core,loader]:arm64-osx@0.1.36
@@ -12,46 +12,6 @@ The following packages will be built and installed:
     sol2:arm64-osx@3.5.0
   * vcpkg-cmake:arm64-osx@2024-04-23
   * vcpkg-cmake-config:arm64-osx@2024-05-23
-Additional packages (*) will be modified to complete this operation.
-Restored 11 package(s) from /Users/mariotarosso/.cache/vcpkg/archives in 63.2 ms. Use --debug to see more details.
-Installing 1/11 vcpkg-cmake-config:arm64-osx@2024-05-23...
-Elapsed time to handle vcpkg-cmake-config:arm64-osx: 1.71 ms
-vcpkg-cmake-config:arm64-osx package ABI: 6b90b8f7add9691552d06700958d52a228ab8793d44ce739ce248a76e43c7987
-Installing 2/11 vcpkg-cmake:arm64-osx@2024-04-23...
-Elapsed time to handle vcpkg-cmake:arm64-osx: 2.12 ms
-vcpkg-cmake:arm64-osx package ABI: 7d97346adce299254adc2d830906e70d4b10f9a5fbe1cfb085b959c9fe9507c9
-Installing 3/11 entt:arm64-osx@3.15.0...
-Elapsed time to handle entt:arm64-osx: 21.2 ms
-entt:arm64-osx package ABI: 3f15f067a39ae0a70b25ad3a07bf28cf57ae8636aa25dab59dc8aa926e124437
-Installing 4/11 egl-registry:arm64-osx@2024-01-25...
-Elapsed time to handle egl-registry:arm64-osx: 2.37 ms
-egl-registry:arm64-osx package ABI: 9908c86ed40f54f8693d88e767f11900166470f278e0fd84ee5e2d07a9ffdd0e
-Installing 5/11 opengl-registry:arm64-osx@2024-02-10#1...
-Elapsed time to handle opengl-registry:arm64-osx: 8.65 ms
-opengl-registry:arm64-osx package ABI: 9ee571d5aac0c64c1b5bae93ab16381c00a6bb0ff5f06c08a2072fac6cf8e63a
-Installing 6/11 glad[core,loader]:arm64-osx@0.1.36...
-Elapsed time to handle glad:arm64-osx: 3.63 ms
-glad:arm64-osx package ABI: 1e2a8b5683d49b97ddb72a824e079a7754f5df2b371295418f0584fef6c94494
-Installing 7/11 glfw3:arm64-osx@3.4#1...
-Elapsed time to handle glfw3:arm64-osx: 3.89 ms
-glfw3:arm64-osx package ABI: fc97f936457f98691785f208f25f6eb021a49ab8e30a4a22c2af809a011f82b9
-Installing 8/11 glm:arm64-osx@1.0.1#3...
-Elapsed time to handle glm:arm64-osx: 101 ms
-glm:arm64-osx package ABI: 7a3b3ceff171e32a7e0bf6967a2fd1c8d94132db7c0db04381e7c030b79f2de3
-Installing 9/11 imgui[core,glfw-binding,opengl3-binding]:arm64-osx@1.91.9...
-Elapsed time to handle imgui:arm64-osx: 5.21 ms
-imgui:arm64-osx package ABI: e37a16883b9ea8e79ecb51c0093d5942c64f5c44ae0e915e2914108fb841b7c7
-Installing 10/11 lua:arm64-osx@5.4.8...
-Elapsed time to handle lua:arm64-osx: 4.55 ms
-lua:arm64-osx package ABI: c35eb44991b842daea8d3c61c4f030842cc7698a3b8cb4a9df1e31364259351a
-Installing 11/11 sol2:arm64-osx@3.5.0...
-Elapsed time to handle sol2:arm64-osx: 28.9 ms
-sol2:arm64-osx package ABI: 1b0b2e759abb12a56b181defefbff7bfacc3db8bb1e442dc4e731b7573859a28
-Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
-Some packages did not declare an SPDX license. Check the `copyright` file for each package for more information about their licensing.
-Packages installed in this vcpkg installation declare the following licenses:
-MIT
-Zlib
 entt provides CMake targets:
 
     find_package(EnTT CONFIG REQUIRED)
@@ -105,4 +65,4 @@ sol2 provides pkg-config modules:
   # C++ <-> Lua Wrapper Library
   sol2
 
-All requested installations completed successfully in: 186 ms
+All requested installations completed successfully in: 221 us

@@ -90,6 +90,9 @@ public:
     bool IsValid() const { return world != nullptr && entity != entt::null; }
     void MarkForDestroy() { pendingDestroy = true; }
     bool IsPendingDestroy() const { return pendingDestroy; }
+    
+    // Static class info (for blueprint system)
+    static std::string StaticClass() { return "Actor"; }
 
 protected:
     World* world;

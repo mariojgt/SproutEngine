@@ -4,8 +4,12 @@
 # SOURCES at CMakeLists.txt:17 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/Users/mariotarosso/Downloads/SproutEngine/src/*.cpp")
 set(OLD_GLOB
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Actor.cpp"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Blueprint.cpp"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/CoreComponents.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Editor.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/FileUtil.cpp"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/GameplayActors.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/HUD.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Renderer.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Scene.cpp"
@@ -14,7 +18,9 @@ set(OLD_GLOB
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Theme.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/TinyImGui.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/VSGraph.cpp"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/World.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/main.cpp"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/main_new.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
@@ -24,17 +30,24 @@ endif()
 # SOURCES at CMakeLists.txt:17 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/Users/mariotarosso/Downloads/SproutEngine/src/*.h")
 set(OLD_GLOB
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Actor.h"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Blueprint.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Components.h"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/CoreComponents.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Editor.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/FileUtil.h"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/GameplayActors.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/HUD.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Renderer.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Scene.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Scripting.h"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/SproutScript.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Systems.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Theme.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/TinyImGui.h"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Transform.h"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/VSGraph.h"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/World.h"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

@@ -21,10 +21,11 @@ public:
     entt::registry registry;
     entt::entity createEntity(const std::string& name);
 
-    // New Actor-based system
-    World* GetWorld() const { return world.get(); }
+    // New Actor-based system (temporarily disabled)
+    // World* GetWorld() const { return world.get(); }
     
-    // Actor management (delegates to World)
+    // Actor management (delegates to World) - temporarily disabled
+    /*
     template<typename ActorType = Actor, typename... Args>
     ActorType* SpawnActor(const std::string& name = "", Args&&... args);
     
@@ -35,22 +36,19 @@ public:
     void BeginPlay();
     void EndPlay();
     void Tick(float deltaTime);
+    */
     
     // Scene properties
     const std::string& GetName() const { return sceneName; }
     void SetName(const std::string& name) { sceneName = name; }
     
-    // Serialization
+    // Serialization - temporarily disabled
+    /*
     void SaveScene(const std::string& filePath) const;
     bool LoadScene(const std::string& filePath);
+    */
 
 private:
     std::string sceneName;
-    std::unique_ptr<World> world;
+    // std::unique_ptr<World> world; // temporarily disabled
 };
-
-// Template implementation
-template<typename ActorType, typename... Args>
-ActorType* Scene::SpawnActor(const std::string& name, Args&&... args) {
-    return world->SpawnActor<ActorType>(name, std::forward<Args>(args)...);
-}

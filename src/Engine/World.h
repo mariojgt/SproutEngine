@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include <functional>
+#include <typeindex>
 
 class Actor;
 using ActorID = uint64_t;

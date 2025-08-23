@@ -40,19 +40,19 @@ set(ENGINE_SOURCES
     src/Engine/TinyImGui.h
     src/Engine/VSGraph.cpp
     src/Engine/VSGraph.h
-    # New Actor system files
-    src/Engine/Actor.cpp
-    src/Engine/Actor.h
-    src/Engine/World.cpp
-    src/Engine/World.h
-    src/Engine/Transform.h
-    src/Engine/CoreComponents.cpp
-    src/Engine/CoreComponents.h
-    src/Engine/Blueprint.cpp
-    src/Engine/Blueprint.h
-    src/Engine/SproutScript.h
-    src/Engine/GameplayActors.cpp
-    src/Engine/GameplayActors.h
+    # New Actor system files (temporarily disabled until compilation issues are resolved)
+    # src/Engine/Actor.cpp
+    # src/Engine/Actor.h
+    # src/Engine/World.cpp
+    # src/Engine/World.h
+    # src/Engine/Transform.h
+    # src/Engine/CoreComponents.cpp
+    # src/Engine/CoreComponents.h
+    # src/Engine/Blueprint.cpp
+    # src/Engine/Blueprint.h
+    # src/Engine/SproutScript.h
+    # src/Engine/GameplayActors.cpp
+    # src/Engine/GameplayActors.h
 )
 
 add_executable(SproutEngine ${ENGINE_SOURCES})
