@@ -45,7 +45,7 @@ public:
     Actor* otherActor;
     glm::vec3 hitLocation;
     glm::vec3 hitNormal;
-    
+
     CollisionEvent(Actor* other, const glm::vec3& location, const glm::vec3& normal)
         : otherActor(other), hitLocation(location), hitNormal(normal) {}
     std::string GetEventName() const override { return "Collision"; }
@@ -55,7 +55,7 @@ class OverlapEvent : public Event {
 public:
     Actor* otherActor;
     bool bBeginOverlap; // true for begin, false for end
-    
+
     OverlapEvent(Actor* other, bool begin) : otherActor(other), bBeginOverlap(begin) {}
     std::string GetEventName() const override { return "Overlap"; }
 };
@@ -67,7 +67,7 @@ class InputEvent : public Event {
 public:
     std::string inputName;
     float value;
-    
+
     InputEvent(const std::string& name, float val) : inputName(name), value(val) {}
     std::string GetEventName() const override { return "Input"; }
 };
@@ -79,10 +79,10 @@ class EventDispatcher {
 public:
     template<typename EventType>
     void Subscribe(std::function<void(const EventType&)> callback);
-    
+
     template<typename EventType>
     void Trigger(const EventType& event);
-    
+
     void Clear();
 
 private:
@@ -97,11 +97,11 @@ public:
     virtual ~BlueprintNode() = default;
     virtual void Execute() = 0;
     virtual std::string GetNodeType() const = 0;
-    
+
     // Node connections
     std::vector<BlueprintNode*> outputNodes;
     std::vector<BlueprintNode*> inputNodes;
-    
+
     void ConnectToNode(BlueprintNode* targetNode);
     void DisconnectFromNode(BlueprintNode* targetNode);
 
@@ -117,7 +117,7 @@ public:
     BlueprintEventNode(const std::string& eventName);
     void Execute() override;
     std::string GetNodeType() const override { return "Event"; }
-    
+
     const std::string& GetEventName() const { return eventName; }
 
 private:
@@ -147,11 +147,11 @@ public:
         Get,
         Set
     };
-    
+
     BlueprintVariableNode(const std::string& varName, VariableOperation op);
     void Execute() override;
     std::string GetNodeType() const override { return "Variable"; }
-    
+
     void SetValue(const std::string& value) { variableValue = value; }
     const std::string& GetValue() const { return variableValue; }
 
@@ -168,21 +168,21 @@ class BlueprintGraph {
 public:
     BlueprintGraph(Actor* owner);
     ~BlueprintGraph();
-    
+
     // Node management
     BlueprintNode* AddNode(std::unique_ptr<BlueprintNode> node);
     void RemoveNode(BlueprintNode* node);
     void ConnectNodes(BlueprintNode* from, BlueprintNode* to);
     void DisconnectNodes(BlueprintNode* from, BlueprintNode* to);
-    
+
     // Execution
     void TriggerEvent(const std::string& eventName);
     void Execute();
-    
+
     // Serialization
     void SaveToFile(const std::string& filePath) const;
     bool LoadFromFile(const std::string& filePath);
-    
+
     Actor* GetOwner() const { return owner; }
 
 private:
@@ -197,17 +197,17 @@ private:
 class BlueprintClass {
 public:
     BlueprintClass(const std::string& className);
-    
+
     // Create an instance of this blueprint
     Actor* CreateInstance(World* world) const;
-    
+
     // Blueprint properties
     void AddProperty(const std::string& name, const std::string& type, const std::string& defaultValue);
     void AddFunction(const std::string& name, std::function<void(Actor*)> func);
-    
+
     // Component defaults
     void AddDefaultComponent(const std::string& componentType);
-    
+
     const std::string& GetClassName() const { return className; }
 
 private:
@@ -224,15 +224,15 @@ private:
 class BlueprintManager {
 public:
     static BlueprintManager& Get();
-    
+
     // Blueprint registration
     void RegisterBlueprint(const std::string& name, std::unique_ptr<BlueprintClass> blueprint);
     BlueprintClass* GetBlueprint(const std::string& name) const;
-    
+
     // Load blueprints from files
     bool LoadBlueprintFromFile(const std::string& filePath);
     void LoadAllBlueprints(const std::string& directory);
-    
+
     // Create blueprint instances
     Actor* CreateBlueprintInstance(const std::string& blueprintName, World* world) const;
 

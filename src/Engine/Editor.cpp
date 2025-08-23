@@ -78,10 +78,10 @@ void Editor::drawPanels(entt::registry& reg, Renderer& renderer, Scripting& scri
             Vec3Control("Scale", tr->scale);
         }
         if(auto* sc = reg.try_get<Script>(selected)){
-            char pathBuf[256]; std::snprintf(pathBuf, sizeof(pathBuf), "%s", sc->path.c_str());
-            if(ImGui::InputText("Script Path", pathBuf, sizeof(pathBuf))) sc->path = pathBuf;
+            char pathBuf[256]; std::snprintf(pathBuf, sizeof(pathBuf), "%s", sc->filePath.c_str());
+            if(ImGui::InputText("Script Path", pathBuf, sizeof(pathBuf))) sc->filePath = pathBuf;
             if(ImGui::Button("Load Script")){
-                if(!sc->path.empty()) scripting.loadScript(reg, selected, sc->path);
+                if(!sc->filePath.empty()) scripting.loadScript(reg, selected, sc->filePath);
             }
         } else {
             if(ImGui::Button("Add Script Component")){
@@ -103,15 +103,15 @@ void Editor::drawPanels(entt::registry& reg, Renderer& renderer, Scripting& scri
     UI::HUDState state;
     if(selected != entt::null && reg.valid(selected)){
         if(auto* hudc = reg.try_get<HUDComponent>(selected)){
-            state.health = hudc->health;
-            state.mana = hudc->mana;
-            state.score = hudc->score;
-            state.title = hudc->title;
-            ImGui::SliderFloat("Health", &hudc->health, 0.0f, 100.0f);
-            ImGui::SliderFloat("Mana", &hudc->mana, 0.0f, 100.0f);
-            ImGui::InputInt("Score", &hudc->score);
-            char titleBuf[128]; snprintf(titleBuf, sizeof(titleBuf), "%s", hudc->title.c_str());
-            if(ImGui::InputText("Title", titleBuf, sizeof(titleBuf))) hudc->title = titleBuf;
+            state.health = hudc->x;
+            state.mana = hudc->y;
+            state.score = hudc->width;
+            state.title = hudc->text;
+            ImGui::SliderFloat("X", &hudc->x, 0.0f, 1000.0f);
+            ImGui::SliderFloat("Y", &hudc->y, 0.0f, 1000.0f);
+            ImGui::InputInt("Width", &hudc->width);
+            char titleBuf[128]; snprintf(titleBuf, sizeof(titleBuf), "%s", hudc->text.c_str());
+            if(ImGui::InputText("Text", titleBuf, sizeof(titleBuf))) hudc->text = titleBuf;
         }
     }
     hud.draw(state);
@@ -142,7 +142,7 @@ void Editor::drawPanels(entt::registry& reg, Renderer& renderer, Scripting& scri
         if(selected != entt::null && reg.valid(selected)){
             auto* sc = reg.try_get<Script>(selected);
             if(!sc) sc = &reg.emplace<Script>(selected);
-            sc->path = path;
+            sc->filePath = path;
         }
     }
     if(ImGui::Button("Print Hello On Start")) {
@@ -150,7 +150,7 @@ void Editor::drawPanels(entt::registry& reg, Renderer& renderer, Scripting& scri
         if(selected != entt::null && reg.valid(selected)){
             auto* sc = reg.try_get<Script>(selected);
             if(!sc) sc = &reg.emplace<Script>(selected);
-            sc->path = path;
+            sc->filePath = path;
         }
     }
     ImGui::End();

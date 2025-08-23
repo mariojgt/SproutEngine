@@ -26,16 +26,16 @@ public:
     // Actor management
     template<typename ActorType = Actor, typename... Args>
     ActorType* SpawnActor(const std::string& name = "", Args&&... args);
-    
+
     void DestroyActor(Actor* actor);
     void DestroyActor(ActorID actorId);
-    
+
     Actor* FindActor(ActorID actorId) const;
     Actor* FindActorByName(const std::string& name) const;
-    
+
     template<typename ActorType>
     std::vector<ActorType*> FindActorsOfClass() const;
-    
+
     const std::vector<std::unique_ptr<Actor>>& GetAllActors() const { return actors; }
 
     // ECS Registry access
@@ -54,7 +54,7 @@ public:
     // Event system
     template<typename EventType>
     void BroadcastEvent(const EventType& event);
-    
+
     template<typename EventType>
     void RegisterGlobalEventHandler(std::function<void(const EventType&)> handler);
 
@@ -71,10 +71,10 @@ private:
     entt::registry registry;
     std::vector<std::unique_ptr<Actor>> actors;
     std::unordered_map<ActorID, Actor*> actorMap;
-    
+
     // Global event handlers
     std::unordered_map<std::type_index, std::vector<std::function<void(const void*)>>> globalEventHandlers;
-    
+
     // State
     bool hasBegunPlay = false;
     std::vector<Actor*> pendingDestroyActors;
@@ -88,25 +88,25 @@ private:
 template<typename ActorType, typename... Args>
 ActorType* World::SpawnActor(const std::string& name, Args&&... args) {
     static_assert(std::is_base_of_v<Actor, ActorType>, "ActorType must derive from Actor");
-    
+
     std::string actorName = name.empty() ? ActorType::StaticClass() : name;
     auto actor = std::make_unique<ActorType>(this, actorName, std::forward<Args>(args)...);
     ActorType* ptr = actor.get();
-    
+
     RegisterActor(std::move(actor));
-    
+
     // If world has already begun play, begin play for this actor
     if (hasBegunPlay) {
         ptr->BeginPlay();
     }
-    
+
     return ptr;
 }
 
 template<typename ActorType>
 std::vector<ActorType*> World::FindActorsOfClass() const {
     static_assert(std::is_base_of_v<Actor, ActorType>, "ActorType must derive from Actor");
-    
+
     std::vector<ActorType*> result;
     for (const auto& actor : actors) {
         if (auto* typedActor = dynamic_cast<ActorType*>(actor.get())) {
@@ -126,7 +126,7 @@ void World::BroadcastEvent(const EventType& event) {
             handler(&event);
         }
     }
-    
+
     // Send to all actors
     for (const auto& actor : actors) {
         actor->TriggerEvent(event);

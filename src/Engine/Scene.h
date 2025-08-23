@@ -23,25 +23,25 @@ public:
 
     // New Actor-based system (temporarily disabled)
     // World* GetWorld() const { return world.get(); }
-    
+
     // Actor management (delegates to World) - temporarily disabled
     /*
     template<typename ActorType = Actor, typename... Args>
     ActorType* SpawnActor(const std::string& name = "", Args&&... args);
-    
+
     void DestroyActor(Actor* actor);
     Actor* FindActorByName(const std::string& name);
-    
+
     // Scene lifecycle
     void BeginPlay();
     void EndPlay();
     void Tick(float deltaTime);
     */
-    
+
     // Scene properties
     const std::string& GetName() const { return sceneName; }
     void SetName(const std::string& name) { sceneName = name; }
-    
+
     // Serialization - temporarily disabled
     /*
     void SaveScene(const std::string& filePath) const;

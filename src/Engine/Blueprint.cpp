@@ -16,7 +16,7 @@ void BlueprintNode::DisconnectFromNode(BlueprintNode* targetNode) {
     auto it = std::find(outputNodes.begin(), outputNodes.end(), targetNode);
     if (it != outputNodes.end()) {
         outputNodes.erase(it);
-        
+
         auto inputIt = std::find(targetNode->inputNodes.begin(), targetNode->inputNodes.end(), this);
         if (inputIt != targetNode->inputNodes.end()) {
             targetNode->inputNodes.erase(inputIt);
@@ -31,7 +31,7 @@ void BlueprintNode::TriggerOutputNodes() {
 }
 
 // BlueprintEventNode Implementation
-BlueprintEventNode::BlueprintEventNode(const std::string& eventName) 
+BlueprintEventNode::BlueprintEventNode(const std::string& eventName)
     : eventName(eventName) {
 }
 
@@ -77,12 +77,12 @@ BlueprintGraph::~BlueprintGraph() {
 
 BlueprintNode* BlueprintGraph::AddNode(std::unique_ptr<BlueprintNode> node) {
     BlueprintNode* ptr = node.get();
-    
+
     // If it's an event node, register it
     if (auto* eventNode = dynamic_cast<BlueprintEventNode*>(ptr)) {
         eventNodes[eventNode->GetEventName()].push_back(eventNode);
     }
-    
+
     nodes.push_back(std::move(node));
     return ptr;
 }
@@ -96,7 +96,7 @@ void BlueprintGraph::RemoveNode(BlueprintNode* node) {
             eventNodeList.erase(it);
         }
     }
-    
+
     // Disconnect all connections
     for (auto* inputNode : node->inputNodes) {
         inputNode->DisconnectFromNode(node);
@@ -104,13 +104,13 @@ void BlueprintGraph::RemoveNode(BlueprintNode* node) {
     for (auto* outputNode : node->outputNodes) {
         node->DisconnectFromNode(outputNode);
     }
-    
+
     // Remove from nodes list
-    auto it = std::find_if(nodes.begin(), nodes.end(), 
+    auto it = std::find_if(nodes.begin(), nodes.end(),
         [node](const std::unique_ptr<BlueprintNode>& ptr) {
             return ptr.get() == node;
         });
-    
+
     if (it != nodes.end()) {
         nodes.erase(it);
     }
@@ -163,25 +163,25 @@ BlueprintClass::BlueprintClass(const std::string& className) : className(classNa
 
 Actor* BlueprintClass::CreateInstance(World* world) const {
     if (!world) return nullptr;
-    
+
     Actor* actor = world->SpawnActor<Actor>(className);
-    
+
     // Add default components
     for (const std::string& componentType : defaultComponents) {
         // TODO: Create components based on type string
         std::cout << "Adding component: " << componentType << " to " << className << std::endl;
     }
-    
+
     // Set default property values
     for (const auto& [name, value] : defaultValues) {
         std::cout << "Setting property " << name << " = " << value << std::endl;
     }
-    
+
     // Bind functions
     for (const auto& [funcName, func] : functions) {
         func(actor);
     }
-    
+
     return actor;
 }
 

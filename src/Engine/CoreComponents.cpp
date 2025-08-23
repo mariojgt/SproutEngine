@@ -3,7 +3,7 @@
 #include <iostream>
 
 // MeshRendererComponent Implementation
-MeshRendererComponent::MeshRendererComponent(Actor* owner) 
+MeshRendererComponent::MeshRendererComponent(Actor* owner)
     : SceneComponent(owner) {
     bCanTick = false;
 }
@@ -27,7 +27,7 @@ void MeshRendererComponent::Deserialize(const class JsonReader& reader) {
 }
 
 // CameraComponent Implementation
-CameraComponent::CameraComponent(Actor* owner) 
+CameraComponent::CameraComponent(Actor* owner)
     : SceneComponent(owner) {
     bCanTick = false;
 }
@@ -47,12 +47,12 @@ glm::mat4 CameraComponent::GetProjectionMatrix() const {
 glm::mat4 CameraComponent::GetViewMatrix() const {
     glm::vec3 worldPos = GetWorldLocation();
     glm::vec3 worldRot = GetWorldRotation();
-    
+
     // Calculate forward, right, up vectors
     glm::quat rotation = glm::quat(glm::radians(worldRot));
     glm::vec3 forward = rotation * glm::vec3(0, 0, -1); // Forward is -Z in camera space
     glm::vec3 up = rotation * glm::vec3(0, 1, 0);
-    
+
     return glm::lookAt(worldPos, worldPos + forward, up);
 }
 
@@ -69,7 +69,7 @@ void CameraComponent::Deserialize(const class JsonReader& reader) {
 }
 
 // LightComponent Implementation
-LightComponent::LightComponent(Actor* owner, LightType type) 
+LightComponent::LightComponent(Actor* owner, LightType type)
     : SceneComponent(owner), lightType(type) {
     bCanTick = false;
 }
@@ -83,7 +83,7 @@ void LightComponent::Deserialize(const class JsonReader& reader) {
 }
 
 // AudioComponent Implementation
-AudioComponent::AudioComponent(Actor* owner) 
+AudioComponent::AudioComponent(Actor* owner)
     : SceneComponent(owner) {
     bCanTick = false;
 }
@@ -115,7 +115,7 @@ void AudioComponent::Deserialize(const class JsonReader& reader) {
 }
 
 // CollisionComponent Implementation
-CollisionComponent::CollisionComponent(Actor* owner, CollisionType type) 
+CollisionComponent::CollisionComponent(Actor* owner, CollisionType type)
     : SceneComponent(owner), collisionType(type) {
     bCanTick = false;
 }

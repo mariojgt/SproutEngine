@@ -32,8 +32,8 @@ void Scripting::attach(entt::registry& reg){
 
 bool Scripting::loadScript(entt::registry& reg, entt::entity e, const std::string& path){
     auto& sc = reg.get<Script>(e);
-    sc.path = path;
-    sc.lastWriteTime = GetFileWriteTime(path);
+    sc.filePath = path;
+    sc.lastUpdateTime = GetFileWriteTime(path);
     auto src = ReadTextFile(path);
     if(!src){ std::cerr<<"Failed to read script: "<<path<<"\n"; return false; }
 
@@ -51,7 +51,7 @@ bool Scripting::loadScript(entt::registry& reg, entt::entity e, const std::strin
         return false;
     }
 
-    sc.loaded = true;
+    sc.needsUpdate = true;
 
     // Call OnStart if present
     sol::object onStartObj = lua["OnStart"];
@@ -67,10 +67,10 @@ void Scripting::update(entt::registry& reg, float dt){
     for(auto e : view){
         auto &sc = view.get<Script>(e);
         // Hot reload
-        double wt = GetFileWriteTime(sc.path);
-        if(!sc.path.empty() && wt > sc.lastWriteTime){
-            std::cout << "Hot reload: " << sc.path << std::endl;
-            loadScript(reg, e, sc.path);
+        double wt = GetFileWriteTime(sc.filePath);
+        if(!sc.filePath.empty() && wt > sc.lastUpdateTime){
+            std::cout << "Hot reload: " << sc.filePath << std::endl;
+            loadScript(reg, e, sc.filePath);
         }
         // Tick
         sol::object onTickObj = lua["OnTick"];

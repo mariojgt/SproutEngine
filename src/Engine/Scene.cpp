@@ -12,7 +12,7 @@ Scene::~Scene() = default;
 
 entt::entity Scene::createEntity(const std::string& name) {
     auto entity = registry.create();
-    registry.emplace<Tag>(entity, Tag{name});
+    registry.emplace<NameComponent>(entity, NameComponent{name});
     registry.emplace<Transform>(entity);
     return entity;
 }

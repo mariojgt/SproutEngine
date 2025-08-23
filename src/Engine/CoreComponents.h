@@ -20,17 +20,17 @@ public:
     // Mesh and Material
     void SetMesh(const std::string& meshPath);
     void SetMaterial(const std::string& materialPath);
-    
+
     const std::string& GetMeshPath() const { return meshPath; }
     const std::string& GetMaterialPath() const { return materialPath; }
-    
+
     // Rendering properties
     bool GetCastShadows() const { return bCastShadows; }
     void SetCastShadows(bool cast) { bCastShadows = cast; }
-    
+
     bool GetReceiveShadows() const { return bReceiveShadows; }
     void SetReceiveShadows(bool receive) { bReceiveShadows = receive; }
-    
+
     // Visibility
     bool IsVisible() const { return bVisible; }
     void SetVisible(bool visible) { bVisible = visible; }
@@ -63,16 +63,16 @@ public:
     // Projection settings
     void SetProjectionType(ProjectionType type) { projectionType = type; }
     ProjectionType GetProjectionType() const { return projectionType; }
-    
+
     void SetFieldOfView(float fov) { fieldOfView = fov; }
     float GetFieldOfView() const { return fieldOfView; }
-    
+
     void SetNearClipPlane(float nearPlane) { nearClipPlane = nearPlane; }
     float GetNearClipPlane() const { return nearClipPlane; }
-    
+
     void SetFarClipPlane(float farPlane) { farClipPlane = farPlane; }
     float GetFarClipPlane() const { return farClipPlane; }
-    
+
     void SetAspectRatio(float aspect) { aspectRatio = aspect; }
     float GetAspectRatio() const { return aspectRatio; }
 
@@ -120,23 +120,23 @@ public:
     // Light properties
     void SetLightType(LightType type) { lightType = type; }
     LightType GetLightType() const { return lightType; }
-    
+
     void SetColor(const glm::vec3& color) { lightColor = color; }
     const glm::vec3& GetColor() const { return lightColor; }
-    
+
     void SetIntensity(float intensity) { lightIntensity = intensity; }
     float GetIntensity() const { return lightIntensity; }
-    
+
     void SetRange(float range) { lightRange = range; }
     float GetRange() const { return lightRange; }
-    
+
     // Spot light properties
     void SetInnerConeAngle(float angle) { innerConeAngle = angle; }
     float GetInnerConeAngle() const { return innerConeAngle; }
-    
+
     void SetOuterConeAngle(float angle) { outerConeAngle = angle; }
     float GetOuterConeAngle() const { return outerConeAngle; }
-    
+
     // Shadow casting
     void SetCastShadows(bool cast) { bCastShadows = cast; }
     bool GetCastShadows() const { return bCastShadows; }
@@ -166,27 +166,27 @@ public:
     // Audio clip
     void SetAudioClip(const std::string& clipPath) { audioClipPath = clipPath; }
     const std::string& GetAudioClip() const { return audioClipPath; }
-    
+
     // Playback control
     void Play();
     void Stop();
     void Pause();
     bool IsPlaying() const { return bIsPlaying; }
-    
+
     // Audio properties
     void SetVolume(float volume) { audioVolume = glm::clamp(volume, 0.0f, 1.0f); }
     float GetVolume() const { return audioVolume; }
-    
+
     void SetPitch(float pitch) { audioPitch = pitch; }
     float GetPitch() const { return audioPitch; }
-    
+
     void SetLoop(bool loop) { bLoop = loop; }
     bool GetLoop() const { return bLoop; }
-    
+
     // 3D Audio properties
     void SetMinDistance(float distance) { minDistance = distance; }
     float GetMinDistance() const { return minDistance; }
-    
+
     void SetMaxDistance(float distance) { maxDistance = distance; }
     float GetMaxDistance() const { return maxDistance; }
 
@@ -222,22 +222,22 @@ public:
     // Collision properties
     void SetCollisionType(CollisionType type) { collisionType = type; }
     CollisionType GetCollisionType() const { return collisionType; }
-    
+
     void SetIsTrigger(bool trigger) { bIsTrigger = trigger; }
     bool IsTrigger() const { return bIsTrigger; }
-    
+
     // Box collider
     void SetBoxExtent(const glm::vec3& extent) { boxExtent = extent; }
     const glm::vec3& GetBoxExtent() const { return boxExtent; }
-    
+
     // Sphere collider
     void SetSphereRadius(float radius) { sphereRadius = radius; }
     float GetSphereRadius() const { return sphereRadius; }
-    
+
     // Capsule collider
     void SetCapsuleRadius(float radius) { capsuleRadius = radius; }
     float GetCapsuleRadius() const { return capsuleRadius; }
-    
+
     void SetCapsuleHeight(float height) { capsuleHeight = height; }
     float GetCapsuleHeight() const { return capsuleHeight; }
 
@@ -253,7 +253,7 @@ public:
 private:
     CollisionType collisionType;
     bool bIsTrigger = false;
-    
+
     // Collision shapes
     glm::vec3 boxExtent{1.0f, 1.0f, 1.0f};
     float sphereRadius = 1.0f;
