@@ -1,0 +1,20 @@
+{
+  "name": "sproutengine",
+  "version-string": "0.1.2",
+  "dependencies": [
+    "glfw3",
+    "glad",
+    "glm",
+    {
+      "name": "imgui",
+      "default-features": false,
+      "features": [
+        "glfw-binding",
+        "opengl3-binding"
+      ]
+    },
+    "entt",
+    "lua",
+    "sol2"
+  ]
+}
