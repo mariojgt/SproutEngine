@@ -1,4 +1,5 @@
 #include "TinyImGui.h"
+#include "ModernTheme.h"
 #include <imgui.h>
 #include <cstdio>
 
@@ -29,15 +30,15 @@ namespace {
 
     void KeyCallback(GLFWwindow*, int key, int, int action, int mods) {
         ImGuiIO& io = ImGui::GetIO();
-        
+
         if (action != GLFW_PRESS && action != GLFW_RELEASE) return;
-        
+
         // Handle modifier keys
         io.AddKeyEvent(ImGuiMod_Ctrl, (mods & GLFW_MOD_CONTROL) != 0);
         io.AddKeyEvent(ImGuiMod_Shift, (mods & GLFW_MOD_SHIFT) != 0);
         io.AddKeyEvent(ImGuiMod_Alt, (mods & GLFW_MOD_ALT) != 0);
         io.AddKeyEvent(ImGuiMod_Super, (mods & GLFW_MOD_SUPER) != 0);
-        
+
         // Convert GLFW key to ImGui key
         ImGuiKey imgui_key = ImGuiKey_None;
         switch (key) {
@@ -148,7 +149,7 @@ namespace {
             case GLFW_KEY_F12: imgui_key = ImGuiKey_F12; break;
             default: break;
         }
-        
+
         if (imgui_key != ImGuiKey_None) {
             io.AddKeyEvent(imgui_key, action == GLFW_PRESS);
         }
@@ -169,6 +170,40 @@ namespace {
         if (!entered) {
             io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
         }
+    }
+
+    void WindowSizeCallback(GLFWwindow* window, int width, int height) {
+        ImGuiIO& io = ImGui::GetIO();
+
+        // Update display size immediately
+        io.DisplaySize = ImVec2((float)width, (float)height);
+
+        // Update framebuffer scale
+        int fbw, fbh;
+        glfwGetFramebufferSize(window, &fbw, &fbh);
+        if (width > 0 && height > 0) {
+            io.DisplayFramebufferScale = ImVec2((float)fbw / width, (float)fbh / height);
+        }
+
+        // Force ImGui to recalculate layout
+        ImGui::GetIO().DisplayFramebufferScale = ImVec2((float)fbw / width, (float)fbh / height);
+    }
+
+    void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+        ImGuiIO& io = ImGui::GetIO();
+
+        // Update framebuffer scale when framebuffer size changes
+        int w, h;
+        glfwGetWindowSize(window, &w, &h);
+        if (w > 0 && h > 0) {
+            io.DisplayFramebufferScale = ImVec2((float)width / w, (float)height / h);
+        }
+
+        // Update OpenGL viewport
+        glViewport(0, 0, width, height);
+
+        // Force ImGui to acknowledge the scale change
+        ImGui::GetIO().DisplayFramebufferScale = ImVec2((float)width / w, (float)height / h);
     }
 
     void CreateFontsTexture() {
@@ -271,16 +306,43 @@ bool Init(GLFWwindow* window){
     io.GetClipboardTextFn = GetClipboardText;
     io.MouseDrawCursor = false;
 
-    int w, h; glfwGetWindowSize(window, &w, &h);
-    int fbw, fbh; glfwGetFramebufferSize(window, &fbw, &fbh);
-    io.DisplaySize = ImVec2((float)w, (float)h);
-    if (w > 0 && h > 0) io.DisplayFramebufferScale = ImVec2((float)fbw / w, (float)fbh / h);
+    // Get window and framebuffer sizes
+    int w, h;
+    glfwGetWindowSize(window, &w, &h);
+    int fbw, fbh;
+    glfwGetFramebufferSize(window, &fbw, &fbh);
 
-    // Register event-based input callbacks for better responsiveness
+    io.DisplaySize = ImVec2((float)w, (float)h);
+    if (w > 0 && h > 0) {
+        io.DisplayFramebufferScale = ImVec2((float)fbw / w, (float)fbh / h);
+    }
+
+    // SIMPLE AND DIRECT APPROACH FOR 4K DISPLAYS
+    // Just use a much larger font - no complex scaling calculations
+    float fontSize = 32.0f; // Large enough for 4K displays
+
+    // Load a much larger font
+    ImFontConfig fontConfig;
+    fontConfig.SizePixels = fontSize;
+    fontConfig.OversampleH = 1;
+    fontConfig.OversampleV = 1;
+    fontConfig.PixelSnapH = true;
+
+    io.Fonts->AddFontDefault(&fontConfig);
+    io.FontGlobalScale = 1.0f;
+
+    // Enable keyboard navigation
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    // Register callbacks
     glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetScrollCallback(window, ScrollCallback);
     glfwSetKeyCallback(window, KeyCallback);
     glfwSetCharCallback(window, CharCallback);
+    glfwSetWindowFocusCallback(window, WindowFocusCallback);
+    glfwSetCursorEnterCallback(window, CursorEnterCallback);
+    glfwSetWindowSizeCallback(window, WindowSizeCallback);
+    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
     CreateDeviceObjects();
     return true;
@@ -298,14 +360,20 @@ void NewFrame(){
     io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (1.0f / 60.0f);
     g_Time = current_time;
 
-    // Update window size
-    int w, h; glfwGetWindowSize(g_Window, &w, &h);
-    int fbw, fbh; glfwGetFramebufferSize(g_Window, &fbw, &fbh);
-    io.DisplaySize = ImVec2((float)w, (float)h);
-    if (w > 0 && h > 0) io.DisplayFramebufferScale = ImVec2((float)fbw / w, (float)fbh / h);
+    // Update window size and handle DPI changes
+    int w, h;
+    glfwGetWindowSize(g_Window, &w, &h);
+    int fbw, fbh;
+    glfwGetFramebufferSize(g_Window, &fbw, &fbh);
 
-    // Update mouse position (polling is fine for this)
-    double mx, my; glfwGetCursorPos(g_Window, &mx, &my);
+    io.DisplaySize = ImVec2((float)w, (float)h);
+    if (w > 0 && h > 0) {
+        io.DisplayFramebufferScale = ImVec2((float)fbw / w, (float)fbh / h);
+    }
+
+    // Update mouse position with proper scaling
+    double mx, my;
+    glfwGetCursorPos(g_Window, &mx, &my);
     io.AddMousePosEvent((float)mx, (float)my);
 
     ImGui::NewFrame();
@@ -363,6 +431,47 @@ void RenderDrawData(ImDrawData* draw_data){
     glUseProgram(0);
     glDisable(GL_SCISSOR_TEST);
     glDisable(GL_BLEND);
+}
+
+void RefreshDPIScale() {
+    if (!g_Window) return;
+
+    // Get current monitor content scale
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    float xscale, yscale;
+    glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+
+    // Update font scale if needed
+    ImGuiIO& io = ImGui::GetIO();
+    float currentScale = io.DisplayFramebufferScale.x;
+
+    if (abs(currentScale - xscale) > 0.1f) {
+        // Scale has changed significantly, rebuild fonts
+        DestroyFontsTexture();
+        io.Fonts->Clear();
+
+        // Load font at appropriate size for DPI
+        ImFontConfig fontConfig;
+        fontConfig.SizePixels = 16.0f * xscale;
+        fontConfig.OversampleH = 3;
+        fontConfig.OversampleV = 3;
+        fontConfig.PixelSnapH = true;
+        io.Fonts->AddFontDefault(&fontConfig);
+
+        CreateFontsTexture();
+
+        // Reapply theme with new scale
+        ModernTheme::ApplyDarkTheme();
+    }
+}
+
+float GetContentScale() {
+    if (!g_Window) return 1.0f;
+
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    float xscale, yscale;
+    glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+    return xscale;
 }
 
 } // namespace TinyImGui

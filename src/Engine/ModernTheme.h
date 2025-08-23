@@ -2,7 +2,7 @@
 #include <imgui.h>
 
 namespace ModernTheme {
-    
+
     // Modern Color Palette (Tailwind-inspired)
     namespace Colors {
         // Grays (Dark theme base)
@@ -17,54 +17,54 @@ namespace ModernTheme {
         constexpr ImU32 Gray800 = IM_COL32(31, 41, 55, 255);
         constexpr ImU32 Gray900 = IM_COL32(17, 24, 39, 255);
         constexpr ImU32 Gray950 = IM_COL32(3, 7, 18, 255);
-        
+
         // Accent Colors
         constexpr ImU32 Blue500  = IM_COL32(59, 130, 246, 255);
         constexpr ImU32 Blue600  = IM_COL32(37, 99, 235, 255);
         constexpr ImU32 Blue700  = IM_COL32(29, 78, 216, 255);
-        
+
         constexpr ImU32 Green500 = IM_COL32(34, 197, 94, 255);
         constexpr ImU32 Green600 = IM_COL32(22, 163, 74, 255);
-        
+
         constexpr ImU32 Red500   = IM_COL32(239, 68, 68, 255);
         constexpr ImU32 Red600   = IM_COL32(220, 38, 38, 255);
-        
+
         constexpr ImU32 Orange500 = IM_COL32(249, 115, 22, 255);
         constexpr ImU32 Orange600 = IM_COL32(234, 88, 12, 255);
-        
+
         constexpr ImU32 Purple500 = IM_COL32(168, 85, 247, 255);
         constexpr ImU32 Purple600 = IM_COL32(147, 51, 234, 255);
     }
-    
+
     // Apply modern dark theme
     void ApplyDarkTheme();
-    
+
     // Modern UI Components
     bool ModernButton(const char* label, ImVec2 size = ImVec2(0, 0), ImU32 color = Colors::Blue600);
     bool ModernButtonSuccess(const char* label, ImVec2 size = ImVec2(0, 0));
     bool ModernButtonDanger(const char* label, ImVec2 size = ImVec2(0, 0));
     bool ModernButtonSecondary(const char* label, ImVec2 size = ImVec2(0, 0));
-    
+
     bool ModernMenuItem(const char* label, const char* shortcut = nullptr, bool selected = false);
     bool ModernSelectable(const char* label, bool selected = false, ImGuiSelectableFlags flags = 0, const ImVec2& size = ImVec2(0, 0));
-    
+
     void ModernSeparator();
     void ModernSpacing(float height = 8.0f);
-    
+
     bool BeginModernWindow(const char* name, bool* p_open = nullptr, ImGuiWindowFlags flags = 0);
     void EndModernWindow();
-    
+
     bool BeginModernMenuBar();
     void EndModernMenuBar();
-    
+
     bool BeginModernMenu(const char* label);
     void EndModernMenu();
-    
+
     void ModernText(const char* text, ImU32 color = Colors::Gray100);
     void ModernTextSecondary(const char* text);
     void ModernTextMuted(const char* text);
     void ModernHeader(const char* text);
-    
+
     // Icons (using Unicode symbols for now)
     namespace Icons {
         constexpr const char* File = "📁";

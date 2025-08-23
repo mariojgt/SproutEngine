@@ -12,7 +12,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
-#include "Engine/TinyImGui.h"
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
@@ -41,13 +42,25 @@ int main(){
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-    // Use 80% of screen size but ensure minimum editor-friendly dimensions
-    int windowWidth = std::max(1600, (int)(mode->width * 0.8));
-    int windowHeight = std::max(1000, (int)(mode->height * 0.8));
+    // Handle high DPI displays (4K/Retina) better
+    float contentScale;
+    glfwGetMonitorContentScale(monitor, &contentScale, nullptr);
+
+    // For 4K displays, we want a good balance between usability and content visibility
+    int windowWidth, windowHeight;
+    if (contentScale >= 2.0f) {
+        // High DPI (4K/Retina) - use larger base size but not too large
+        windowWidth = std::max(1800, (int)(mode->width * 0.7));
+        windowHeight = std::max(1200, (int)(mode->height * 0.7));
+    } else {
+        // Standard DPI - use 80% of screen size
+        windowWidth = std::max(1600, (int)(mode->width * 0.8));
+        windowHeight = std::max(1000, (int)(mode->height * 0.8));
+    }
 
     // Cap maximum size for very large monitors
-    windowWidth = std::min(windowWidth, 2560);
-    windowHeight = std::min(windowHeight, 1600);
+    windowWidth = std::min(windowWidth, 2800);
+    windowHeight = std::min(windowHeight, 1800);
 
     GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "SproutEngine - Game Engine Foundation", nullptr, nullptr);
     if(!window){ std::cerr<<"Failed to create window\n"; glfwTerminate(); return -1; }
@@ -111,9 +124,35 @@ int main(){
     scene.registry.emplace<Script>(cube3, Script{std::string("assets/scripts/Rotate.lua"), 0.0, false});
     scripting.loadScript(scene.registry, cube3, "assets/scripts/Rotate.lua");
 
-    // Editor - Use new Unreal-like editor
+    // Editor - Use new Unreal-like editor with standard ImGui backends
     UnrealEditor unrealEditor;
-    TinyImGui::Init(window);
+
+    // Setup Dear ImGui context with proper 4K support
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    const char* glsl_version = "#version 330";
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+    // Configure font for 4K displays - more reasonable scaling
+    float baseFontSize = 16.0f;
+    GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+    float xscale, yscale;
+    glfwGetMonitorContentScale(primaryMonitor, &xscale, &yscale);
+    if (xscale >= 2.0f) {
+        baseFontSize = 20.0f; // Reasonable size for 4K
+    }
+
+    io.Fonts->AddFontDefault();
+    io.FontGlobalScale = baseFontSize / 13.0f; // 13.0f is ImGui default font size
+
     unrealEditor.Init(window);
 
     bool playMode = true;
@@ -124,56 +163,74 @@ int main(){
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
-        renderer.beginFrame(width, height);
 
-        // Update
-        auto now = std::chrono::high_resolution_clock::now();
-        float dt = std::chrono::duration<float>(now - last).count();
-        last = now;
+        // Only update viewport if size is valid
+        if (width > 0 && height > 0) {
+            renderer.beginFrame(width, height);
 
-        if(playMode){
-            scripting.update(scene.registry, dt);
-            Systems::UpdateTransform(scene.registry, dt);
+            // Update
+            auto now = std::chrono::high_resolution_clock::now();
+            float dt = std::chrono::duration<float>(now - last).count();
+            last = now;
 
-            // Manually rotate one cube to show animation
-            auto& rotatingTransform = scene.registry.get<Transform>(cube3);
-            rotatingTransform.rotationEuler.y += 45.0f * dt; // 45 degrees per second
-        }
+            if(playMode){
+                scripting.update(scene.registry, dt);
+                Systems::UpdateTransform(scene.registry, dt);
 
-        // Update editor
-        unrealEditor.Update(dt);
-
-        // Camera matrices
-        glm::vec3 camPos = {5, 3, 8};
-        glm::mat4 V = glm::lookAt(camPos, glm::vec3(0,0,0), glm::vec3(0,1,0));
-        glm::mat4 P = glm::perspective(glm::radians(60.0f), width > 0 ? (float)width/height : 16.0f/9.0f, 0.1f, 100.0f);
-
-        // Draw cubes
-        auto view = scene.registry.view<Transform, MeshCube>();
-        for(auto e : view){
-            auto& t = view.get<Transform>(e);
-            glm::mat4 M = ComposeTRS(t);
-            glm::mat4 MVP = P * V * M;
-            // If this entity is the selected one in the editor, tint it
-            glm::vec3 tint(1.0f, 1.0f, 1.0f);
-            if (unrealEditor.GetSelectedEntity() == e) {
-                tint = glm::vec3(1.0f, 0.6f, 0.2f); // orange highlight
+                // Manually rotate one cube to show animation
+                auto& rotatingTransform = scene.registry.get<Transform>(cube3);
+                rotatingTransform.rotationEuler.y += 45.0f * dt; // 45 degrees per second
             }
-            renderer.drawCube(MVP, tint);
+
+            // Update editor
+            unrealEditor.Update(dt);
+
+            // Camera matrices
+            glm::vec3 camPos = {5, 3, 8};
+            glm::mat4 V = glm::lookAt(camPos, glm::vec3(0,0,0), glm::vec3(0,1,0));
+            glm::mat4 P = glm::perspective(glm::radians(60.0f), width > 0 ? (float)width/height : 16.0f/9.0f, 0.1f, 100.0f);
+
+            // Draw cubes
+            auto view = scene.registry.view<Transform, MeshCube>();
+            for(auto e : view){
+                auto& t = view.get<Transform>(e);
+                glm::mat4 M = ComposeTRS(t);
+                glm::mat4 MVP = P * V * M;
+                // If this entity is the selected one in the editor, tint it
+                glm::vec3 tint(1.0f, 1.0f, 1.0f);
+                if (unrealEditor.GetSelectedEntity() == e) {
+                    tint = glm::vec3(1.0f, 0.6f, 0.2f); // orange highlight
+                }
+                renderer.drawCube(MVP, tint);
+            }
+
+            // ---- Unreal-like Editor Interface ----
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            unrealEditor.Render(scene.registry, renderer, scripting, playMode);
+
+            // Rendering
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            // ---- end ImGui ----
+
+            renderer.endFrame();
+            glfwSwapBuffers(window);
         }
-
-        // ---- Unreal-like Editor Interface ----
-        unrealEditor.Render(scene.registry, renderer, scripting, playMode);
-        // ---- end ImGui ----
-
-        renderer.endFrame();
-        glfwSwapBuffers(window);
     }
 
     unrealEditor.Shutdown(window);
     scripting.shutdown();
     renderer.shutdown();
-    TinyImGui::Shutdown();
+
+    // Cleanup ImGui
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

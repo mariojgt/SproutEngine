@@ -36,12 +36,12 @@ set(ENGINE_SOURCES
     src/Engine/FileUtil.h
     src/Engine/Theme.cpp
     src/Engine/Theme.h
-    src/Engine/TinyImGui.cpp
-    src/Engine/TinyImGui.h
     src/Engine/VSGraph.cpp
     src/Engine/VSGraph.h
     src/Engine/UnrealEditorSimple.cpp
     src/Engine/UnrealEditorSimple.h
+    src/Engine/ModernTheme.cpp
+    src/Engine/ModernTheme.h
     # New Actor system files (temporarily disabled until compilation issues are resolved)
     # src/Engine/Actor.cpp
     # src/Engine/Actor.h
