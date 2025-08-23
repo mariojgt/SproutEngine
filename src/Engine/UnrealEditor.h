@@ -92,10 +92,19 @@ private:
             ImVec2 position;
             std::vector<int> inputs;
             std::vector<int> outputs;
+            // simple single string parameter for many nodes (e.g. print text)
+            std::string param;
         };
         std::vector<Node> nodes;
         std::vector<std::pair<int, int>> links; // input->output pairs
     } blueprintGraph;
+    // Currently loaded blueprint graph file path (empty if none)
+    std::string currentBlueprintFile;
+
+    // Node editor temporary state (for non-imnodes built-in editor)
+    int linkDragStart = 0; // attribute id (node*100 + pin)
+    int linkDragEnd = 0;
+    entt::entity blueprintEditingEntity = entt::null; // entity blueprint is being edited for (optional)
 
     // Panel implementations
     void DrawMainMenuBar(entt::registry& registry, Scripting& scripting, bool& playMode);
@@ -108,6 +117,9 @@ private:
     void DrawConsole(entt::registry& registry, Scripting& scripting);
     void DrawMaterialEditor();
     void DrawToolbar(bool& playMode);
+
+    // Whether this editor initialized ImGui platform/renderer backends
+    bool ownsImGuiBackends = false;
 
     // Viewport functionality
     void HandleViewportInput();

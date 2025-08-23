@@ -24,27 +24,31 @@ UnrealEditor::~UnrealEditor() {
 bool UnrealEditor::Init(GLFWwindow* window) {
     editorWindow = window;
 
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    // If an external ImGui context (TinyImGui) already created it, don't recreate or re-init backends.
+    if (ImGui::GetCurrentContext() == nullptr) {
+        // Setup Dear ImGui context
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
+        // Setup Dear ImGui style
+        ImGui::StyleColorsDark();
 
-    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
+        // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+        ImGuiStyle& style = ImGui::GetStyle();
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            style.WindowRounding = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
+    ownsImGuiBackends = true;
+    }
 
 #ifdef IMNODES_AVAILABLE
     // Initialize imnodes for blueprint graphs
@@ -67,9 +71,8 @@ void UnrealEditor::Shutdown(GLFWwindow* window) {
     ImNodes::DestroyContext();
 #endif
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    // Do not destroy global ImGui context here: the application may be using a shared tiny backend (TinyImGui)
+    // which will manage ImGui lifetime. Only destroy imnodes context above.
 }
 
 void UnrealEditor::Update(float deltaTime) {
@@ -89,10 +92,25 @@ void UnrealEditor::Update(float deltaTime) {
 }
 
 void UnrealEditor::Render(entt::registry& registry, Renderer& renderer, Scripting& scripting, bool& playMode) {
+    // Ensure ImGui context exists; create and init backends on-demand if needed
+    if (ImGui::GetCurrentContext() == nullptr) {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(editorWindow, true);
+        ImGui_ImplOpenGL3_Init("#version 330");
+        ownsImGuiBackends = true;
+    }
+
     // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+    if (ownsImGuiBackends) {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    } else {
+        // Use TinyImGui (application-owned) to create frame
+        TinyImGui::NewFrame();
+    }
 
     // Draw main menu bar
     DrawMainMenuBar(registry, scripting, playMode);
@@ -118,7 +136,11 @@ void UnrealEditor::Render(entt::registry& registry, Renderer& renderer, Scriptin
 
     // Render
     ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    if (ownsImGuiBackends) {
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    } else {
+        TinyImGui::RenderDrawData(ImGui::GetDrawData());
+    }
 
     // Update and Render additional Platform Windows
     ImGuiIO& io = ImGui::GetIO();
@@ -405,6 +427,41 @@ void UnrealEditor::DrawContentBrowser() {
         // File grid (right side)
         if (ImGui::BeginChild("FileGrid", ImVec2(0, 0), true)) {
             DrawFileGrid();
+            // If user double-clicks a .graph or .lua, open it
+            if (!contentBrowser.selectedItem.empty()) {
+                std::string sel = contentBrowser.selectedItem;
+                if (ImGui::IsMouseDoubleClicked(0)) {
+                    std::string full = contentBrowser.currentPath + sel;
+                    // Open blueprint files into editor
+                    if (sel.find(".graph") != std::string::npos) {
+                        // Load graph
+                        std::ifstream ifs(full);
+                        if (ifs.good()) {
+                            // Simple format: store as raw JSON/text in blueprintGraph.param of a single node for now
+                            // TODO: implement proper serialization. For now treat .graph as Lua fallback
+                            std::string contents((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+                            currentBlueprintFile = full;
+                            // Load into code panel for editing (fallback)
+                            // Create a temporary file under assets/scripts/generated and write contents if needed
+                        }
+                    } else if (sel.find(".lua") != std::string::npos) {
+                        // Open Lua in Blueprint Graph panel code editor (fallback)
+                        std::ifstream ifs(full);
+                        if (ifs.good()) {
+                            std::string contents((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+                            // write into a temporary node param so DrawBlueprintGraph shows it
+                            blueprintGraph.nodes.clear();
+                            BlueprintState::Node n;
+                            n.id = blueprintGraph.nextNodeId++;
+                            n.type = "Code";
+                            n.name = sel;
+                            n.param = contents;
+                            blueprintGraph.nodes.push_back(n);
+                            currentBlueprintFile = full;
+                        }
+                    }
+                }
+            }
         }
         ImGui::EndChild();
 
@@ -533,6 +590,30 @@ void UnrealEditor::DrawInspector(entt::registry& registry, Scripting& scripting)
                 DrawScriptComponent(registry, selectedEntity, scripting);
             }
 
+            // Blueprint component support: show attached blueprint file and button to open editor
+            if (registry.any_of<BlueprintComponent>(selectedEntity)) {
+                ImGui::Separator();
+                auto& bp = registry.get<BlueprintComponent>(selectedEntity);
+                ImGui::Text("Blueprint: %s", bp.filePath.c_str());
+                if (ImGui::Button("Open Blueprint Editor")) {
+                    // Load file contents into blueprintGraph for editing (fallback)
+                    std::ifstream ifs(bp.filePath);
+                    if (ifs.good()) {
+                        std::string contents((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+                        blueprintGraph.nodes.clear();
+                        BlueprintState::Node n;
+                        n.id = blueprintGraph.nextNodeId++;
+                        n.type = "Code";
+                        n.name = bp.filePath;
+                        n.param = contents;
+                        blueprintGraph.nodes.push_back(n);
+                        currentBlueprintFile = bp.filePath;
+                        blueprintEditingEntity = selectedEntity;
+                        showBlueprintGraph = true;
+                    }
+                }
+            }
+
             // Add component button
             DrawAddComponentButton(registry, selectedEntity);
 
@@ -588,15 +669,127 @@ void UnrealEditor::DrawBlueprintGraph() {
     ImGui::End();
 #else
     if (ImGui::Begin("Blueprint Graph")) {
-        ImGui::Text("Blueprint Graph requires imnodes library");
-        ImGui::Text("Install imnodes to enable visual scripting");
+        ImGui::Text("Simple Blueprint Editor (fallback)");
+        ImGui::Separator();
 
-        // Simple text-based blueprint editor as fallback
-        static char luaCode[4096] = "-- Generated Lua code will appear here\n";
-        ImGui::InputTextMultiline("Lua Code", luaCode, sizeof(luaCode));
+        // Palette
+        if (ImGui::CollapsingHeader("Palette", ImGuiTreeNodeFlags_DefaultOpen)) {
+            if (ImGui::Button("Event: OnStart")) {
+                BlueprintState::Node n; n.id = blueprintGraph.nextNodeId++; n.type = "Event"; n.name = "OnStart"; n.position = ImVec2(50,50);
+                blueprintGraph.nodes.push_back(n);
+            }
+            if (ImGui::Button("Event: OnTick")) {
+                BlueprintState::Node n; n.id = blueprintGraph.nextNodeId++; n.type = "Event"; n.name = "OnTick"; n.position = ImVec2(50,100);
+                blueprintGraph.nodes.push_back(n);
+            }
+            if (ImGui::Button("Function: Print")) {
+                BlueprintState::Node n; n.id = blueprintGraph.nextNodeId++; n.type = "Function"; n.name = "Print"; n.position = ImVec2(200,50); n.param = "Hello";
+                blueprintGraph.nodes.push_back(n);
+            }
+            if (ImGui::Button("Action: SetRotation")) {
+                BlueprintState::Node n; n.id = blueprintGraph.nextNodeId++; n.type = "Function"; n.name = "SetRotation"; n.position = ImVec2(200,120); n.param = "0,90,0";
+                blueprintGraph.nodes.push_back(n);
+            }
+        }
 
-        if (ImGui::Button("Save to Script")) {
-            AddLog("Blueprint to Lua conversion - imnodes required", "Warning");
+        ImGui::SameLine();
+
+        // Node canvas (very simple list-based editor)
+        ImGui::BeginChild("NodeCanvas", ImVec2(0, 300), true);
+        for (auto &node : blueprintGraph.nodes) {
+            ImGui::PushID(node.id);
+            ImGui::Separator();
+            ImGui::Text("Node %d: %s (%s)", node.id, node.name.c_str(), node.type.c_str());
+            char buf[256]; strncpy(buf, node.param.c_str(), sizeof(buf));
+            if (ImGui::InputText("Param", buf, sizeof(buf))) {
+                node.param = std::string(buf);
+            }
+            if (ImGui::Button("Remove")) {
+                // remove node by id
+                int id = node.id;
+                auto it = std::remove_if(blueprintGraph.nodes.begin(), blueprintGraph.nodes.end(), [&](const BlueprintState::Node& n){ return n.id==id; });
+                blueprintGraph.nodes.erase(it, blueprintGraph.nodes.end());
+                ImGui::PopID();
+                break;
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndChild();
+
+        // Links (simple textual linkage) - not implemented fully; placeholder to connect node indices
+        ImGui::Separator();
+        static int connectA = -1, connectB = -1;
+        ImGui::InputInt("Connect A (node id)", &connectA);
+        ImGui::InputInt("Connect B (node id)", &connectB);
+        if (ImGui::Button("Create Link")) {
+            if (connectA > 0 && connectB > 0) blueprintGraph.links.push_back({connectA, connectB});
+        }
+        ImGui::Separator();
+        // Display links
+        for (auto &l : blueprintGraph.links) {
+            ImGui::Text("%d -> %d", l.first, l.second);
+        }
+
+        // Save/Load
+        if (ImGui::Button("Save Blueprint")) {
+            if (currentBlueprintFile.empty()) currentBlueprintFile = std::string(SE_ASSETS_DIR) + "/scripts/generated/graph_" + std::to_string(blueprintGraph.nextNodeId) + ".graph";
+            // simple save: write a minimal representation (node count + node lines)
+            std::ofstream ofs(currentBlueprintFile);
+            for (auto &n : blueprintGraph.nodes) {
+                ofs << n.id << "|" << n.type << "|" << n.name << "|" << n.param << "\n";
+            }
+            for (auto &l : blueprintGraph.links) ofs << "L|" << l.first << "|" << l.second << "\n";
+            AddLog("Saved blueprint: " + currentBlueprintFile, "Info");
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Load Blueprint")) {
+            if (!currentBlueprintFile.empty()) {
+                blueprintGraph.nodes.clear(); blueprintGraph.links.clear();
+                std::ifstream ifs(currentBlueprintFile);
+                std::string line;
+                while (std::getline(ifs, line)) {
+                    if (line.rfind("L|",0) == 0) {
+                        // link
+                        int a=0,b=0; sscanf(line.c_str(), "L|%d|%d", &a,&b);
+                        blueprintGraph.links.push_back({a,b});
+                    } else {
+                        int id=0; char type[64]; char name[128]; char param[256];
+                        memset(type,0,sizeof(type)); memset(name,0,sizeof(name)); memset(param,0,sizeof(param));
+                        sscanf(line.c_str(), "%d|%63[^|]|%127[^|]|%255[^"]", &id, type, name, param);
+                        BlueprintState::Node n; n.id=id; n.type=type; n.name=name; n.param=param;
+                        blueprintGraph.nodes.push_back(n);
+                    }
+                }
+                AddLog("Loaded blueprint: " + currentBlueprintFile, "Info");
+            } else {
+                AddLog("No blueprint file selected to load", "Warning");
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Generate Lua")) {
+            GenerateLuaFromGraph();
+        }
+
+        // If a code-node exists, show its code for editing (fallback)
+        for (auto &n : blueprintGraph.nodes) {
+            if (n.type == "Code") {
+                ImGui::Separator();
+                static ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
+                static std::string buf;
+                buf = n.param;
+                if (ImGui::InputTextMultiline("Code", &buf, ImVec2(0,200), flags)) {
+                    n.param = buf;
+                }
+                if (ImGui::Button("Save Code Node")) {
+                    // write to file
+                    std::string out = currentBlueprintFile.empty() ? std::string(SE_ASSETS_DIR) + "/scripts/generated/code_node.lua" : currentBlueprintFile;
+                    std::ofstream ofs(out);
+                    ofs << n.param;
+                    AddLog(std::string("Saved code node to ") + out, "Info");
+                }
+            }
         }
     }
     ImGui::End();
@@ -1029,8 +1222,62 @@ void UnrealEditor::HandleNodeConnections() {
 }
 
 void UnrealEditor::GenerateLuaFromGraph() {
-    AddLog("Generated Lua from Blueprint graph", "Info");
-    // TODO: Implement actual code generation
+    AddLog("Generating Lua and .sp from Blueprint graph", "Info");
+
+    // Compose a simple generated Lua from nodes: chain Event->Function links
+    std::string lua;
+    // Simple header
+    lua += "-- Generated from Blueprint graph\n";
+    // For simplicity, build functions from nodes
+    for (auto &n : blueprintGraph.nodes) {
+        if (n.type == "Event" && n.name == "OnStart") {
+            lua += "function OnStart(id)\n";
+            // find linked functions
+            for (auto &l : blueprintGraph.links) {
+                if (l.first == n.id) {
+                    // find node with id == l.second
+                    for (auto &m : blueprintGraph.nodes) {
+                        if (m.id == l.second && m.type == "Function" && m.name == "Print") {
+                            lua += "  Print(\"" + m.param + "\")\n";
+                        }
+                    }
+                }
+            }
+            lua += "end\n\n";
+        }
+        if (n.type == "Event" && n.name == "OnTick") {
+            lua += "function OnTick(id, dt)\n";
+            // placeholder: no ops
+            lua += "end\n\n";
+        }
+    }
+
+    // Write Lua to generated file
+    std::string outLua = currentBlueprintFile.empty() ? std::string(SE_ASSETS_DIR) + "/scripts/generated/graph_gen.lua" : currentBlueprintFile + ".lua";
+    std::ofstream ofs(outLua);
+    ofs << lua;
+    ofs.close();
+
+    // Write .sp (simple JSON-like) alongside
+    std::string outSp = outLua + ".sp";
+    std::ofstream ofs2(outSp);
+    ofs2 << "{\n  \"nodes\": [\n";
+    for (size_t i=0;i<blueprintGraph.nodes.size();++i){
+        auto &n = blueprintGraph.nodes[i];
+        ofs2 << "    { \"id\": " << n.id << ", \"type\": \"" << n.type << "\", \"name\": \"" << n.name << "\", \"param\": \"" << n.param << "\" }";
+        if (i+1<blueprintGraph.nodes.size()) ofs2 << ",\n"; else ofs2 << "\n";
+    }
+    ofs2 << "  ],\n  \"links\": [\n";
+    for (size_t i=0;i<blueprintGraph.links.size();++i){
+        auto &l = blueprintGraph.links[i];
+        ofs2 << "    { \"a\": " << l.first << ", \"b\": " << l.second << " }";
+        if (i+1<blueprintGraph.links.size()) ofs2 << ",\n"; else ofs2 << "\n";
+    }
+    ofs2 << "  ]\n}\n";
+    ofs2.close();
+
+    AddLog("Wrote generated Lua: " + outLua, "Info");
+    AddLog("Wrote blueprint asset: " + outSp, "Info");
 }
 #else
 void UnrealEditor::DrawNode(const BlueprintState::Node& node) {}

@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include "TinyImGui.h"
 
 class Renderer;
 class Scripting;
@@ -30,6 +31,28 @@ public:
     entt::entity GetSelectedEntity() const { return selectedEntity; }
 
     // ...existing code...
+
+    // Simple blueprint/code editor state
+    bool showBlueprintEditor = false;
+    std::string currentBlueprintPath;
+    std::string currentBlueprintCode;
+    // Editable buffer for ImGui InputTextMultiline
+    std::vector<char> blueprintEditBuffer;
+    // Whether this editor initialized ImGui backends
+    bool ownsImGuiBackends = false;
+    
+    // Blueprint node system
+    struct BlueprintNode {
+        int id;
+        std::string type; // "Event", "Function", "Variable", "Math"
+        std::string name;
+        ImVec2 position;
+        std::string param1, param2, param3; // node parameters
+        std::vector<int> inputPins, outputPins;
+    };
+    std::vector<BlueprintNode> blueprintNodes;
+    std::vector<std::pair<int, int>> blueprintLinks; // pin connections
+    int nextNodeId = 1;
 
 private:
     // Core editor state
@@ -91,7 +114,7 @@ private:
     void DrawContentBrowser();
     void DrawWorldOutliner(entt::registry& registry);
     void DrawInspector(entt::registry& registry, Scripting& scripting);
-    void DrawBlueprintGraph();
+    void DrawBlueprintGraph(entt::registry& registry, Scripting& scripting);
     void DrawConsole(entt::registry& registry, Scripting& scripting);
     void DrawMaterialEditor();
     void DrawToolbar(bool& playMode);
