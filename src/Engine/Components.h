@@ -24,6 +24,11 @@ struct Script {
     bool needsUpdate{false};
 };
 
+// Blueprint asset component - stores path to generated blueprint/script
+struct BlueprintComponent {
+    std::string filePath; // e.g. assets/scripts/generated/my_blueprint.lua
+};
+
 
 struct HUDComponent {
     float x{100.0f};

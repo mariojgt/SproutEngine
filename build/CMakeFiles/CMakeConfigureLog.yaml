@@ -139,11 +139,11 @@ events:
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeUnixFindMake.cmake:5 (find_program)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeNinjaFindMake.cmake:5 (find_program)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_MAKE_PROGRAM"
-    description: "Path to a program."
+    description: "Program used to build from build.ninja files."
     settings:
       SearchFramework: "LAST"
       SearchAppBundle: "LAST"
@@ -153,9 +153,9 @@ events:
       CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
       CMAKE_FIND_USE_INSTALL_PREFIX: true
     names:
-      - "gmake"
-      - "make"
-      - "smake"
+      - "ninja-build"
+      - "ninja"
+      - "samu"
     candidate_directories:
       - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/"
       - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/"
@@ -224,58 +224,161 @@ events:
       - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
       - "/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/opt/homebrew/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/opt/homebrew/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/local/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/System/Cryptexes/App/usr/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/local/share/dotnet/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/.dotnet/tools/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Applications/Visual Studio Code.app/Contents/Resources/app/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/opt/homebrew/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/opt/homebrew/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/local/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/System/Cryptexes/App/usr/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/local/share/dotnet/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Users/mariotarosso/.dotnet/tools/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Applications/Visual Studio Code.app/Contents/Resources/app/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/gmake"
-      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/gmake"
-    found: "/opt/homebrew/bin/gmake"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/opt/homebrew/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/opt/homebrew/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/opt/homebrew/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/opt/homebrew/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/opt/homebrew/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/opt/homebrew/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/local/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/local/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/local/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/System/Cryptexes/App/usr/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/System/Cryptexes/App/usr/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/System/Cryptexes/App/usr/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/local/share/dotnet/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/local/share/dotnet/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/usr/local/share/dotnet/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/.dotnet/tools/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/.dotnet/tools/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/.dotnet/tools/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Applications/Visual Studio Code.app/Contents/Resources/app/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Applications/Visual Studio Code.app/Contents/Resources/app/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Applications/Visual Studio Code.app/Contents/Resources/app/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/opt/homebrew/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/opt/homebrew/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/opt/homebrew/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/opt/homebrew/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/opt/homebrew/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/opt/homebrew/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/local/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/local/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/local/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/System/Cryptexes/App/usr/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/System/Cryptexes/App/usr/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/System/Cryptexes/App/usr/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/local/share/dotnet/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/local/share/dotnet/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/usr/local/share/dotnet/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Users/mariotarosso/.dotnet/tools/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Users/mariotarosso/.dotnet/tools/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Users/mariotarosso/.dotnet/tools/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Applications/Visual Studio Code.app/Contents/Resources/app/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Applications/Visual Studio Code.app/Contents/Resources/app/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Applications/Visual Studio Code.app/Contents/Resources/app/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/debug/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/bin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/sbin/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/samu"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/ninja-build"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/ninja"
+      - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools/samu"
+      - "/opt/homebrew/bin/ninja-build"
+    found: "/opt/homebrew/bin/ninja"
     search_context:
       CMAKE_PROGRAM_PATH:
         - "/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/tools"
@@ -2166,8 +2269,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y"
-      binary: "/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y"
+      source: "/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-BMNxAf"
+      binary: "/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-BMNxAf"
     cmakeVariables:
       CMAKE_CXX_FLAGS: ""
       CMAKE_CXX_FLAGS_DEBUG: "-g"
@@ -2184,20 +2287,17 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y'
+        Change Dir: '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-BMNxAf'
         
-        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /opt/homebrew/bin/gmake -f Makefile cmTC_ec346/fast
-        /opt/homebrew/bin/gmake  -f CMakeFiles/cmTC_ec346.dir/build.make CMakeFiles/cmTC_ec346.dir/build
-        gmake[1]: Entering directory '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y'
-        Building CXX object CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o
-        /usr/bin/c++   -arch arm64   -v -Wl,-v -MD -MT CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_4e787
+        [1/2] /usr/bin/c++   -arch arm64   -v -Wl,-v -MD -MT CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp
         Apple clang version 17.0.0 (clang-1700.0.13.5)
         Target: arm64-apple-darwin24.6.0
         Thread model: posix
         InstalledDir: /Library/Developer/CommandLineTools/usr/bin
         clang++: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
         ignoring nonexistent directory "/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"
-         "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1 -triple arm64-apple-macosx15.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=15.5 -fvisibility-inlines-hidden-static-local-var -fdefine-target-os-macros -fno-assume-unique-vtables -fno-modulemap-allow-subdirectory-search -target-cpu apple-m1 -target-feature +zcm -target-feature +zcz -target-feature +v8.5a -target-feature +aes -target-feature +altnzcv -target-feature +ccdp -target-feature +complxnum -target-feature +crc -target-feature +dotprod -target-feature +fp-armv8 -target-feature +fp16fml -target-feature +fptoint -target-feature +fullfp16 -target-feature +jsconv -target-feature +lse -target-feature +neon -target-feature +pauth -target-feature +perfmon -target-feature +predres -target-feature +ras -target-feature +rcpc -target-feature +rdm -target-feature +sb -target-feature +sha2 -target-feature +sha3 -target-feature +specrestrict -target-feature +ssbs -target-abi darwinpcs -debugger-tuning=lldb -fdebug-compilation-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y -target-linker-version 1167.5 -v -fcoverage-compilation-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y -resource-dir /Library/Developer/CommandLineTools/usr/lib/clang/17 -dependency-file CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include -internal-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -internal-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /Library/Developer/CommandLineTools/usr/lib/clang/17/include -internal-externc-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -internal-externc-isystem /Library/Developer/CommandLineTools/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -fdeprecated-macro -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fno-cxx-modules -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+         "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1 -triple arm64-apple-macosx15.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=15.5 -fvisibility-inlines-hidden-static-local-var -fdefine-target-os-macros -fno-assume-unique-vtables -fno-modulemap-allow-subdirectory-search -target-cpu apple-m1 -target-feature +zcm -target-feature +zcz -target-feature +v8.5a -target-feature +aes -target-feature +altnzcv -target-feature +ccdp -target-feature +complxnum -target-feature +crc -target-feature +dotprod -target-feature +fp-armv8 -target-feature +fp16fml -target-feature +fptoint -target-feature +fullfp16 -target-feature +jsconv -target-feature +lse -target-feature +neon -target-feature +pauth -target-feature +perfmon -target-feature +predres -target-feature +ras -target-feature +rcpc -target-feature +rdm -target-feature +sb -target-feature +sha2 -target-feature +sha3 -target-feature +specrestrict -target-feature +ssbs -target-abi darwinpcs -debugger-tuning=lldb -fdebug-compilation-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-BMNxAf -target-linker-version 1167.5 -v -fcoverage-compilation-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-BMNxAf -resource-dir /Library/Developer/CommandLineTools/usr/lib/clang/17 -dependency-file CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include -internal-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -internal-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /Library/Developer/CommandLineTools/usr/lib/clang/17/include -internal-externc-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -internal-externc-isystem /Library/Developer/CommandLineTools/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -fdeprecated-macro -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fno-cxx-modules -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp
         clang -cc1 version 17.0.0 (clang-1700.0.13.5) default target arm64-apple-darwin24.6.0
         ignoring nonexistent directory "/usr/local/include"
         ignoring nonexistent directory "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/local/include"
@@ -2211,13 +2311,12 @@ events:
          /Library/Developer/CommandLineTools/usr/include
          /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)
         End of search list.
-        Linking CXX executable cmTC_ec346
-        /opt/homebrew/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ec346.dir/link.txt --verbose=1
+        [2/2] : && /usr/bin/c++ -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_4e787   && :
         Apple clang version 17.0.0 (clang-1700.0.13.5)
         Target: arm64-apple-darwin24.6.0
         Thread model: posix
         InstalledDir: /Library/Developer/CommandLineTools/usr/bin
-         "/Library/Developer/CommandLineTools/usr/bin/ld" -demangle -lto_library /Library/Developer/CommandLineTools/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 15.0.0 15.5 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_ec346 -L/usr/local/lib -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Library/Developer/CommandLineTools/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a
+         "/Library/Developer/CommandLineTools/usr/bin/ld" -demangle -lto_library /Library/Developer/CommandLineTools/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 15.0.0 15.5 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_4e787 -L/usr/local/lib -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Library/Developer/CommandLineTools/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a
         @(#)PROGRAM:ld PROJECT:ld-1167.5
         BUILD 01:45:05 Apr 30 2025
         configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
@@ -2229,8 +2328,6 @@ events:
         	/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/swift
         Framework search paths:
         	/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks
-        /usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_ec346
-        gmake[1]: Leaving directory '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y'
         
       exitCode: 0
   -
@@ -2274,20 +2371,17 @@ events:
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
-        ignore line: [Change Dir: '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y']
+        ignore line: [Change Dir: '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-BMNxAf']
         ignore line: []
-        ignore line: [Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /opt/homebrew/bin/gmake -f Makefile cmTC_ec346/fast]
-        ignore line: [/opt/homebrew/bin/gmake  -f CMakeFiles/cmTC_ec346.dir/build.make CMakeFiles/cmTC_ec346.dir/build]
-        ignore line: [gmake[1]: Entering directory '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y']
-        ignore line: [Building CXX object CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o]
-        ignore line: [/usr/bin/c++   -arch arm64   -v -Wl -v -MD -MT CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_4e787]
+        ignore line: [[1/2] /usr/bin/c++   -arch arm64   -v -Wl -v -MD -MT CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [Apple clang version 17.0.0 (clang-1700.0.13.5)]
         ignore line: [Target: arm64-apple-darwin24.6.0]
         ignore line: [Thread model: posix]
         ignore line: [InstalledDir: /Library/Developer/CommandLineTools/usr/bin]
         ignore line: [clang++: warning: -Wl -v: 'linker' input unused [-Wunused-command-line-argument]]
         ignore line: [ignoring nonexistent directory "/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"]
-        ignore line: [ "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1 -triple arm64-apple-macosx15.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=15.5 -fvisibility-inlines-hidden-static-local-var -fdefine-target-os-macros -fno-assume-unique-vtables -fno-modulemap-allow-subdirectory-search -target-cpu apple-m1 -target-feature +zcm -target-feature +zcz -target-feature +v8.5a -target-feature +aes -target-feature +altnzcv -target-feature +ccdp -target-feature +complxnum -target-feature +crc -target-feature +dotprod -target-feature +fp-armv8 -target-feature +fp16fml -target-feature +fptoint -target-feature +fullfp16 -target-feature +jsconv -target-feature +lse -target-feature +neon -target-feature +pauth -target-feature +perfmon -target-feature +predres -target-feature +ras -target-feature +rcpc -target-feature +rdm -target-feature +sb -target-feature +sha2 -target-feature +sha3 -target-feature +specrestrict -target-feature +ssbs -target-abi darwinpcs -debugger-tuning=lldb -fdebug-compilation-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y -target-linker-version 1167.5 -v -fcoverage-compilation-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-rqBF4y -resource-dir /Library/Developer/CommandLineTools/usr/lib/clang/17 -dependency-file CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include -internal-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -internal-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /Library/Developer/CommandLineTools/usr/lib/clang/17/include -internal-externc-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -internal-externc-isystem /Library/Developer/CommandLineTools/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -fdeprecated-macro -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fno-cxx-modules -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [ "/Library/Developer/CommandLineTools/usr/bin/clang" -cc1 -triple arm64-apple-macosx15.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=15.5 -fvisibility-inlines-hidden-static-local-var -fdefine-target-os-macros -fno-assume-unique-vtables -fno-modulemap-allow-subdirectory-search -target-cpu apple-m1 -target-feature +zcm -target-feature +zcz -target-feature +v8.5a -target-feature +aes -target-feature +altnzcv -target-feature +ccdp -target-feature +complxnum -target-feature +crc -target-feature +dotprod -target-feature +fp-armv8 -target-feature +fp16fml -target-feature +fptoint -target-feature +fullfp16 -target-feature +jsconv -target-feature +lse -target-feature +neon -target-feature +pauth -target-feature +perfmon -target-feature +predres -target-feature +ras -target-feature +rcpc -target-feature +rdm -target-feature +sb -target-feature +sha2 -target-feature +sha3 -target-feature +specrestrict -target-feature +ssbs -target-abi darwinpcs -debugger-tuning=lldb -fdebug-compilation-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-BMNxAf -target-linker-version 1167.5 -v -fcoverage-compilation-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-BMNxAf -resource-dir /Library/Developer/CommandLineTools/usr/lib/clang/17 -dependency-file CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include -internal-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -internal-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /Library/Developer/CommandLineTools/usr/lib/clang/17/include -internal-externc-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -internal-externc-isystem /Library/Developer/CommandLineTools/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -fdeprecated-macro -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fno-cxx-modules -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [clang -cc1 version 17.0.0 (clang-1700.0.13.5) default target arm64-apple-darwin24.6.0]
         ignore line: [ignoring nonexistent directory "/usr/local/include"]
         ignore line: [ignoring nonexistent directory "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/local/include"]
@@ -2301,13 +2395,12 @@ events:
         ignore line: [ /Library/Developer/CommandLineTools/usr/include]
         ignore line: [ /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)]
         ignore line: [End of search list.]
-        ignore line: [Linking CXX executable cmTC_ec346]
-        ignore line: [/opt/homebrew/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ec346.dir/link.txt --verbose=1]
+        ignore line: [[2/2] : && /usr/bin/c++ -arch arm64 -Wl -search_paths_first -Wl -headerpad_max_install_names -v -Wl -v CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_4e787   && :]
         ignore line: [Apple clang version 17.0.0 (clang-1700.0.13.5)]
         ignore line: [Target: arm64-apple-darwin24.6.0]
         ignore line: [Thread model: posix]
         ignore line: [InstalledDir: /Library/Developer/CommandLineTools/usr/bin]
-        link line: [ "/Library/Developer/CommandLineTools/usr/bin/ld" -demangle -lto_library /Library/Developer/CommandLineTools/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 15.0.0 15.5 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_ec346 -L/usr/local/lib -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Library/Developer/CommandLineTools/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a]
+        link line: [ "/Library/Developer/CommandLineTools/usr/bin/ld" -demangle -lto_library /Library/Developer/CommandLineTools/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 15.0.0 15.5 -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_4e787 -L/usr/local/lib -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Library/Developer/CommandLineTools/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a]
           arg [/Library/Developer/CommandLineTools/usr/bin/ld] ==> ignore
           arg [-demangle] ==> ignore
           arg [-lto_library] ==> ignore, skip following value
@@ -2324,12 +2417,12 @@ events:
           arg [-mllvm] ==> ignore
           arg [-enable-linkonceodr-outlining] ==> ignore
           arg [-o] ==> ignore
-          arg [cmTC_ec346] ==> ignore
+          arg [cmTC_4e787] ==> ignore
           arg [-L/usr/local/lib] ==> dir [/usr/local/lib]
           arg [-search_paths_first] ==> ignore
           arg [-headerpad_max_install_names] ==> ignore
           arg [-v] ==> ignore
-          arg [CMakeFiles/cmTC_ec346.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [CMakeFiles/cmTC_4e787.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
           arg [-lc++] ==> lib [c++]
           arg [-lSystem] ==> lib [System]
           arg [/Library/Developer/CommandLineTools/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a] ==> lib [/Library/Developer/CommandLineTools/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a]
@@ -2378,8 +2471,8 @@ events:
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-LOC2wc"
-      binary: "/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-LOC2wc"
+      source: "/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-vB25kY"
+      binary: "/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-vB25kY"
     cmakeVariables:
       CMAKE_CXX_FLAGS: ""
       CMAKE_CXX_FLAGS_DEBUG: "-g"
@@ -2395,17 +2488,11 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-LOC2wc'
+        Change Dir: '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-vB25kY'
         
-        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /opt/homebrew/bin/gmake -f Makefile cmTC_171a4/fast
-        /opt/homebrew/bin/gmake  -f CMakeFiles/cmTC_171a4.dir/build.make CMakeFiles/cmTC_171a4.dir/build
-        gmake[1]: Entering directory '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-LOC2wc'
-        Building CXX object CMakeFiles/cmTC_171a4.dir/src.cxx.o
-        /usr/bin/c++ -DCMAKE_HAVE_LIBC_PTHREAD  -std=gnu++20 -arch arm64 -MD -MT CMakeFiles/cmTC_171a4.dir/src.cxx.o -MF CMakeFiles/cmTC_171a4.dir/src.cxx.o.d -o CMakeFiles/cmTC_171a4.dir/src.cxx.o -c /Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-LOC2wc/src.cxx
-        Linking CXX executable cmTC_171a4
-        /opt/homebrew/bin/cmake -E cmake_link_script CMakeFiles/cmTC_171a4.dir/link.txt --verbose=1
-        /usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_171a4.dir/src.cxx.o -o cmTC_171a4
-        gmake[1]: Leaving directory '/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-LOC2wc'
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_898dd
+        [1/2] /usr/bin/c++ -DCMAKE_HAVE_LIBC_PTHREAD  -std=gnu++20 -arch arm64 -MD -MT CMakeFiles/cmTC_898dd.dir/src.cxx.o -MF CMakeFiles/cmTC_898dd.dir/src.cxx.o.d -o CMakeFiles/cmTC_898dd.dir/src.cxx.o -c /Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/CMakeScratch/TryCompile-vB25kY/src.cxx
+        [2/2] : && /usr/bin/c++ -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_898dd.dir/src.cxx.o -o cmTC_898dd   && :
         
       exitCode: 0
   -

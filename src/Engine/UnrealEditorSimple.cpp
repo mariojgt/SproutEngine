@@ -18,19 +18,10 @@ UnrealEditor::~UnrealEditor() {
 
 bool UnrealEditor::Init(GLFWwindow* window) {
     editorWindow = window;
-
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    
+    // Don't create ImGui context - TinyImGui already did that
+    // Just store that we don't own the backends
+    ownsImGuiBackends = false;
 
     // Initialize console with welcome message
     AddLog("=== SproutEngine Unreal-like Editor Started ===", "System");
@@ -44,9 +35,11 @@ bool UnrealEditor::Init(GLFWwindow* window) {
 }
 
 void UnrealEditor::Shutdown(GLFWwindow* window) {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    if (ownsImGuiBackends) {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
 }
 
 void UnrealEditor::Update(float deltaTime) {
@@ -63,10 +56,8 @@ void UnrealEditor::Update(float deltaTime) {
 }
 
 void UnrealEditor::Render(entt::registry& registry, Renderer& renderer, Scripting& scripting, bool& playMode) {
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+    // Start the Dear ImGui frame using TinyImGui
+    TinyImGui::NewFrame();
 
     // Draw main menu bar
     DrawMainMenuBar(registry, scripting, playMode);
@@ -76,7 +67,7 @@ void UnrealEditor::Render(entt::registry& registry, Renderer& renderer, Scriptin
     if (showContentBrowser) DrawContentBrowser();
     if (showWorldOutliner) DrawWorldOutliner(registry);
     if (showInspector) DrawInspector(registry, scripting);
-    if (showBlueprintGraph) DrawBlueprintGraph();
+    if (showBlueprintGraph) DrawBlueprintGraph(registry, scripting);
     if (showConsole) DrawConsole(registry, scripting);
     if (showMaterialEditor) DrawMaterialEditor();
     if (showRoadmap) DrawRoadmap();
@@ -88,9 +79,9 @@ void UnrealEditor::Render(entt::registry& registry, Renderer& renderer, Scriptin
     if (showDemoWindow) ImGui::ShowDemoWindow(&showDemoWindow);
     if (showMetrics) ImGui::ShowMetricsWindow(&showMetrics);
 
-    // Render
+    // Render using TinyImGui
     ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    TinyImGui::RenderDrawData(ImGui::GetDrawData());
 }
 
 void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scripting, bool& playMode) {
@@ -565,6 +556,52 @@ void UnrealEditor::DrawInspector(entt::registry& registry, Scripting& scripting)
                         AddLog("Added Script Component", "Info");
                     }
                 }
+                if (ImGui::MenuItem("Blueprint")) {
+                    if (!registry.any_of<BlueprintComponent>(selectedEntity)) {
+                        // create generated folder if needed
+                        std::filesystem::create_directories("assets/scripts/generated");
+                        std::string out = "assets/scripts/generated/blueprint_" + std::to_string((uint32_t)selectedEntity) + ".lua";
+                        // write a small template
+                        std::ofstream ofs(out);
+                        ofs << "function OnStart(id)\n  -- Blueprint start\nend\n\nfunction OnTick(id, dt)\n  -- Blueprint tick\nend\n";
+                        ofs.close();
+                        registry.emplace<BlueprintComponent>(selectedEntity, BlueprintComponent{out});
+                        currentBlueprintPath = out;
+                        // load file into editor buffer
+                        currentBlueprintCode.clear();
+                        std::ifstream ifs(out);
+                        if (ifs) {
+                            std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+                            currentBlueprintCode = content;
+                        }
+                        showBlueprintEditor = true;
+                        AddLog("Added Blueprint Component and opened editor: " + out, "Info");
+                    }
+                }
+                if (ImGui::MenuItem("Code")) {
+                    // Create a raw Lua script and open code editor
+                    std::filesystem::create_directories("assets/scripts/generated");
+                    std::string out = "assets/scripts/generated/code_" + std::to_string((uint32_t)selectedEntity) + ".lua";
+                    std::ofstream ofs(out);
+                    ofs << "-- New code\nfunction OnStart(id) end\nfunction OnTick(id, dt) end\n";
+                    ofs.close();
+                    // attach as Script component if not present
+                    if (!registry.any_of<Script>(selectedEntity)) {
+                        registry.emplace<Script>(selectedEntity, out, 0.0, false);
+                    } else {
+                        auto& s = registry.get<Script>(selectedEntity);
+                        s.filePath = out;
+                    }
+                    currentBlueprintPath = out;
+                    std::ifstream ifs(out);
+                    currentBlueprintCode.clear();
+                    if (ifs) {
+                        std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+                        currentBlueprintCode = content;
+                    }
+                    showBlueprintEditor = true;
+                    AddLog("Created code file and opened editor: " + out, "Info");
+                }
                 if (ImGui::MenuItem("HUD")) {
                     if (!registry.any_of<HUDComponent>(selectedEntity)) {
                         registry.emplace<HUDComponent>(selectedEntity, HUDComponent{100.0f, 100.0f, 200, "New HUD"});
@@ -592,31 +629,80 @@ void UnrealEditor::DrawInspector(entt::registry& registry, Scripting& scripting)
     ImGui::End();
 }
 
-void UnrealEditor::DrawBlueprintGraph() {
+// include VSGraph generator
+#include "VSGraph.h"
+
+void UnrealEditor::DrawBlueprintGraph(entt::registry& registry, Scripting& scripting) {
     if (ImGui::Begin("Blueprint Graph")) {
-        ImGui::Text("🔧 Blueprint Visual Scripting System");
+        ImGui::Text("🔧 Blueprint Visual Scripting / Code Editor");
         ImGui::Separator();
 
-        ImGui::Text("This panel will contain the visual scripting interface");
-        ImGui::Text("Similar to Unreal Engine's Blueprint system");
+#ifdef IMNODES_AVAILABLE
+        ImGui::Text("ImNodes visual editor available (full UI in other editor)");
+#else
+        ImGui::Text("Visual node editor not available. Using code editor as fallback.");
+#endif
 
         ImGui::Spacing();
-        ImGui::Text("Features planned:");
-        ImGui::BulletText("Node-based visual scripting");
-        ImGui::BulletText("Event nodes (BeginPlay, Tick, etc.)");
-        ImGui::BulletText("Function nodes");
-        ImGui::BulletText("Variable nodes");
-        ImGui::BulletText("Flow control nodes");
-        ImGui::BulletText("Lua code generation");
+        if (ImGui::Button("Generate Rotate Premade")) {
+            std::string out = VSGraph::Generate("assets", VSGraph::Premade::RotateOnTick);
+            currentBlueprintPath = out;
+            std::ifstream ifs(out);
+            currentBlueprintCode.clear();
+            if (ifs) currentBlueprintCode.assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+            showBlueprintEditor = true;
+            AddLog("Generated premade blueprint: " + out, "Info");
+        }
 
-        ImGui::Spacing();
-        if (ImGui::Button("Generate Test Lua")) {
-            AddLog("Generated Lua from Blueprint graph (placeholder)", "Info");
+        ImGui::SameLine();
+        if (ImGui::Button("Generate PrintHello Premade")) {
+            std::string out = VSGraph::Generate("assets", VSGraph::Premade::PrintHelloOnStart);
+            currentBlueprintPath = out;
+            std::ifstream ifs(out);
+            currentBlueprintCode.clear();
+            if (ifs) currentBlueprintCode.assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+            showBlueprintEditor = true;
+            AddLog("Generated premade blueprint: " + out, "Info");
         }
 
         ImGui::Spacing();
-        ImGui::Text("Current Status: Architecture designed, UI pending");
-        ImGui::Text("Requires imnodes library for full implementation");
+        if (showBlueprintEditor) {
+            ImGui::Separator();
+            ImGui::Text("Editing: %s", currentBlueprintPath.c_str());
+
+            // Ensure buffer is large enough for ImGui to edit in-place
+                // prepare char buffer
+                blueprintEditBuffer.assign(currentBlueprintCode.begin(), currentBlueprintCode.end());
+                blueprintEditBuffer.push_back('\0');
+                if (ImGui::InputTextMultiline("##blueprintcode", blueprintEditBuffer.data(), blueprintEditBuffer.size(), ImVec2(-1,300))) {
+                    currentBlueprintCode = std::string(blueprintEditBuffer.data());
+                }
+
+            if (ImGui::Button("Save")) {
+                if (!currentBlueprintPath.empty()) {
+                    std::ofstream ofs(currentBlueprintPath, std::ios::binary);
+                    ofs << currentBlueprintCode;
+                    ofs.close();
+                    AddLog("Saved blueprint: " + currentBlueprintPath, "Info");
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Apply to Selected")) {
+                if (selectedEntity != entt::null && IsEntityValid(registry, selectedEntity)) {
+                    // ensure Script component
+                    if (!registry.any_of<Script>(selectedEntity)) {
+                        registry.emplace<Script>(selectedEntity, currentBlueprintPath, 0.0, false);
+                    } else {
+                        auto& s = registry.get<Script>(selectedEntity);
+                        s.filePath = currentBlueprintPath;
+                    }
+                    scripting.loadScript(registry, selectedEntity, currentBlueprintPath);
+                    AddLog("Applied blueprint/script to entity", "Info");
+                } else {
+                    AddLog("No selected entity to apply to", "Warning");
+                }
+            }
+        }
     }
     ImGui::End();
 }
