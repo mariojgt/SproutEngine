@@ -4,6 +4,7 @@
 
 struct Transform {
     glm::vec3 position{0.0f};
+    glm::vec3 rotation{0.0f}; // for gizmo compatibility
     glm::vec3 rotationEuler{0.0f}; // degrees
     glm::vec3 scale{1.0f};
 };
@@ -15,6 +16,10 @@ struct NameComponent {
 struct Tag { std::string name{"Entity"}; };
 
 struct MeshCube {
+    bool enabled = true; // Dummy member to avoid zero-size struct issues
+};
+
+struct MeshSphere {
     bool enabled = true; // Dummy member to avoid zero-size struct issues
 };
 
