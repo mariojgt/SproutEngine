@@ -11,6 +11,8 @@ public:
 
     void beginFrame(int width, int height);
     void drawCube(const glm::mat4& mvp);
+    // tint multiplies the base color (use to highlight selected objects)
+    void drawCube(const glm::mat4& mvp, const glm::vec3& tint);
     void endFrame();
 
 private:

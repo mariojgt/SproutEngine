@@ -91,6 +91,18 @@ void Renderer::drawCube(const glm::mat4& mvp){
     glBindVertexArray(0);
 }
 
+void Renderer::drawCube(const glm::mat4& mvp, const glm::vec3& tint) {
+    glUseProgram(m_program);
+    glUniformMatrix4fv(m_uMVP, 1, GL_FALSE, &mvp[0][0]);
+    int loc = glGetUniformLocation(m_program, "uTint");
+    if (loc >= 0) glUniform3f(loc, tint.x, tint.y, tint.z);
+    glBindVertexArray(m_vao);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+    // reset tint to white to avoid leaking to other draws
+    if (loc >= 0) glUniform3f(loc, 1.0f, 1.0f, 1.0f);
+}
+
 void Renderer::endFrame(){
     // nothing for now
 }
@@ -123,5 +135,12 @@ bool Renderer::loadShaders(const std::string& vp, const std::string& fp){
     unsigned fs = compileShader(GL_FRAGMENT_SHADER, fsrc);
     m_program = linkProgram(vs, fs);
     m_uMVP = glGetUniformLocation(m_program, "uMVP");
+    // Ensure tint uniform exists and initialize to white
+    int tintLoc = glGetUniformLocation(m_program, "uTint");
+    if (tintLoc >= 0) {
+        glUseProgram(m_program);
+        glUniform3f(tintLoc, 1.0f, 1.0f, 1.0f);
+        glUseProgram(0);
+    }
     return m_program != 0;
 }

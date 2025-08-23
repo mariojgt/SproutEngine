@@ -131,7 +131,12 @@ int main(){
             auto& t = view.get<Transform>(e);
             glm::mat4 M = ComposeTRS(t);
             glm::mat4 MVP = P * V * M;
-            renderer.drawCube(MVP);
+            // If this entity is the selected one in the editor, tint it
+            glm::vec3 tint(1.0f, 1.0f, 1.0f);
+            if (unrealEditor.GetSelectedEntity() == e) {
+                tint = glm::vec3(1.0f, 0.6f, 0.2f); // orange highlight
+            }
+            renderer.drawCube(MVP, tint);
         }
 
         // ---- Unreal-like Editor Interface ----

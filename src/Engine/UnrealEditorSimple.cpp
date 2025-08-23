@@ -290,7 +290,17 @@ void UnrealEditor::DrawViewport(entt::registry& registry, Renderer& renderer) {
         ImGui::SameLine();
         ImGui::Checkbox("Show Gizmos", &showGizmos);
 
-        // Entity selection list for now (until we have proper 3D picking)
+        // Handle entity selection via mouse picking
+        if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0)) {
+            ImVec2 mousePos = ImGui::GetMousePos();
+            ImVec2 windowPos = ImGui::GetWindowPos();
+            ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+            ImVec2 contentPos = ImVec2(windowPos.x + contentMin.x, windowPos.y + contentMin.y);
+            ImVec2 relativePos = ImVec2(mousePos.x - contentPos.x, mousePos.y - contentPos.y);
+            HandleEntitySelection(registry, relativePos, viewportSize);
+        }
+
+        // Entity selection list for now (fallback)
         ImGui::Separator();
         ImGui::Text("Quick Entity Selection:");
 
@@ -901,6 +911,61 @@ void UnrealEditor::RefreshContentBrowser() {
         }
     } catch (const std::exception& e) {
         AddLog("Failed to refresh content browser: " + std::string(e.what()), "Error");
+    }
+}
+
+void UnrealEditor::HandleEntitySelection(entt::registry& registry, ImVec2 mousePos, ImVec2 viewportSize) {
+    int width = (int)viewportSize.x;
+    int height = (int)viewportSize.y;
+    if (width <= 0 || height <= 0) return;
+
+    glm::vec3 camPos = viewportCamera.position;
+    glm::mat4 V = glm::lookAt(viewportCamera.position, viewportCamera.target, viewportCamera.up);
+    float aspect = width > 0 ? (float)width / (float)height : 16.0f/9.0f;
+    glm::mat4 P = glm::perspective(glm::radians(viewportCamera.fov), aspect, viewportCamera.nearPlane, viewportCamera.farPlane);
+
+    float ndcX = (mousePos.x / (float)width) * 2.0f - 1.0f;
+    float ndcY = 1.0f - (mousePos.y / (float)height) * 2.0f;
+    glm::vec4 clip = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+    glm::mat4 invPV = glm::inverse(P * V);
+    glm::vec4 worldNear = invPV * clip; worldNear /= worldNear.w;
+
+    clip.z = 1.0f; clip.w = 1.0f;
+    glm::vec4 worldFar = invPV * clip; worldFar /= worldFar.w;
+
+    glm::vec3 rayOrig = glm::vec3(worldNear);
+    glm::vec3 rayDir = glm::normalize(glm::vec3(worldFar - worldNear));
+
+    float bestT = FLT_MAX;
+    entt::entity best = entt::null;
+
+    auto view = registry.view<Transform, MeshCube>();
+    for (auto e : view) {
+        auto& t = view.get<Transform>(e);
+        glm::vec3 aabbMin = t.position - glm::vec3(0.5f) * t.scale;
+        glm::vec3 aabbMax = t.position + glm::vec3(0.5f) * t.scale;
+
+        float tmin = 0.0f, tmax = FLT_MAX;
+        for (int i = 0; i < 3; ++i) {
+            float invD = 1.0f / rayDir[i];
+            float t0 = (aabbMin[i] - rayOrig[i]) * invD;
+            float t1 = (aabbMax[i] - rayOrig[i]) * invD;
+            if (invD < 0.0f) std::swap(t0, t1);
+            tmin = t0 > tmin ? t0 : tmin;
+            tmax = t1 < tmax ? t1 : tmax;
+            if (tmax <= tmin) break;
+        }
+        if (tmax > tmin) {
+            if (tmin < bestT) {
+                bestT = tmin;
+                best = e;
+            }
+        }
+    }
+
+    if (best != entt::null) {
+        selectedEntity = best;
+        AddLog("Selected entity via viewport click: " + GetEntityName(registry, best), "Info");
     }
 }
 

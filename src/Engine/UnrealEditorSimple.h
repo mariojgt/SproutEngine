@@ -26,6 +26,11 @@ public:
     void Update(float deltaTime);
     void Render(entt::registry& registry, Renderer& renderer, Scripting& scripting, bool& playMode);
 
+    // Expose selected entity for external rendering/helpers
+    entt::entity GetSelectedEntity() const { return selectedEntity; }
+
+    // ...existing code...
+
 private:
     // Core editor state
     struct GLFWwindow* editorWindow = nullptr;
@@ -92,6 +97,9 @@ private:
     void DrawToolbar(bool& playMode);
     void DrawRoadmap();
 
+    // Viewport selection via mouse
+    void HandleEntitySelection(entt::registry& registry, ImVec2 mousePos, ImVec2 viewportSize);
+
     // Console functionality
     void AddLog(const std::string& message, const std::string& level = "Info");
     void ExecuteCommand(const std::string& command, entt::registry& registry, Scripting& scripting);
@@ -105,6 +113,8 @@ private:
     entt::entity CreateEntity(entt::registry& registry, const std::string& name = "Entity");
     void DeleteEntity(entt::registry& registry, entt::entity entity);
     void DuplicateEntity(entt::registry& registry, entt::entity entity);
+
+    // ...existing code...
 
     // Content browser functionality
     void RefreshContentBrowser();

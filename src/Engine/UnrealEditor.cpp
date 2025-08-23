@@ -326,11 +326,13 @@ void UnrealEditor::DrawViewport(entt::registry& registry, Renderer& renderer) {
         // Get the size of the viewport
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-        // Handle entity selection
+        // Handle entity selection (convert global mouse to viewport-local coords)
         if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0)) {
             ImVec2 mousePos = ImGui::GetMousePos();
             ImVec2 windowPos = ImGui::GetWindowPos();
-            ImVec2 relativePos = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
+            ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+            ImVec2 contentPos = ImVec2(windowPos.x + contentMin.x, windowPos.y + contentMin.y);
+            ImVec2 relativePos = ImVec2(mousePos.x - contentPos.x, mousePos.y - contentPos.y);
             HandleEntitySelection(registry, relativePos, viewportSize);
         }
 
@@ -792,7 +794,64 @@ void UnrealEditor::DrawGizmos(entt::registry& registry) {
 }
 
 void UnrealEditor::HandleEntitySelection(entt::registry& registry, ImVec2 mousePos, ImVec2 viewportSize) {
-    // TODO: Implement entity selection via mouse picking
+    // Simple ray-AABB test in world space
+    // Convert mousePos (window coords) to NDC (-1..1)
+    int width = (int)viewportSize.x;
+    int height = (int)viewportSize.y;
+    if (width <= 0 || height <= 0) return;
+
+    // Build camera matrices
+    glm::vec3 camPos = viewportCamera.position;
+    glm::mat4 V = glm::lookAt(viewportCamera.position, viewportCamera.target, viewportCamera.up);
+    float aspect = width > 0 ? (float)width / (float)height : 16.0f/9.0f;
+    glm::mat4 P = glm::perspective(glm::radians(viewportCamera.fov), aspect, viewportCamera.nearPlane, viewportCamera.farPlane);
+
+    float ndcX = (mousePos.x / (float)width) * 2.0f - 1.0f;
+    float ndcY = 1.0f - (mousePos.y / (float)height) * 2.0f;
+    glm::vec4 clip = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+    glm::mat4 invPV = glm::inverse(P * V);
+    glm::vec4 worldNear = invPV * clip; worldNear /= worldNear.w;
+
+    clip.z = 1.0f; clip.w = 1.0f;
+    glm::vec4 worldFar = invPV * clip; worldFar /= worldFar.w;
+
+    glm::vec3 rayOrig = glm::vec3(worldNear);
+    glm::vec3 rayDir = glm::normalize(glm::vec3(worldFar - worldNear));
+
+    // Find nearest hit
+    float bestT = FLT_MAX;
+    entt::entity best = entt::null;
+
+    auto view = registry.view<Transform, MeshCube>();
+    for (auto e : view) {
+        auto& t = view.get<Transform>(e);
+        // AABB centered at position with half-extents 0.5 (cube)
+        glm::vec3 aabbMin = t.position - glm::vec3(0.5f) * t.scale;
+        glm::vec3 aabbMax = t.position + glm::vec3(0.5f) * t.scale;
+
+        // Ray-AABB slab method
+        float tmin = 0.0f, tmax = FLT_MAX;
+        for (int i = 0; i < 3; ++i) {
+            float invD = 1.0f / rayDir[i];
+            float t0 = (aabbMin[i] - rayOrig[i]) * invD;
+            float t1 = (aabbMax[i] - rayOrig[i]) * invD;
+            if (invD < 0.0f) std::swap(t0, t1);
+            tmin = t0 > tmin ? t0 : tmin;
+            tmax = t1 < tmax ? t1 : tmax;
+            if (tmax <= tmin) break;
+        }
+        if (tmax > tmin) {
+            if (tmin < bestT) {
+                bestT = tmin;
+                best = e;
+            }
+        }
+    }
+
+    if (best != entt::null) {
+        selectedEntity = best;
+        AddLog("Selected entity via viewport click: " + GetEntityName(registry, best), "Info");
+    }
 }
 
 void UnrealEditor::RefreshContentBrowser() {

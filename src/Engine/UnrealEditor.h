@@ -23,6 +23,9 @@ public:
     bool Init(struct GLFWwindow* window);
     void Shutdown(struct GLFWwindow* window);
 
+    // Expose selected entity for external rendering helpers
+    entt::entity GetSelectedEntity() const { return selectedEntity; }
+
     void Update(float deltaTime);
     void Render(entt::registry& registry, Renderer& renderer, Scripting& scripting, bool& playMode);
 
