@@ -1,0 +1,3 @@
+/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/SproutEngine.dir
+/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/edit_cache.dir
+/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/rebuild_cache.dir

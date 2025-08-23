@@ -1,0 +1,12 @@
+# ninja log v7
+0	7	1755946349274005263	/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles/cmake.verify_globs	e2134b6cf1e31b9a
+9	67	1755946349282345008	CMakeFiles/SproutEngine.dir/src/Engine/TinyImGui.cpp.o	2e45dc9314b6db38
+8	73	1755946349281951677	CMakeFiles/SproutEngine.dir/src/Engine/Theme.cpp.o	e1fc175d4d06708e
+8	384	1755946349281452388	CMakeFiles/SproutEngine.dir/src/Engine/HUD.cpp.o	3ed9f66c944823a8
+9	574	1755946349282857796	CMakeFiles/SproutEngine.dir/src/Engine/VSGraph.cpp.o	b5657562367eb0f6
+8	682	1755946349281550012	CMakeFiles/SproutEngine.dir/src/Engine/Renderer.cpp.o	14df892ae21c38aa
+8	695	1755946349281344388	CMakeFiles/SproutEngine.dir/src/Engine/FileUtil.cpp.o	c74f4b9a62f94d27
+8	809	1755946349281848219	CMakeFiles/SproutEngine.dir/src/Engine/Systems.cpp.o	87b04c5e8db26851
+8	989	1755946349281648303	CMakeFiles/SproutEngine.dir/src/Engine/Scene.cpp.o	855a02f2e6db7b4
+7	1421	1755946349281148098	CMakeFiles/SproutEngine.dir/src/Engine/Editor.cpp.o	de3fde058c3b7303
+8	1465	1755946349281746136	CMakeFiles/SproutEngine.dir/src/Engine/Scripting.cpp.o	d806027836630778
