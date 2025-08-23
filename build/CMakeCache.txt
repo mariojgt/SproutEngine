@@ -208,7 +208,7 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 CMAKE_TAPI:FILEPATH=/Library/Developer/CommandLineTools/usr/bin/tapi
 
 //The CMake toolchain file
-CMAKE_TOOLCHAIN_FILE:FILEPATH=/Users/mariotarosso/vcpkg/scripts/buildsystems/vcpkg.cmake
+CMAKE_TOOLCHAIN_FILE:FILEPATH=/Users/mariotarosso/Downloads/SproutEngine/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console
@@ -456,5 +456,5 @@ VCPKG_VERBOSE-ADVANCED:INTERNAL=1
 //Making sure VCPKG_MANIFEST_MODE doesn't change
 Z_VCPKG_CHECK_MANIFEST_MODE:INTERNAL=ON
 //Vcpkg root directory
-Z_VCPKG_ROOT_DIR:INTERNAL=/Users/mariotarosso/vcpkg
+Z_VCPKG_ROOT_DIR:INTERNAL=/Users/mariotarosso/Downloads/SproutEngine/vcpkg
 

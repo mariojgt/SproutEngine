@@ -1,0 +1,120 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 6b90b8f7add9691552d06700958d52a228ab8793d44ce739ce248a76e43c7987
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 7d97346adce299254adc2d830906e70d4b10f9a5fbe1cfb085b959c9fe9507c9
+Status: install ok installed
+
+Package: entt
+Version: 3.15.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 3f15f067a39ae0a70b25ad3a07bf28cf57ae8636aa25dab59dc8aa926e124437
+Description: Gaming meets modern C++ - a fast and reliable entity-component system and much more
+Status: install ok installed
+
+Package: egl-registry
+Version: 2024-01-25
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 9908c86ed40f54f8693d88e767f11900166470f278e0fd84ee5e2d07a9ffdd0e
+Description: EGL API and Extension Registry
+Status: install ok installed
+
+Package: opengl-registry
+Version: 2024-02-10
+Port-Version: 1
+Depends: egl-registry
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 9ee571d5aac0c64c1b5bae93ab16381c00a6bb0ff5f06c08a2072fac6cf8e63a
+Description: OpenGL, OpenGL ES, and OpenGL ES-SC API and Extension Registry
+Status: install ok installed
+
+Package: glad
+Version: 0.1.36
+Depends: egl-registry, opengl-registry, vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 1e2a8b5683d49b97ddb72a824e079a7754f5df2b371295418f0584fef6c94494
+Description: Multi-Language Vulkan/GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs.
+Default-Features: loader
+Status: install ok installed
+
+Package: glad
+Feature: loader
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Generate loader logic.
+Status: install ok installed
+
+Package: glfw3
+Version: 3.4
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: fc97f936457f98691785f208f25f6eb021a49ab8e30a4a22c2af809a011f82b9
+Description: GLFW is a free, Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
+Status: install ok installed
+
+Package: glm
+Version: 1.0.1
+Port-Version: 3
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 7a3b3ceff171e32a7e0bf6967a2fd1c8d94132db7c0db04381e7c030b79f2de3
+Description: OpenGL Mathematics (GLM)
+Status: install ok installed
+
+Package: imgui
+Version: 1.91.9
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: e37a16883b9ea8e79ecb51c0093d5942c64f5c44ae0e915e2914108fb841b7c7
+Description: Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies.
+Status: install ok installed
+
+Package: imgui
+Feature: glfw-binding
+Depends: glfw3
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Make available GLFW binding
+Status: install ok installed
+
+Package: imgui
+Feature: opengl3-binding
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Make available OpenGL3/ES/ES2 (modern) binding
+Status: install ok installed
+
+Package: lua
+Version: 5.4.8
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: c35eb44991b842daea8d3c61c4f030842cc7698a3b8cb4a9df1e31364259351a
+Description: A powerful, fast, lightweight, embeddable scripting language
+Status: install ok installed
+
+Package: sol2
+Version: 3.5.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 1b0b2e759abb12a56b181defefbff7bfacc3db8bb1e442dc4e731b7573859a28
+Description: Sol3 (sol2 v3.0) - a C++ <-> Lua API wrapper with advanced features and top notch performance
+Status: install ok installed
+

@@ -40,7 +40,7 @@ public:
     std::vector<char> blueprintEditBuffer;
     // Whether this editor initialized ImGui backends
     bool ownsImGuiBackends = false;
-    
+
     // Blueprint node system
     struct BlueprintNode {
         int id;
@@ -147,4 +147,10 @@ private:
     // File operations
     void NewScene(entt::registry& registry);
     void SaveScene(entt::registry& registry, const std::string& filepath);
+
+    // Blueprint system methods
+    void GenerateBlueprintSP();
+    void GenerateLuaFromSP();
+    void SaveCodeToFile();
+    void ApplyScriptToSelected(entt::registry& registry, Scripting& scripting);
 };

@@ -6,6 +6,7 @@ file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/Users/mariotarosso/Downloads
 set(OLD_GLOB
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Actor.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Blueprint.cpp"
+  "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/BlueprintEditor.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/CoreComponents.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/Editor.cpp"
   "/Users/mariotarosso/Downloads/SproutEngine/src/Engine/FileUtil.cpp"
