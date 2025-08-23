@@ -12,6 +12,63 @@ The following packages are already installed:
     sol2:arm64-osx@3.5.0
   * vcpkg-cmake:arm64-osx@2024-04-23
   * vcpkg-cmake-config:arm64-osx@2024-05-23
+The following packages will be built and installed:
+    civetweb:arm64-osx@1.16#2
+  * zlib:arm64-osx@1.3.1
+Additional packages (*) will be modified to complete this operation.
+Restored 0 package(s) from /Users/mariotarosso/.cache/vcpkg/archives in 197 us. Use --debug to see more details.
+Installing 1/2 zlib:arm64-osx@1.3.1...
+Building zlib:arm64-osx@1.3.1...
+Downloading https://github.com/madler/zlib/archive/v1.3.1.tar.gz -> madler-zlib-v1.3.1.tar.gz
+Successfully downloaded madler-zlib-v1.3.1.tar.gz
+-- Extracting source /Users/mariotarosso/vcpkg/downloads/madler-zlib-v1.3.1.tar.gz
+-- Applying patch 0001-Prevent-invalid-inclusions-when-HAVE_-is-set-to-0.patch
+-- Applying patch 0002-build-static-or-shared-not-both.patch
+-- Applying patch 0003-android-and-mingw-fixes.patch
+-- Using source at /Users/mariotarosso/vcpkg/buildtrees/zlib/src/v1.3.1-2e5db616bf.clean
+-- Found external ninja('1.13.1').
+-- Configuring arm64-osx
+-- Building arm64-osx-dbg
+-- Building arm64-osx-rel
+-- Installing: /Users/mariotarosso/vcpkg/packages/zlib_arm64-osx/share/zlib/vcpkg-cmake-wrapper.cmake
+-- Fixing pkgconfig file: /Users/mariotarosso/vcpkg/packages/zlib_arm64-osx/lib/pkgconfig/zlib.pc
+-- Fixing pkgconfig file: /Users/mariotarosso/vcpkg/packages/zlib_arm64-osx/debug/lib/pkgconfig/zlib.pc
+-- Installing: /Users/mariotarosso/vcpkg/packages/zlib_arm64-osx/share/zlib/copyright
+-- Performing post-build validation
+Starting submission of zlib:arm64-osx@1.3.1 to 1 binary cache(s) in the background
+Elapsed time to handle zlib:arm64-osx: 2.2 s
+zlib:arm64-osx package ABI: 020c1ae22f8d868133baa69590846c57dec6d3084af7f4e11f9567d52ab33e62
+Installing 2/2 civetweb:arm64-osx@1.16#2...
+Building civetweb:arm64-osx@1.16#2...
+Downloading https://github.com/civetweb/civetweb/archive/v1.16.tar.gz -> civetweb-civetweb-v1.16.tar.gz
+Successfully downloaded civetweb-civetweb-v1.16.tar.gz
+-- Extracting source /Users/mariotarosso/vcpkg/downloads/civetweb-civetweb-v1.16.tar.gz
+-- Applying patch disable_warnings.patch
+-- Applying patch fix-fseeko.patch
+-- Applying patch pkgconfig.patch
+-- Using source at /Users/mariotarosso/vcpkg/buildtrees/civetweb/src/v1.16-fdc4998d67.clean
+-- Found external ninja('1.13.1').
+-- Configuring arm64-osx
+-- Building arm64-osx-dbg
+-- Building arm64-osx-rel
+-- Fixing pkgconfig file: /Users/mariotarosso/vcpkg/packages/civetweb_arm64-osx/lib/pkgconfig/civetweb-cpp.pc
+-- Fixing pkgconfig file: /Users/mariotarosso/vcpkg/packages/civetweb_arm64-osx/lib/pkgconfig/civetweb.pc
+-- Fixing pkgconfig file: /Users/mariotarosso/vcpkg/packages/civetweb_arm64-osx/debug/lib/pkgconfig/civetweb-cpp.pc
+-- Fixing pkgconfig file: /Users/mariotarosso/vcpkg/packages/civetweb_arm64-osx/debug/lib/pkgconfig/civetweb.pc
+-- Installing: /Users/mariotarosso/vcpkg/packages/civetweb_arm64-osx/share/civetweb/copyright
+-- Performing post-build validation
+Starting submission of civetweb:arm64-osx@1.16#2 to 1 binary cache(s) in the background
+Elapsed time to handle civetweb:arm64-osx: 6.6 s
+civetweb:arm64-osx package ABI: 735ca1b3e8199885a6a6c04c4aa470fcb324f268563eda1fbd0156b57008d637
+Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Some packages did not declare an SPDX license. Check the `copyright` file for each package for more information about their licensing.
+Packages installed in this vcpkg installation declare the following licenses:
+Zlib
+civetweb provides CMake targets:
+
+  find_package(civetweb CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE civetweb::civetweb)
+
 entt provides CMake targets:
 
     find_package(EnTT CONFIG REQUIRED)
@@ -65,4 +122,7 @@ sol2 provides pkg-config modules:
   # C++ <-> Lua Wrapper Library
   sol2
 
-All requested installations completed successfully in: 80.5 us
+Completed submission of zlib:arm64-osx@1.3.1 to 1 binary cache(s) in 26.1 ms
+Waiting for 1 remaining binary cache submissions...
+Completed submission of civetweb:arm64-osx@1.16#2 to 1 binary cache(s) in 47.5 ms (1/1)
+All requested installations completed successfully in: 8.9 s

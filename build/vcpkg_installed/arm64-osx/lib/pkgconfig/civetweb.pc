@@ -1,0 +1,14 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+Name: civetweb
+Description: generic graph library
+Version: 1.16
+
+
+
+Libs: "-L${libdir}" -lcivetweb
+Requires:  
+Cflags: "-I${includedir}"

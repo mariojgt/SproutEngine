@@ -1,0 +1,33 @@
+{
+  "blueprint": {
+    "name": "NewBlueprint",
+    "description": "A template blueprint for SproutEngine",
+    "version": "1.0",
+    "nodes": [
+      {
+        "id": 1,
+        "type": "Event",
+        "subtype": "OnStart",
+        "position": {"x": 100, "y": 100},
+        "properties": {}
+      },
+      {
+        "id": 2,
+        "type": "Function",
+        "subtype": "Print",
+        "position": {"x": 300, "y": 100},
+        "properties": {
+          "message": "Blueprint Started!"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from_node": 1,
+        "from_pin": "exec_out",
+        "to_node": 2,
+        "to_pin": "exec_in"
+      }
+    ]
+  }
+}

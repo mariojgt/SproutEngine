@@ -78,8 +78,8 @@ CMAKE_INSTALL_PREFIX:PATH=/usr/local
 //Path to a program.
 CMAKE_LINKER:FILEPATH=/usr/bin/ld
 
-//No help, variable specified on the command line.
-CMAKE_MAKE_PROGRAM:UNINITIALIZED=/opt/homebrew/bin/ninja
+//Program used to build from build.ninja files.
+CMAKE_MAKE_PROGRAM:FILEPATH=/opt/homebrew/bin/ninja
 
 //Flags used by the linker during the creation of modules during
 // all build types.
@@ -293,6 +293,9 @@ Z_VCPKG_CL:FILEPATH=Z_VCPKG_CL-NOTFOUND
 // triplet
 _VCPKG_INSTALLED_DIR:PATH=/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed
 
+//The directory containing a CMake configuration file for civetweb.
+civetweb_DIR:PATH=/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/share/civetweb
+
 //The directory containing a CMake configuration file for glad.
 glad_DIR:PATH=/Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/share/glad
 
@@ -387,6 +390,8 @@ CMAKE_INSTALL_NAME_TOOL-ADVANCED:INTERNAL=1
 CMAKE_LINKER-ADVANCED:INTERNAL=1
 //Name of CMakeLists files to read
 CMAKE_LIST_FILE_NAME:INTERNAL=CMakeLists.txt
+//ADVANCED property for variable: CMAKE_MAKE_PROGRAM
+CMAKE_MAKE_PROGRAM-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS
 CMAKE_MODULE_LINKER_FLAGS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_DEBUG
