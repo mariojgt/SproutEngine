@@ -1,5 +1,5 @@
 [package]
-name = "sprout_engine_unified"
+name = "sprout_engine_unified_fbx"
 version = "0.3.0"
 edition = "2021"
 
@@ -10,7 +10,8 @@ opt-level = 1
 opt-level = "s"
 
 [dependencies]
-bevy = { version = "0.15", default-features = true }
-bevy_egui = "0.31"
+bevy = { version = "0.10", default-features = true, features = ["bevy_animation"] }
+bevy_egui = "0.20"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+bevy_mod_fbx = "0.4" # compatible with Bevy 0.10

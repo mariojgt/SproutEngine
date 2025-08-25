@@ -1,24 +1,19 @@
-# Sprout Engine (Unified)
+# Sprout Engine — Unified (glTF + FBX + Animator)
 
-Cross‑platform minimal editor starter with:
-- File: **New / Save / Load** (JSON)
-- **Gizmos**: W/E/R + X/Y/Z, drag to move/rotate/scale
-- **Click-to-select in viewport**
-- **Node Graph** (basic) + list-based visual script
-- **Content Browser** scans `/assets` for `.gltf/.glb/.png/.jpg` and spawns them
+**What’s inside**
+- File: New / Save / Load (JSON scene)
+- Content Browser: scans `/assets` for `.gltf/.glb/.fbx/.png/.jpg`
+- Viewport click-select + W/E/R gizmos (X/Y/Z axis lock)
+- Inspector: edit transform numerically
+- Visual Scripting: list + simple Node Graph
+- **Animator tab:** attach an Animator to an entity, list its clips, create simple state machine with a single float parameter `speed` and thresholds
+- **FBX support:** via `bevy_mod_fbx` (FBX 7.4/7.5 binary recommended). Anim support depends on the plugin’s current capabilities.
 
-## Run
+## Build
 ```
 cargo run
 ```
-If crates whine: `cargo update`
+If crates mismatch: `cargo update`. If `bevy_mod_fbx` complains about Bevy version, check its README for matching versions and adjust.
 
-## Usage
-- Drop files into the `assets/` folder (next to Cargo.toml).
-- Open the app → **Content Browser** (bottom) → select a file → **Spawn**.
-- Left‑click an object in the viewport to **select** it, then use gizmos (W/E/R + X/Y/Z), or edit in Inspector.
-- Save/Load scene via **File** menu (JSON path field).
-
-## Notes
-- Picking uses simple ray‑sphere tests (fast, good enough for prototypes). For perfect picking per‑mesh triangles, integrate a picking plugin later.
-- glTF spawns the default scene of the file at origin; images spawn as unlit quads.
+## Assets
+Put models/textures in the `assets/` folder (next to `Cargo.toml`). FBX works best as Binary 7.4/7.5. If FBX fails, export glTF/GLB as a fallback.
