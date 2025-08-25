@@ -46,6 +46,8 @@ set(ENGINE_SOURCES
     src/Engine/UnrealEditorSimple.h
     src/Engine/ModernTheme.cpp
     src/Engine/ModernTheme.h
+    src/Engine/widgets/SpCodeEditor.cpp
+    src/Engine/widgets/SpCodeEditor.h
     # New Actor system files (temporarily disabled until compilation issues are resolved)
     # src/Engine/Actor.cpp
     # src/Engine/Actor.h

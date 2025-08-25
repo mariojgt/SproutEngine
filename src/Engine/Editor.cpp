@@ -83,6 +83,11 @@ void Editor::drawPanels(entt::registry& reg, Renderer& renderer, Scripting& scri
             if(ImGui::Button("Load Script")){
                 if(!sc->filePath.empty()) scripting.loadScript(reg, selected, sc->filePath);
             }
+#ifdef SP_TOOLCHAIN_ENABLED
+            if(ImGui::Button("Edit Script")){
+                if(!sc->filePath.empty()) spEditor.open(sc->filePath);
+            }
+#endif
         } else {
             if(ImGui::Button("Add Script Component")){
                 reg.emplace<Script>(selected, Script{std::string("assets/scripts/Rotate.lua"), 0.0, false});
@@ -154,4 +159,7 @@ void Editor::drawPanels(entt::registry& reg, Renderer& renderer, Scripting& scri
         }
     }
     ImGui::End();
+#ifdef SP_TOOLCHAIN_ENABLED
+    spEditor.draw();
+#endif
 }
