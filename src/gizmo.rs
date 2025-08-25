@@ -91,23 +91,23 @@ pub fn gizmo_toolbar(
     egui::TopBottomPanel::top("gizmo_toolbar").show(contexts.ctx_mut(), |ui| {
         ui.horizontal(|ui| {
             ui.label("Tools:");
-            
+
             if ui.selectable_label(gizmo_settings.current_tool == GizmoTool::Select, "Select (Q)").clicked() {
                 gizmo_settings.current_tool = GizmoTool::Select;
             }
-            
+
             if ui.selectable_label(gizmo_settings.current_tool == GizmoTool::Translate, "Move (W)").clicked() {
                 gizmo_settings.current_tool = GizmoTool::Translate;
             }
-            
+
             if ui.selectable_label(gizmo_settings.current_tool == GizmoTool::Rotate, "Rotate (E)").clicked() {
                 gizmo_settings.current_tool = GizmoTool::Rotate;
             }
-            
+
             if ui.selectable_label(gizmo_settings.current_tool == GizmoTool::Scale, "Scale (R)").clicked() {
                 gizmo_settings.current_tool = GizmoTool::Scale;
             }
-            
+
             if ui.selectable_label(gizmo_settings.current_tool == GizmoTool::Universal, "Universal (T)").clicked() {
                 gizmo_settings.current_tool = GizmoTool::Universal;
             }
@@ -124,7 +124,7 @@ pub fn gizmo_toolbar(
             ui.selectable_value(&mut gizmo_settings.snap_mode, SnapMode::None, "None");
             ui.selectable_value(&mut gizmo_settings.snap_mode, SnapMode::Grid, "Grid");
             ui.selectable_value(&mut gizmo_settings.snap_mode, SnapMode::Increment, "Increment");
-            
+
             if gizmo_settings.snap_mode != SnapMode::None {
                 ui.add(egui::DragValue::new(&mut gizmo_settings.snap_value).speed(0.1).clamp_range(0.1..=10.0));
             }
@@ -144,7 +144,7 @@ pub fn spawn_gizmo_handles(
 ) {
     // This would spawn invisible collision meshes for gizmo interaction
     // For now, we'll create a simple representation
-    
+
     let handle_material = materials.add(StandardMaterial {
         base_color: Color::rgba(1.0, 0.0, 0.0, 0.8),
         unlit: true,
@@ -179,7 +179,7 @@ pub fn update_gizmo_visibility(
     mut gizmo_handles: Query<&mut Visibility, With<GizmoHandle>>,
     _transforms: Query<&Transform, Without<GizmoHandle>>,
 ) {
-    let show_gizmos = gizmo_settings.show_gizmo && 
+    let show_gizmos = gizmo_settings.show_gizmo &&
                      gizmo_settings.current_tool != GizmoTool::Select &&
                      selection.entity.is_some();
 
@@ -202,7 +202,7 @@ pub fn position_gizmos(
         if let Ok(selected_transform) = selected_transforms.get(selected_entity) {
             for mut gizmo_transform in gizmo_transforms.iter_mut() {
                 gizmo_transform.translation = selected_transform.translation;
-                
+
                 // Apply coordinate space
                 match gizmo_settings.coordinate_space {
                     GizmoSpace::World => {
@@ -212,7 +212,7 @@ pub fn position_gizmos(
                         gizmo_transform.rotation = selected_transform.rotation;
                     }
                 }
-                
+
                 // Apply gizmo size
                 gizmo_transform.scale = Vec3::splat(gizmo_settings.gizmo_size);
             }

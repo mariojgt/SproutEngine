@@ -133,35 +133,35 @@ pub fn viewport_ui(
     egui::TopBottomPanel::top("viewport_toolbar").show(contexts.ctx_mut(), |ui| {
         ui.horizontal(|ui| {
             ui.label("Viewport:");
-            
+
             if ui.selectable_label(viewport_manager.active_viewport == ViewportType::Perspective, "Perspective").clicked() {
                 switch_viewport(&mut viewport_manager, &mut cameras, ViewportType::Perspective);
             }
-            
+
             if ui.selectable_label(viewport_manager.active_viewport == ViewportType::Top, "Top").clicked() {
                 switch_viewport(&mut viewport_manager, &mut cameras, ViewportType::Top);
             }
-            
+
             if ui.selectable_label(viewport_manager.active_viewport == ViewportType::Front, "Front").clicked() {
                 switch_viewport(&mut viewport_manager, &mut cameras, ViewportType::Front);
             }
-            
+
             if ui.selectable_label(viewport_manager.active_viewport == ViewportType::Right, "Right").clicked() {
                 switch_viewport(&mut viewport_manager, &mut cameras, ViewportType::Right);
             }
 
             ui.separator();
-            
+
             ui.checkbox(&mut viewport_manager.show_grid, "Grid");
             ui.checkbox(&mut viewport_manager.show_gizmos, "Gizmos");
-            
+
             ui.separator();
-            
+
             ui.label("Grid Size:");
             ui.add(egui::DragValue::new(&mut viewport_manager.grid_size).speed(0.1).clamp_range(0.1..=10.0));
-            
+
             ui.separator();
-            
+
             ui.label("Speed:");
             ui.add(egui::DragValue::new(&mut viewport_manager.camera_speed).speed(0.1).clamp_range(0.1..=20.0));
         });
@@ -174,7 +174,7 @@ fn switch_viewport(
     new_viewport: ViewportType,
 ) {
     viewport_manager.active_viewport = new_viewport;
-    
+
     for (mut camera, mut editor_camera) in cameras.iter_mut() {
         let should_be_active = editor_camera.viewport_type == new_viewport;
         camera.is_active = should_be_active;
@@ -188,7 +188,7 @@ pub fn draw_grid(
     if !viewport_manager.show_grid {
         return;
     }
-    
+
     // Note: In Bevy 0.10, gizmo system is different
     // This is a placeholder for grid rendering
     // In a real implementation, we'd use a custom mesh or shader

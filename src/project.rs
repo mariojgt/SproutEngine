@@ -145,35 +145,35 @@ pub fn project_menu(
                     project_manager.show_new_project_dialog = true;
                     ui.close_menu();
                 }
-                
+
                 if ui.button("Open Project...").clicked() {
                     // In a real implementation, this would open a file dialog
                     ui.close_menu();
                 }
-                
+
                 ui.separator();
-                
+
                 if ui.button("Save Project").clicked() {
                     if let Some(project) = &project_manager.current_project {
                         save_project(project, &project_manager.project_path);
                     }
                     ui.close_menu();
                 }
-                
+
                 if ui.button("Save Project As...").clicked() {
                     // In a real implementation, this would open a save file dialog
                     ui.close_menu();
                 }
-                
+
                 ui.separator();
-                
+
                 if ui.button("Project Settings...").clicked() {
                     project_manager.show_project_settings = true;
                     ui.close_menu();
                 }
-                
+
                 ui.separator();
-                
+
                 ui.label("Recent Projects:");
                 for recent_path in &project_manager.recent_projects.clone() {
                     if let Some(file_name) = recent_path.file_name() {
@@ -184,27 +184,27 @@ pub fn project_menu(
                     }
                 }
             });
-            
+
             ui.menu_button("Build", |ui| {
                 if ui.button("Build Project").clicked() {
                     build_project(&project_manager);
                     ui.close_menu();
                 }
-                
+
                 if ui.button("Build and Run").clicked() {
                     build_and_run_project(&project_manager);
                     ui.close_menu();
                 }
-                
+
                 ui.separator();
-                
+
                 if ui.button("Package for Distribution").clicked() {
                     package_project(&project_manager);
                     ui.close_menu();
                 }
-                
+
                 ui.separator();
-                
+
                 if ui.button("Build Settings...").clicked() {
                     project_manager.show_project_settings = true;
                     ui.close_menu();
@@ -223,7 +223,7 @@ pub fn new_project_dialog(
     }
 
     let mut new_project = ProjectSettings::default();
-    
+
     egui::Window::new("New Project")
         .collapsible(false)
         .resizable(false)
@@ -232,25 +232,25 @@ pub fn new_project_dialog(
                 ui.label("Project Name:");
                 ui.text_edit_singleline(&mut new_project.name);
             });
-            
+
             ui.horizontal(|ui| {
                 ui.label("Author:");
                 ui.text_edit_singleline(&mut new_project.author);
             });
-            
+
             ui.horizontal(|ui| {
                 ui.label("Description:");
                 ui.text_edit_multiline(&mut new_project.description);
             });
-            
+
             ui.separator();
-            
+
             ui.horizontal(|ui| {
                 if ui.button("Create").clicked() {
                     project_manager.current_project = Some(new_project);
                     project_manager.show_new_project_dialog = false;
                 }
-                
+
                 if ui.button("Cancel").clicked() {
                     project_manager.show_new_project_dialog = false;
                 }
@@ -268,7 +268,7 @@ pub fn project_settings_dialog(
 
     let project_path = project_manager.project_path.clone();
     let mut close_dialog = false;
-    
+
     if let Some(project) = &mut project_manager.current_project {
         egui::Window::new("Project Settings")
             .collapsible(false)
@@ -281,23 +281,23 @@ pub fn project_settings_dialog(
                             ui.label("Name:");
                             ui.text_edit_singleline(&mut project.name);
                         });
-                        
+
                         ui.horizontal(|ui| {
                             ui.label("Version:");
                             ui.text_edit_singleline(&mut project.version);
                         });
-                        
+
                         ui.horizontal(|ui| {
                             ui.label("Author:");
                             ui.text_edit_singleline(&mut project.author);
                         });
-                        
+
                         ui.horizontal(|ui| {
                             ui.label("Description:");
                             ui.text_edit_multiline(&mut project.description);
                         });
                     });
-                    
+
                     ui.collapsing("Build Settings", |ui| {
                         ui.horizontal(|ui| {
                             ui.label("Optimization:");
@@ -309,12 +309,12 @@ pub fn project_settings_dialog(
                                     ui.selectable_value(&mut project.build_settings.optimization_level, OptimizationLevel::ReleaseWithDebugInfo, "Release with Debug Info");
                                 });
                         });
-                        
+
                         ui.checkbox(&mut project.build_settings.strip_debug_info, "Strip Debug Info");
                         ui.checkbox(&mut project.build_settings.compress_assets, "Compress Assets");
                         ui.checkbox(&mut project.build_settings.bundle_assets, "Bundle Assets");
                     });
-                    
+
                     ui.collapsing("Physics Settings", |ui| {
                         ui.horizontal(|ui| {
                             ui.label("Gravity:");
@@ -322,27 +322,27 @@ pub fn project_settings_dialog(
                             ui.add(egui::DragValue::new(&mut project.physics_settings.gravity[1]).speed(0.1));
                             ui.add(egui::DragValue::new(&mut project.physics_settings.gravity[2]).speed(0.1));
                         });
-                        
+
                         ui.horizontal(|ui| {
                             ui.label("Timestep:");
                             ui.add(egui::DragValue::new(&mut project.physics_settings.timestep).speed(0.001).clamp_range(0.001..=0.1));
                         });
-                        
+
                         ui.horizontal(|ui| {
                             ui.label("Substeps:");
                             ui.add(egui::DragValue::new(&mut project.physics_settings.substeps).clamp_range(1..=16));
                         });
                     });
-                    
+
                     ui.collapsing("Rendering Settings", |ui| {
                         ui.horizontal(|ui| {
                             ui.label("Target FPS:");
                             ui.add(egui::DragValue::new(&mut project.rendering_settings.target_fps).clamp_range(30..=240));
                         });
-                        
+
                         ui.checkbox(&mut project.rendering_settings.vsync, "VSync");
                         ui.checkbox(&mut project.rendering_settings.post_processing, "Post Processing");
-                        
+
                         ui.horizontal(|ui| {
                             ui.label("MSAA Samples:");
                             egui::ComboBox::from_label("")
@@ -356,22 +356,22 @@ pub fn project_settings_dialog(
                         });
                     });
                 });
-                
+
                 ui.separator();
-                
+
                 ui.horizontal(|ui| {
                     if ui.button("Save").clicked() {
                         save_project(project, &project_path);
                         close_dialog = true;
                     }
-                    
+
                     if ui.button("Cancel").clicked() {
                         close_dialog = true;
                     }
                 });
             });
     }
-    
+
     // Handle close dialog outside the UI closure to avoid borrow checker issues
     if close_dialog || contexts.ctx_mut().input(|i| i.key_pressed(egui::Key::Escape)) {
         project_manager.show_project_settings = false;
@@ -393,7 +393,7 @@ fn load_project(project_manager: &mut ProjectManager, path: PathBuf) {
         if let Ok(project) = serde_json::from_str::<ProjectSettings>(&content) {
             project_manager.current_project = Some(project);
             project_manager.project_path = Some(path.clone());
-            
+
             // Add to recent projects
             if !project_manager.recent_projects.contains(&path) {
                 project_manager.recent_projects.insert(0, path);

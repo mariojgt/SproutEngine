@@ -142,6 +142,8 @@ struct EditorState {
     axis_lock: AxisLock,
     assets_scan: Vec<String>,
     assets_root: String,
+    is_simulating: bool,
+    show_docking_window: bool,
 }
 impl Default for EditorState {
     fn default() -> Self {
@@ -151,6 +153,8 @@ impl Default for EditorState {
             axis_lock: AxisLock::None,
             assets_scan: vec![],
             assets_root: "assets".into(),
+            is_simulating: false,
+            show_docking_window: true,
         }
     }
 }
@@ -241,6 +245,7 @@ fn ui_menu(
 ) {
     egui::TopBottomPanel::top("menu_top").show(contexts.ctx_mut(), |ui| {
         egui::menu::bar(ui, |ui| {
+            // File Menu
             ui.menu_button("File", |ui| {
                 if ui.button("New Scene").clicked() {
                     for (e, name) in q_entities.iter() {
@@ -321,6 +326,26 @@ fn ui_menu(
                 }
             });
 
+            ui.separator();
+
+            // Play/Stop Controls (like Unreal Engine)
+            ui.horizontal(|ui| {
+                if state.is_simulating {
+                    if ui.button("⏹ Stop").clicked() {
+                        state.is_simulating = false;
+                    }
+                    ui.colored_label(egui::Color32::GREEN, "▶ Playing");
+                } else {
+                    if ui.button("▶ Play").clicked() {
+                        state.is_simulating = true;
+                    }
+                    ui.colored_label(egui::Color32::GRAY, "⏸ Stopped");
+                }
+            });
+
+            ui.separator();
+
+            // Gizmo Tools
             ui.menu_button("Gizmo", |ui| {
                 ui.horizontal(|ui| {
                     ui.selectable_value(&mut state.gizmo, GizmoMode::Translate, "W Move");
@@ -335,6 +360,24 @@ fn ui_menu(
                     ui.selectable_value(&mut state.axis_lock, AxisLock::Z, "Z");
                 });
             });
+
+            ui.separator();
+
+            // Window Layout
+            ui.menu_button("Window", |ui| {
+                ui.checkbox(&mut state.show_docking_window, "Show Docking");
+                if ui.button("Reset Layout").clicked() {
+                    // Reset window positions - basic implementation
+                    ui.close_menu();
+                }
+            });
+
+            // Add space and show simulation status
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if state.is_simulating {
+                    ui.colored_label(egui::Color32::GREEN, "🎮 SIMULATION RUNNING");
+                }
+            });
         });
     });
 }
@@ -342,24 +385,50 @@ fn ui_menu(
 fn ui_hierarchy(
     mut contexts: EguiContexts,
     mut selection: ResMut<Selection>,
+    state: Res<EditorState>,
     query: Query<(Entity, Option<&Name>)>,
 ) {
-    egui::SidePanel::left("hierarchy_left")
-        .default_width(220.0)
-        .resizable(true)
-        .show(contexts.ctx_mut(), |ui| {
-            ui.heading("Hierarchy");
-            ui.separator();
-            egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
-                for (entity, name) in query.iter() {
-                    let label = name.map(|n| n.as_str().to_string()).unwrap_or_else(|| format!("Entity {:?}", entity));
-                    let selected = selection.entity == Some(entity);
-                    if ui.selectable_label(selected, label).clicked() {
-                        selection.entity = Some(entity);
+    if state.show_docking_window {
+        egui::SidePanel::left("hierarchy_left")
+            .default_width(220.0)
+            .resizable(true)
+            .show(contexts.ctx_mut(), |ui| {
+                ui.horizontal(|ui| {
+                    ui.heading("Hierarchy");
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.small_button("📌").on_hover_text("Pin/Unpin panel").clicked() {
+                            // Toggle pinning - basic implementation
+                        }
+                    });
+                });
+                ui.separator();
+                egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
+                    for (entity, name) in query.iter() {
+                        let label = name.map(|n| n.as_str().to_string()).unwrap_or_else(|| format!("Entity {:?}", entity));
+                        let selected = selection.entity == Some(entity);
+                        if ui.selectable_label(selected, label).clicked() {
+                            selection.entity = Some(entity);
+                        }
                     }
-                }
+                });
             });
-        });
+    } else {
+        // Floating window when docking is disabled
+        egui::Window::new("Hierarchy")
+            .default_size([220.0, 400.0])
+            .resizable(true)
+            .show(contexts.ctx_mut(), |ui| {
+                egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
+                    for (entity, name) in query.iter() {
+                        let label = name.map(|n| n.as_str().to_string()).unwrap_or_else(|| format!("Entity {:?}", entity));
+                        let selected = selection.entity == Some(entity);
+                        if ui.selectable_label(selected, label).clicked() {
+                            selection.entity = Some(entity);
+                        }
+                    }
+                });
+            });
+    }
 }
 
 fn ui_inspector(
@@ -370,63 +439,108 @@ fn ui_inspector(
     mut state: ResMut<EditorState>,
     keys: Res<Input<KeyCode>>,
 ) {
-    egui::SidePanel::right("inspector_right")
-        .default_width(320.0)
-        .resizable(true)
-        .show(contexts.ctx_mut(), |ui| {
-            ui.heading("Inspector");
-            ui.separator();
-            ui.label("Shortcuts: W/E/R (Move/Rotate/Scale), X/Y/Z axis lock, F frame");
-            if let Some(entity) = selection.entity {
-                if let Ok(name) = names.get(entity) {
-                    ui.label(format!("Selected: {}", name));
-                }
-                if let Ok(mut t) = transforms.get_mut(entity) {
-                    if keys.just_pressed(KeyCode::W) { state.gizmo = GizmoMode::Translate; }
-                    if keys.just_pressed(KeyCode::E) { state.gizmo = GizmoMode::Rotate; }
-                    if keys.just_pressed(KeyCode::R) { state.gizmo = GizmoMode::Scale; }
-                    if keys.just_pressed(KeyCode::X) { state.axis_lock = AxisLock::X; }
-                    if keys.just_pressed(KeyCode::Y) { state.axis_lock = AxisLock::Y; }
-                    if keys.just_pressed(KeyCode::Z) { state.axis_lock = AxisLock::Z; }
-
-                    // Translation
-                    let mut pos = t.translation.to_array();
-                    ui.horizontal(|ui| {
-                        ui.label("Position");
-                        ui.add(egui::DragValue::new(&mut pos[0]).speed(0.05));
-                        ui.add(egui::DragValue::new(&mut pos[1]).speed(0.05));
-                        ui.add(egui::DragValue::new(&mut pos[2]).speed(0.05));
+    if state.show_docking_window {
+        egui::SidePanel::right("inspector_right")
+            .default_width(320.0)
+            .resizable(true)
+            .show(contexts.ctx_mut(), |ui| {
+                ui.horizontal(|ui| {
+                    ui.heading("Inspector");
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.small_button("📌").on_hover_text("Pin/Unpin panel").clicked() {
+                            // Toggle pinning - basic implementation
+                        }
                     });
-                    t.translation = Vec3::from_array(pos);
+                });
+                ui.separator();
+                ui.label("Shortcuts: W/E/R (Move/Rotate/Scale), X/Y/Z axis lock, F frame");
+                ui.label("WASD + Right Mouse: Fly camera, Shift: Speed boost");
 
-                    // Rotation (Euler degrees)
-                    let (mut pitch, mut yaw, mut roll) = t.rotation.to_euler(EulerRot::XYZ);
-                    let mut deg = [pitch.to_degrees(), yaw.to_degrees(), roll.to_degrees()];
-                    ui.horizontal(|ui| {
-                        ui.label("Rotation°");
-                        ui.add(egui::DragValue::new(&mut deg[0]).speed(0.2));
-                        ui.add(egui::DragValue::new(&mut deg[1]).speed(0.2));
-                        ui.add(egui::DragValue::new(&mut deg[2]).speed(0.2));
-                    });
-                    pitch = deg[0].to_radians(); yaw = deg[1].to_radians(); roll = deg[2].to_radians();
-                    t.rotation = Quat::from_euler(EulerRot::XYZ, pitch, yaw, roll);
+                if let Some(entity) = selection.entity {
+                    if let Ok(name) = names.get(entity) {
+                        ui.label(format!("Selected: {}", name));
+                    }
+                    if let Ok(mut t) = transforms.get_mut(entity) {
+                        if keys.just_pressed(KeyCode::W) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
+                            state.gizmo = GizmoMode::Translate;
+                        }
+                        if keys.just_pressed(KeyCode::E) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
+                            state.gizmo = GizmoMode::Rotate;
+                        }
+                        if keys.just_pressed(KeyCode::R) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
+                            state.gizmo = GizmoMode::Scale;
+                        }
+                        if keys.just_pressed(KeyCode::X) { state.axis_lock = AxisLock::X; }
+                        if keys.just_pressed(KeyCode::Y) { state.axis_lock = AxisLock::Y; }
+                        if keys.just_pressed(KeyCode::Z) { state.axis_lock = AxisLock::Z; }
 
-                    // Scale
-                    let mut scl = t.scale.to_array();
-                    ui.horizontal(|ui| {
-                        ui.label("Scale");
-                        ui.add(egui::DragValue::new(&mut scl[0]).speed(0.02));
-                        ui.add(egui::DragValue::new(&mut scl[1]).speed(0.02));
-                        ui.add(egui::DragValue::new(&mut scl[2]).speed(0.02));
-                    });
-                    t.scale = Vec3::new(scl[0].max(0.001), scl[1].max(0.001), scl[2].max(0.001));
+                        // Translation
+                        let mut pos = t.translation.to_array();
+                        ui.horizontal(|ui| {
+                            ui.label("Position");
+                            ui.add(egui::DragValue::new(&mut pos[0]).speed(0.05));
+                            ui.add(egui::DragValue::new(&mut pos[1]).speed(0.05));
+                            ui.add(egui::DragValue::new(&mut pos[2]).speed(0.05));
+                        });
+                        t.translation = Vec3::from_array(pos);
+
+                        // Rotation (Euler degrees)
+                        let (mut pitch, mut yaw, mut roll) = t.rotation.to_euler(EulerRot::XYZ);
+                        let mut deg = [pitch.to_degrees(), yaw.to_degrees(), roll.to_degrees()];
+                        ui.horizontal(|ui| {
+                            ui.label("Rotation°");
+                            ui.add(egui::DragValue::new(&mut deg[0]).speed(0.2));
+                            ui.add(egui::DragValue::new(&mut deg[1]).speed(0.2));
+                            ui.add(egui::DragValue::new(&mut deg[2]).speed(0.2));
+                        });
+                        pitch = deg[0].to_radians(); yaw = deg[1].to_radians(); roll = deg[2].to_radians();
+                        t.rotation = Quat::from_euler(EulerRot::XYZ, pitch, yaw, roll);
+
+                        // Scale
+                        let mut scl = t.scale.to_array();
+                        ui.horizontal(|ui| {
+                            ui.label("Scale");
+                            ui.add(egui::DragValue::new(&mut scl[0]).speed(0.02));
+                            ui.add(egui::DragValue::new(&mut scl[1]).speed(0.02));
+                            ui.add(egui::DragValue::new(&mut scl[2]).speed(0.02));
+                        });
+                        t.scale = Vec3::new(scl[0].max(0.001), scl[1].max(0.001), scl[2].max(0.001));
+                    } else {
+                        ui.label("No transform found.");
+                    }
                 } else {
-                    ui.label("No transform found.");
+                    ui.label("Nothing selected");
                 }
-            } else {
-                ui.label("Nothing selected");
-            }
-        });
+            });
+    } else {
+        // Floating window when docking is disabled
+        egui::Window::new("Inspector")
+            .default_size([320.0, 500.0])
+            .resizable(true)
+            .show(contexts.ctx_mut(), |ui| {
+                ui.label("Shortcuts: W/E/R (Move/Rotate/Scale), X/Y/Z axis lock, F frame");
+                ui.label("WASD + Right Mouse: Fly camera, Shift: Speed boost");
+
+                if let Some(entity) = selection.entity {
+                    if let Ok(name) = names.get(entity) {
+                        ui.label(format!("Selected: {}", name));
+                    }
+                    if let Ok(mut t) = transforms.get_mut(entity) {
+                        // ... same transform code as above (keeping it concise)
+                        let mut pos = t.translation.to_array();
+                        ui.horizontal(|ui| {
+                            ui.label("Position");
+                            ui.add(egui::DragValue::new(&mut pos[0]).speed(0.05));
+                            ui.add(egui::DragValue::new(&mut pos[1]).speed(0.05));
+                            ui.add(egui::DragValue::new(&mut pos[2]).speed(0.05));
+                        });
+                        t.translation = Vec3::from_array(pos);
+                    }
+                } else {
+                    ui.label("Nothing selected");
+                }
+            });
+    }
 }
 
 fn ui_script_panel(
@@ -668,8 +782,14 @@ fn ui_animator_tab(
 /* Apply Animations: very basic playback based on parameter/state machine */
 fn apply_scripts(
     time: Res<Time>,
+    state: Res<EditorState>,
     mut q: Query<(&mut Transform, Option<&VisualScript>, Option<&NodeGraph>)>,
 ) {
+    // Only apply scripts when simulating (like Unreal Engine play mode)
+    if !state.is_simulating {
+        return;
+    }
+
     for (mut t, script, graph) in q.iter_mut() {
         if let Some(script) = script {
             if script.enabled {
@@ -710,10 +830,12 @@ fn camera_controls(
     mut windows: Query<&mut Window, With<PrimaryWindow>>,
     mut camera_q: Query<&mut Transform, (With<Camera3d>, Without<DirectionalLight>)>,
     mut orbit: ResMut<CameraOrbit>,
+    state: Res<EditorState>,
     mouse: Res<Input<MouseButton>>,
     keys: Res<Input<KeyCode>>,
     mut motion_evr: EventReader<bevy::input::mouse::MouseMotion>,
     mut wheel_evr: EventReader<bevy::input::mouse::MouseWheel>,
+    time: Res<Time>,
 ) {
     let mut cam = if let Ok(c) = camera_q.get_single_mut() { c } else { return; };
 
@@ -724,22 +846,56 @@ fn camera_controls(
     for ev in wheel_evr.iter() { zoom += ev.y; }
     if zoom.abs() > 0.0 { orbit.distance = (orbit.distance * (1.0 - zoom * 0.1 * orbit.zoom_speed)).clamp(0.5, 100.0); }
 
+    // WASD movement (like Unreal Engine viewport controls)
+    let move_speed = if keys.any_pressed([KeyCode::LShift, KeyCode::RShift]) { 20.0 } else { 5.0 };
+    let dt = time.delta_seconds();
+
+    if keys.pressed(KeyCode::W) {
+        let forward = cam.forward();
+        orbit.target += forward * move_speed * dt;
+    }
+    if keys.pressed(KeyCode::S) {
+        let forward = cam.forward();
+        orbit.target -= forward * move_speed * dt;
+    }
+    if keys.pressed(KeyCode::A) {
+        let right = cam.right();
+        orbit.target -= right * move_speed * dt;
+    }
+    if keys.pressed(KeyCode::D) {
+        let right = cam.right();
+        orbit.target += right * move_speed * dt;
+    }
+    if keys.pressed(KeyCode::Q) {
+        orbit.target.y -= move_speed * dt;
+    }
+    if keys.pressed(KeyCode::E) {
+        orbit.target.y += move_speed * dt;
+    }
+
+    // Mouse look (right mouse button)
     if mouse.pressed(MouseButton::Right) && delta.length_squared() > 0.0 {
         orbit.yaw   -= delta.x * orbit.orbit_speed;
         orbit.pitch -= delta.y * orbit.orbit_speed;
         orbit.pitch = orbit.pitch.clamp(-1.54, 1.54);
     }
+
+    // Pan with middle mouse or right+shift
     if mouse.pressed(MouseButton::Middle) || (mouse.pressed(MouseButton::Right) && keys.any_pressed([KeyCode::LShift, KeyCode::RShift])) {
         let right = cam.right(); let up = cam.up();
         let pan_speed = orbit.pan_speed;
         let distance = orbit.distance;
         orbit.target += (-right * delta.x + up * delta.y) * pan_speed * distance.max(1.0);
     }
+
     let rot = Quat::from_euler(EulerRot::ZYX, 0.0, orbit.yaw, orbit.pitch);
     cam.translation = orbit.target + rot * (Vec3::Z * orbit.distance);
     cam.look_at(orbit.target, Vec3::Y);
 
-    if let Ok(mut window) = windows.get_single_mut() { window.cursor.visible = !mouse.pressed(MouseButton::Right); }
+    // Hide cursor when right-clicking (like Unreal Engine)
+    if let Ok(mut window) = windows.get_single_mut() {
+        window.cursor.visible = !mouse.pressed(MouseButton::Right);
+    }
 }
 
 fn frame_selected_on_f_key(

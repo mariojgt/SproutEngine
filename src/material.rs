@@ -50,13 +50,13 @@ pub struct MaterialLibrary {
 impl Default for MaterialLibrary {
     fn default() -> Self {
         let mut materials = HashMap::new();
-        
+
         // Add some default materials
         materials.insert("Default".to_string(), SproutMaterial {
             name: "Default".to_string(),
             ..Default::default()
         });
-        
+
         materials.insert("Metal".to_string(), SproutMaterial {
             name: "Metal".to_string(),
             albedo_color: [0.7, 0.7, 0.7, 1.0],
@@ -64,7 +64,7 @@ impl Default for MaterialLibrary {
             roughness: 0.2,
             ..Default::default()
         });
-        
+
         materials.insert("Plastic".to_string(), SproutMaterial {
             name: "Plastic".to_string(),
             albedo_color: [0.1, 0.5, 0.9, 1.0],
@@ -91,10 +91,10 @@ pub fn material_editor_ui(
         .resizable(true)
         .default_size([400.0, 600.0])
         .show(contexts.ctx_mut(), |ui| {
-            
+
         ui.horizontal(|ui| {
             ui.label("Material:");
-            
+
             egui::ComboBox::from_label("")
                 .selected_text(material_library.selected_material.as_ref().unwrap_or(&"None".to_string()))
                 .show_ui(ui, |ui| {
@@ -103,7 +103,7 @@ pub fn material_editor_ui(
                         ui.selectable_value(&mut material_library.selected_material, Some(material_name.clone()), material_name);
                     }
                 });
-                
+
             if ui.button("New").clicked() {
                 let new_name = format!("Material_{}", material_library.materials.len());
                 material_library.materials.insert(new_name.clone(), SproutMaterial {
@@ -112,7 +112,7 @@ pub fn material_editor_ui(
                 });
                 material_library.selected_material = Some(new_name);
             }
-            
+
             if ui.button("Delete").clicked() {
                 if let Some(selected) = material_library.selected_material.clone() {
                     if selected != "Default" { // Don't delete the default material
@@ -128,7 +128,7 @@ pub fn material_editor_ui(
         if let Some(selected_name) = &material_library.selected_material.clone() {
             if let Some(material) = material_library.materials.get_mut(selected_name) {
                 ui.heading("Properties");
-                
+
                 ui.horizontal(|ui| {
                     ui.label("Name:");
                     ui.text_edit_singleline(&mut material.name);
@@ -201,19 +201,19 @@ pub fn material_editor_ui(
 fn texture_slot_ui(ui: &mut egui::Ui, label: &str, texture_path: &mut Option<String>) {
     ui.horizontal(|ui| {
         ui.label(label);
-        
+
         let display_text = texture_path.as_ref()
             .map(|path| path.split('/').last().unwrap_or(path))
             .unwrap_or("None");
-            
+
         ui.text_edit_singleline(&mut display_text.to_string());
-        
+
         if ui.button("Browse").clicked() {
             // In a real implementation, this would open a file dialog
             // For now, we'll use a placeholder
             *texture_path = Some("assets/textures/placeholder.png".to_string());
         }
-        
+
         if ui.button("Clear").clicked() {
             *texture_path = None;
         }
