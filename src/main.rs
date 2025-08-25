@@ -1,6 +1,6 @@
-//! Sprout Engine — Unified with FBX + Animator tab
-//! Minimal editor: content browser, click select, gizmos, inspector, save/load, visual scripting, node graph, and a simple Animator UI.
-//! FBX support is provided by bevy_mod_fbx; prefer glTF when possible.
+//! Sprout Engine — Unified with FBX + Enhanced Editor Features
+//! A free, open-source alternative to Game Engine built on Bevy
+//! Features: advanced editor UI, material system, project management, visual scripting, and more
 
 use bevy::prelude::*;
 use bevy::window::{PrimaryWindow, WindowResolution};
@@ -9,6 +9,17 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 
 use bevy_mod_fbx::FbxPlugin;
+
+// Module declarations
+mod viewport;
+mod gizmo;
+mod material;
+mod project;
+
+use viewport::ViewportPlugin;
+use gizmo::GizmoPlugin;
+use material::MaterialPlugin;
+use project::ProjectPlugin;
 
 fn main() {
     App::new()
@@ -20,8 +31,8 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Sprout Engine — Unified".into(),
-                        resolution: WindowResolution::new(1400.0, 900.0),
+                        title: "Sprout Engine — Advanced Editor".into(),
+                        resolution: WindowResolution::new(1600.0, 1000.0),
                         resizable: true,
                         ..default()
                     }),
@@ -31,6 +42,10 @@ fn main() {
         )
         .add_plugin(EguiPlugin)
         .add_plugin(FbxPlugin) // FBX support
+        .add_plugin(ViewportPlugin) // Enhanced viewport system
+        .add_plugin(GizmoPlugin) // Advanced gizmo system
+        .add_plugin(MaterialPlugin) // Material editor
+        .add_plugin(ProjectPlugin) // Project management
         .add_startup_system(setup_scene)
         .add_systems(
             (
@@ -438,7 +453,7 @@ fn ui_script_panel(
                     let mut move_up: Option<usize> = None;
                     let mut move_down: Option<usize> = None;
                     let ops_len = script.ops.len();
-                    
+
                     for (i, op) in script.ops.iter_mut().enumerate() {
                         ui.group(|ui| {
                             ui.horizontal(|ui| {
@@ -475,7 +490,7 @@ fn ui_script_panel(
                             }
                         });
                     }
-                    
+
                     if let Some(idx) = remove_idx { script.ops.remove(idx); }
                     if let Some(idx) = move_up { script.ops.swap(idx, idx-1); }
                     if let Some(idx) = move_down { script.ops.swap(idx, idx+1); }
