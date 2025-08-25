@@ -8,6 +8,8 @@ This repo gives you:
 - Lua scripting via sol2 (hot-reload on file save)
 - A demo cube entity rotated by `assets/scripts/Rotate.lua`
 
+Early documentation for the upcoming **Sprout Script (`.sp`) toolchain** lives under [docs/](docs/). These documents describe the language, editor workflow and engine integration behind the feature flag `SP_TOOLCHAIN_ENABLED`.
+
 ---
 
 ## Requirements

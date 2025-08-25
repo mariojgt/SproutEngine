@@ -1,6 +1,9 @@
 #pragma once
 #include <entt/entt.hpp>
 #include <string>
+#ifdef SP_TOOLCHAIN_ENABLED
+#include "widgets/SpCodeEditor.h"
+#endif
 
 struct GLFWwindow;
 class Renderer;
@@ -15,4 +18,7 @@ public:
     void drawPanels(entt::registry& reg, Renderer& renderer, Scripting& scripting, bool& playMode);
 
     entt::entity selected{entt::null};
+#ifdef SP_TOOLCHAIN_ENABLED
+    SpCodeEditor spEditor;
+#endif
 };
