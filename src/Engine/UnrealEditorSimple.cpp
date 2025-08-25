@@ -7,9 +7,12 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
+#include <ImGuizmo.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 UnrealEditor::UnrealEditor() {
 }
@@ -349,16 +352,19 @@ void UnrealEditor::DrawToolbar(bool& playMode) {
 
         ImGui::SameLine();
         if (ImGui::Button("Move", ImVec2(60, 30))) {
+            currentGizmoOperation = ImGuizmo::TRANSLATE;
             AddLog("Move tool activated", "Info");
         }
 
         ImGui::SameLine();
         if (ImGui::Button("Rotate", ImVec2(60, 30))) {
+            currentGizmoOperation = ImGuizmo::ROTATE;
             AddLog("Rotate tool activated", "Info");
         }
 
         ImGui::SameLine();
         if (ImGui::Button("Scale", ImVec2(60, 30))) {
+            currentGizmoOperation = ImGuizmo::SCALE;
             AddLog("Scale tool activated", "Info");
         }
 
@@ -406,6 +412,44 @@ void UnrealEditor::DrawViewport(entt::registry& registry, Renderer& renderer) {
             ImVec2 contentPos = ImVec2(windowPos.x + contentMin.x, windowPos.y + contentMin.y);
             ImVec2 relativePos = ImVec2(mousePos.x - contentPos.x, mousePos.y - contentPos.y);
             HandleEntitySelection(registry, relativePos, viewportSize);
+        }
+
+        if (showGizmos && selectedEntity != entt::null && registry.any_of<Transform>(selectedEntity)) {
+            ImGuizmo::SetOrthographic(false);
+            ImGuizmo::SetDrawlist();
+
+            ImVec2 windowPos = ImGui::GetWindowPos();
+            ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+            ImVec2 contentPos = ImVec2(windowPos.x + contentMin.x, windowPos.y + contentMin.y);
+            ImGuizmo::SetRect(contentPos.x, contentPos.y, viewportSize.x, viewportSize.y);
+
+            glm::mat4 view = glm::lookAt(viewportCamera.position, viewportCamera.target, viewportCamera.up);
+            glm::mat4 proj = glm::perspective(glm::radians(viewportCamera.fov),
+                                             viewportSize.x / viewportSize.y,
+                                             viewportCamera.nearPlane,
+                                             viewportCamera.farPlane);
+
+            auto& tr = registry.get<Transform>(selectedEntity);
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, tr.position);
+            model = glm::rotate(model, glm::radians(tr.rotationEuler.x), glm::vec3(1,0,0));
+            model = glm::rotate(model, glm::radians(tr.rotationEuler.y), glm::vec3(0,1,0));
+            model = glm::rotate(model, glm::radians(tr.rotationEuler.z), glm::vec3(0,0,1));
+            model = glm::scale(model, tr.scale);
+
+            float matrix[16];
+            memcpy(matrix, glm::value_ptr(model), sizeof(float)*16);
+            if (ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj),
+                                     currentGizmoOperation, ImGuizmo::WORLD, matrix)) {
+                glm::vec3 translation, rotation, scale;
+                ImGuizmo::DecomposeMatrixToComponents(matrix,
+                    glm::value_ptr(translation),
+                    glm::value_ptr(rotation),
+                    glm::value_ptr(scale));
+                tr.position = translation;
+                tr.rotationEuler = rotation;
+                tr.scale = scale;
+            }
         }
 
         // Entity selection list for now (fallback)
