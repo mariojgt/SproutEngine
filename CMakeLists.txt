@@ -4,7 +4,7 @@ project(SproutEngine LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Use vcpkg manifest mode; pass -DCMAKE_TOOLCHAIN_FILE=... when configuring
+#Use vcpkg manifest mode; pass - DCMAKE_TOOLCHAIN_FILE = ... when configuring
 
 find_package(glfw3 REQUIRED)
 find_package(glad REQUIRED)
@@ -13,6 +13,7 @@ find_package(imgui REQUIRED)
 find_package(EnTT REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(Lua REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h)
 
@@ -38,6 +39,9 @@ set(ENGINE_SOURCES
     src/Engine/Theme.h
     src/Engine/VSGraph.cpp
     src/Engine/VSGraph.h
+    src/Engine/FbxImporter.cpp
+    src/Engine/FbxImporter.h
+    src/Engine/Model.h
     src/Engine/UnrealEditorSimple.cpp
     src/Engine/UnrealEditorSimple.h
     src/Engine/ModernTheme.cpp
@@ -97,6 +101,12 @@ if(TARGET Lua::Lua)
 else()
   target_include_directories(SproutEngine PRIVATE ${LUA_INCLUDE_DIR})
   target_link_libraries(SproutEngine PRIVATE ${LUA_LIBRARIES})
+endif()
+
+if(TARGET assimp::assimp)
+  target_link_libraries(SproutEngine PRIVATE assimp::assimp)
+else()
+  target_link_libraries(SproutEngine PRIVATE assimp)
 endif()
 
 # Copy assets after build
