@@ -31,13 +31,13 @@ pub enum MaterialNodeType {
     ColorConstant,
     ScalarConstant,
     Vector3Constant,
-
+    
     // Math nodes
     Multiply,
     Add,
     Subtract,
     Lerp,
-
+    
     // Output node (there's always one)
     MaterialOutput,
 }
@@ -82,7 +82,7 @@ impl Default for MaterialGraph {
             connections: Vec::new(),
             next_node_id: 2,
         };
-
+        
         // Always start with a Material Output node
         graph.nodes.push(MaterialNode {
             id: 1,
@@ -96,7 +96,7 @@ impl Default for MaterialGraph {
             ]),
             name: "Material Output".to_string(),
         });
-
+        
         graph
     }
 }
@@ -185,8 +185,8 @@ pub fn material_editor_ui(
     mut contexts: EguiContexts,
     mut material_library: ResMut<MaterialLibrary>,
     mut editor_state: ResMut<MaterialEditorState>,
-    _asset_server: Res<AssetServer>,
-    _bevy_materials: ResMut<Assets<StandardMaterial>>,
+    asset_server: Res<AssetServer>,
+    mut bevy_materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // Material Browser Window
     egui::Window::new("Material Browser")
@@ -239,7 +239,7 @@ pub fn material_editor_ui(
         if let Some(selected_name) = &material_library.selected_material.clone() {
             if let Some(material) = material_library.materials.get(selected_name) {
                 ui.label("Material Properties (computed from graph):");
-
+                
                 ui.horizontal(|ui| {
                     ui.label("Base Color:");
                     let color = material.albedo_color;
@@ -253,7 +253,7 @@ pub fn material_editor_ui(
                         "█████"
                     );
                 });
-
+                
                 ui.label(format!("Metallic: {:.2}", material.metallic));
                 ui.label(format!("Roughness: {:.2}", material.roughness));
                 ui.label(format!("Nodes in graph: {}", material.material_graph.nodes.len()));
@@ -277,7 +277,7 @@ pub fn material_node_editor_ui(
         .resizable(true)
         .default_size([800.0, 600.0])
         .show(ctx, |ui| {
-
+            
             if ui.button("Close Node Editor").clicked() {
                 editor_state.show_node_editor = false;
                 return;
@@ -285,87 +285,223 @@ pub fn material_node_editor_ui(
 
             if let Some(selected_name) = &material_library.selected_material.clone() {
                 if let Some(material) = material_library.materials.get_mut(selected_name) {
-
+                    
                     ui.separator();
-
+                    
                     // Add Node buttons
                     ui.horizontal(|ui| {
                         ui.label("Add Node:");
-
+                        
                         if ui.button("Color Constant").clicked() {
                             add_node(&mut material.material_graph, MaterialNodeType::ColorConstant, "Color");
                         }
-
+                        
                         if ui.button("Scalar Constant").clicked() {
                             add_node(&mut material.material_graph, MaterialNodeType::ScalarConstant, "Scalar");
                         }
-
+                        
                         if ui.button("Texture Sample").clicked() {
                             add_node(&mut material.material_graph, MaterialNodeType::TextureSample, "Texture");
                         }
-
+                        
                         if ui.button("Multiply").clicked() {
                             add_node(&mut material.material_graph, MaterialNodeType::Multiply, "Multiply");
                         }
-
+                        
                         if ui.button("Add").clicked() {
                             add_node(&mut material.material_graph, MaterialNodeType::Add, "Add");
                         }
                     });
-
+                    
                     ui.separator();
-
+                    
                     // Node canvas
                     let response = ui.allocate_response(
                         egui::vec2(ui.available_width(), 400.0),
                         egui::Sense::click_and_drag()
                     );
-
+                    
                     let painter = ui.painter_at(response.rect);
-
+                    
                     // Draw background grid
                     draw_grid(&painter, response.rect);
-
+                    
                     // Draw connections first (so they appear behind nodes)
                     for connection in &material.material_graph.connections {
                         draw_connection(&painter, &material.material_graph, connection, response.rect);
                     }
-
+                    
                     // Draw nodes
                     for node in &mut material.material_graph.nodes {
                         draw_node(
-                            &painter,
-                            ui,
-                            node,
-                            response.rect,
+                            &painter, 
+                            ui, 
+                            node, 
+                            response.rect, 
                             editor_state,
                             &response
                         );
                     }
-
-                    // Draw preview connection line if creating a connection
-                    if let Some((from_node_id, from_output)) = &editor_state.creating_connection {
-                        if let Some(pointer_pos) = response.hover_pos() {
-                            if let Some(from_node) = material.material_graph.nodes.iter().find(|n| n.id == *from_node_id) {
-                                let from_pos = get_output_socket_pos(from_node, from_output, response.rect);
-                                draw_preview_connection(&painter, from_pos, pointer_pos);
-                            }
-                        }
-                    }
-
-                    // Handle node interactions - removed ctx parameter to fix borrowing issue
+                    
+                    // Handle node interactions
                     handle_node_interactions(
                         &mut material.material_graph,
                         editor_state,
                         &response,
-                        response.rect,
+                        ctx
                     );
-
+                    
                     // Compile material from graph
                     compile_material_from_graph(material);
                 }
             }
         });
+}
+                ui.heading("Properties");
+
+                ui.horizontal(|ui| {
+                    ui.label("Name:");
+                    ui.text_edit_singleline(&mut material.name);
+                });
+
+                ui.separator();
+
+                // Albedo color
+                ui.horizontal(|ui| {
+                    ui.label("Albedo:");
+                    ui.color_edit_button_rgba_unmultiplied(&mut material.albedo_color);
+                });
+
+                // Metallic
+                ui.horizontal(|ui| {
+                    ui.label("Metallic:");
+                    ui.add(egui::Slider::new(&mut material.metallic, 0.0..=1.0));
+                });
+
+                // Roughness
+                ui.horizontal(|ui| {
+                    ui.label("Roughness:");
+                    ui.add(egui::Slider::new(&mut material.roughness, 0.0..=1.0));
+                });
+
+                ui.separator();
+
+                // Emission
+                ui.horizontal(|ui| {
+                    ui.label("Emission:");
+                    ui.color_edit_button_rgb(&mut material.emission);
+                });
+
+                ui.horizontal(|ui| {
+                    ui.label("Emission Strength:");
+                    ui.add(egui::Slider::new(&mut material.emission_strength, 0.0..=10.0));
+                });
+
+                ui.separator();
+
+                // Normal strength
+                ui.horizontal(|ui| {
+                    ui.label("Normal Strength:");
+                    ui.add(egui::Slider::new(&mut material.normal_strength, 0.0..=2.0));
+                });
+
+                ui.separator();
+                ui.heading("Textures");
+
+                // Texture slots
+                texture_slot_ui(ui, "Albedo", &mut material.albedo_texture);
+                texture_slot_ui(ui, "Normal", &mut material.normal_texture);
+                texture_slot_ui(ui, "Metallic/Roughness", &mut material.metallic_roughness_texture);
+                texture_slot_ui(ui, "Emission", &mut material.emission_texture);
+                texture_slot_ui(ui, "Occlusion", &mut material.occlusion_texture);
+
+                ui.separator();
+
+                if ui.button("Apply to Selected Objects").clicked() {
+                    // This would apply the material to selected objects
+                    // For now, we'll just create a Bevy StandardMaterial
+                    let bevy_material = create_bevy_material(material, &asset_server);
+                    bevy_materials.add(bevy_material);
+                }
+            }
+        }
+    });
+}
+
+fn texture_slot_ui(ui: &mut egui::Ui, label: &str, texture_path: &mut Option<String>) {
+    ui.horizontal(|ui| {
+        ui.label(label);
+
+        let display_text = texture_path.as_ref()
+            .map(|path| path.split('/').last().unwrap_or(path))
+            .unwrap_or("None");
+
+        ui.text_edit_singleline(&mut display_text.to_string());
+
+        if ui.button("Browse").clicked() {
+            // In a real implementation, this would open a file dialog
+            // For now, we'll use a placeholder
+            *texture_path = Some("assets/textures/placeholder.png".to_string());
+        }
+
+        if ui.button("Clear").clicked() {
+            *texture_path = None;
+        }
+    });
+}
+
+fn create_bevy_material(sprout_material: &SproutMaterial, asset_server: &AssetServer) -> StandardMaterial {
+    let mut material = StandardMaterial {
+        base_color: Color::rgba(
+            sprout_material.albedo_color[0],
+            sprout_material.albedo_color[1],
+            sprout_material.albedo_color[2],
+            sprout_material.albedo_color[3],
+        ),
+        metallic: sprout_material.metallic,
+        perceptual_roughness: sprout_material.roughness,
+        emissive: Color::rgb(
+            sprout_material.emission[0] * sprout_material.emission_strength,
+            sprout_material.emission[1] * sprout_material.emission_strength,
+            sprout_material.emission[2] * sprout_material.emission_strength,
+        ),
+        ..default()
+    };
+
+    // Load textures if specified
+    if let Some(albedo_path) = &sprout_material.albedo_texture {
+        material.base_color_texture = Some(asset_server.load(albedo_path));
+    }
+
+    if let Some(normal_path) = &sprout_material.normal_texture {
+        material.normal_map_texture = Some(asset_server.load(normal_path));
+    }
+
+    if let Some(metallic_roughness_path) = &sprout_material.metallic_roughness_texture {
+        material.metallic_roughness_texture = Some(asset_server.load(metallic_roughness_path));
+    }
+
+    if let Some(emission_path) = &sprout_material.emission_texture {
+        material.emissive_texture = Some(asset_server.load(emission_path));
+    }
+
+    if let Some(occlusion_path) = &sprout_material.occlusion_texture {
+        material.occlusion_texture = Some(asset_server.load(occlusion_path));
+    }
+
+    material
+}
+
+pub fn save_material_library(material_library: &MaterialLibrary, path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let json = serde_json::to_string_pretty(material_library)?;
+    std::fs::write(path, json)?;
+    Ok(())
+}
+
+pub fn load_material_library(path: &str) -> Result<MaterialLibrary, Box<dyn std::error::Error>> {
+    let json = std::fs::read_to_string(path)?;
+    let library = serde_json::from_str(&json)?;
+    Ok(library)
 }
 
 // Helper functions for the node editor
@@ -378,7 +514,7 @@ fn add_node(graph: &mut MaterialGraph, node_type: MaterialNodeType, name: &str) 
         inputs: get_default_inputs_for_node_type(&node_type),
         name: format!("{} {}", name, graph.next_node_id),
     };
-
+    
     graph.nodes.push(node);
     graph.next_node_id += 1;
 }
@@ -445,7 +581,7 @@ fn get_default_inputs_for_node_type(node_type: &MaterialNodeType) -> HashMap<Str
 fn draw_grid(painter: &egui::Painter, rect: egui::Rect) {
     let grid_size = 20.0;
     let color = egui::Color32::from_rgba_premultiplied(50, 50, 50, 255);
-
+    
     // Vertical lines
     let mut x = rect.left();
     while x < rect.right() {
@@ -455,7 +591,7 @@ fn draw_grid(painter: &egui::Painter, rect: egui::Rect) {
         );
         x += grid_size;
     }
-
+    
     // Horizontal lines
     let mut y = rect.top();
     while y < rect.bottom() {
@@ -485,12 +621,12 @@ fn draw_connection(
             canvas_rect.left() + to_node.position[0], // Left side of input node
             canvas_rect.top() + to_node.position[1] + 20.0,
         );
-
+        
         // Draw bezier curve
         let control_offset = (to_pos.x - from_pos.x).abs() * 0.5;
         let control1 = egui::pos2(from_pos.x + control_offset, from_pos.y);
         let control2 = egui::pos2(to_pos.x - control_offset, to_pos.y);
-
+        
         draw_bezier_curve(painter, from_pos, control1, control2, to_pos);
     }
 }
@@ -504,14 +640,14 @@ fn draw_bezier_curve(
 ) {
     let segments = 20;
     let color = egui::Color32::from_rgb(255, 255, 100);
-
+    
     let mut points = Vec::new();
     for i in 0..=segments {
         let t = i as f32 / segments as f32;
         let point = bezier_point(start, control1, control2, end, t);
         points.push(point);
     }
-
+    
     for i in 0..points.len() - 1 {
         painter.line_segment(
             [points[i], points[i + 1]],
@@ -532,7 +668,7 @@ fn bezier_point(
     let mt = 1.0 - t;
     let mt2 = mt * mt;
     let mt3 = mt2 * mt;
-
+    
     egui::pos2(
         mt3 * p0.x + 3.0 * mt2 * t * p1.x + 3.0 * mt * t2 * p2.x + t3 * p3.x,
         mt3 * p0.y + 3.0 * mt2 * t * p1.y + 3.0 * mt * t2 * p2.y + t3 * p3.y,
@@ -551,15 +687,10 @@ fn draw_node(
         canvas_rect.left() + node.position[0],
         canvas_rect.top() + node.position[1],
     );
-
-    let node_width = 140.0;
-    let input_count = node.inputs.len() as f32;
-    let output_count = get_output_count_for_node_type(&node.node_type) as f32;
-    let node_height = 30.0 + (input_count.max(output_count) * 20.0).max(50.0);
-
-    let node_size = egui::vec2(node_width, node_height);
+    
+    let node_size = egui::vec2(120.0, 80.0);
     let node_rect = egui::Rect::from_min_size(node_pos, node_size);
-
+    
     // Node background
     let node_color = match node.node_type {
         MaterialNodeType::MaterialOutput => egui::Color32::from_rgb(100, 200, 100),
@@ -568,10 +699,10 @@ fn draw_node(
         MaterialNodeType::TextureSample => egui::Color32::from_rgb(200, 150, 100),
         _ => egui::Color32::from_rgb(150, 150, 150),
     };
-
+    
     painter.rect_filled(node_rect, egui::Rounding::same(5.0), node_color);
     painter.rect_stroke(node_rect, egui::Rounding::same(5.0), egui::Stroke::new(1.0, egui::Color32::WHITE));
-
+    
     // Node title
     painter.text(
         egui::pos2(node_pos.x + 5.0, node_pos.y + 5.0),
@@ -580,274 +711,26 @@ fn draw_node(
         egui::FontId::default(),
         egui::Color32::WHITE,
     );
-
-    // Draw input sockets (left side)
-    let mut input_y = node_pos.y + 25.0;
-    for (input_name, _value) in &node.inputs {
-        let socket_pos = egui::pos2(node_pos.x - 5.0, input_y);
-        draw_input_socket(painter, ui, socket_pos, input_name, node.id, editor_state, response);
-
-        // Draw input label
-        painter.text(
-            egui::pos2(node_pos.x + 8.0, input_y - 6.0),
-            egui::Align2::LEFT_TOP,
-            input_name,
-            egui::FontId::proportional(10.0),
-            egui::Color32::WHITE,
-        );
-
-        input_y += 20.0;
-    }
-
-    // Draw output sockets (right side) - most nodes have one output
-    if node.node_type != MaterialNodeType::MaterialOutput {
-        let output_names = get_output_names_for_node_type(&node.node_type);
-        let mut output_y = node_pos.y + 25.0;
-
-        for output_name in output_names {
-            let socket_pos = egui::pos2(node_pos.x + node_width + 5.0, output_y);
-            draw_output_socket(painter, ui, socket_pos, &output_name, node.id, editor_state, response);
-
-            // Draw output label
-            painter.text(
-                egui::pos2(node_pos.x + node_width - 8.0, output_y - 6.0),
-                egui::Align2::RIGHT_TOP,
-                &output_name,
-                egui::FontId::proportional(10.0),
-                egui::Color32::WHITE,
-            );
-
-            output_y += 20.0;
-        }
-    }
-}
-
-fn get_output_count_for_node_type(node_type: &MaterialNodeType) -> usize {
-    match node_type {
-        MaterialNodeType::MaterialOutput => 0,
-        _ => 1, // Most nodes have one output
-    }
-}
-
-fn get_output_names_for_node_type(node_type: &MaterialNodeType) -> Vec<String> {
-    match node_type {
-        MaterialNodeType::ColorConstant => vec!["Color".to_string()],
-        MaterialNodeType::ScalarConstant => vec!["Value".to_string()],
-        MaterialNodeType::Vector3Constant => vec!["Vector".to_string()],
-        MaterialNodeType::TextureSample => vec!["RGB".to_string()],
-        MaterialNodeType::Multiply | MaterialNodeType::Add | MaterialNodeType::Subtract => vec!["Result".to_string()],
-        MaterialNodeType::Lerp => vec!["Result".to_string()],
-        MaterialNodeType::MaterialOutput => vec![], // No outputs
-    }
-}
-
-fn draw_input_socket(
-    painter: &egui::Painter,
-    ui: &mut egui::Ui,
-    socket_pos: egui::Pos2,
-    input_name: &str,
-    node_id: u32,
-    editor_state: &mut MaterialEditorState,
-    response: &egui::Response,
-) {
-    let socket_radius = 6.0;
-    let socket_rect = egui::Rect::from_center_size(socket_pos, egui::vec2(socket_radius * 2.0, socket_radius * 2.0));
-
-    // Socket color - different colors for different types
-    let socket_color = match input_name {
-        "Base Color" | "Color" | "A" | "B" if input_name.contains("Color") => egui::Color32::from_rgb(255, 100, 100),
-        "Metallic" | "Roughness" | "Value" | "Alpha" => egui::Color32::from_rgb(100, 255, 100),
-        "Texture" => egui::Color32::from_rgb(255, 255, 100),
-        _ => egui::Color32::from_rgb(200, 200, 200),
-    };
-
-    painter.circle_filled(socket_pos, socket_radius, socket_color);
-    painter.circle_stroke(socket_pos, socket_radius, egui::Stroke::new(1.0, egui::Color32::WHITE));
-}
-
-fn draw_output_socket(
-    painter: &egui::Painter,
-    ui: &mut egui::Ui,
-    socket_pos: egui::Pos2,
-    output_name: &str,
-    node_id: u32,
-    editor_state: &mut MaterialEditorState,
-    response: &egui::Response,
-) {
-    let socket_radius = 6.0;
-    let socket_rect = egui::Rect::from_center_size(socket_pos, egui::vec2(socket_radius * 2.0, socket_radius * 2.0));
-
-    // Socket color - different colors for different types
-    let socket_color = match output_name {
-        "Color" | "RGB" => egui::Color32::from_rgb(255, 100, 100),
-        "Value" | "Result" => egui::Color32::from_rgb(100, 255, 100),
-        "Vector" => egui::Color32::from_rgb(100, 100, 255),
-        _ => egui::Color32::from_rgb(200, 200, 200),
-    };
-
-    painter.circle_filled(socket_pos, socket_radius, socket_color);
-    painter.circle_stroke(socket_pos, socket_radius, egui::Stroke::new(1.0, egui::Color32::WHITE));
+    
+    // Input/Output connectors would go here in a full implementation
+    // For now, just show the node structure
 }
 
 fn handle_node_interactions(
     graph: &mut MaterialGraph,
     editor_state: &mut MaterialEditorState,
     response: &egui::Response,
-    canvas_rect: egui::Rect,
+    ctx: &mut egui::Context,
 ) {
-    // Handle socket interactions for each node - need to collect node data first to avoid borrowing issues
-    let node_count = graph.nodes.len();
-    for i in 0..node_count {
-        let node_id = graph.nodes[i].id;
-        let node_position = graph.nodes[i].position;
-        let node_type = graph.nodes[i].node_type.clone();
-        let node_inputs: Vec<(String, MaterialValue)> = graph.nodes[i].inputs.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
-
-        // Check input socket interactions
-        let node_pos = egui::pos2(
-            canvas_rect.left() + node_position[0],
-            canvas_rect.top() + node_position[1],
-        );
-
-        let mut input_y = node_pos.y + 25.0;
-        for (input_name, _value) in &node_inputs {
-            let socket_pos = egui::pos2(node_pos.x - 5.0, input_y);
-            let socket_radius = 6.0;
-            let socket_rect = egui::Rect::from_center_size(socket_pos, egui::vec2(socket_radius * 2.0, socket_radius * 2.0));
-
-            if let Some(pointer_pos) = response.interact_pointer_pos() {
-                if socket_rect.contains(pointer_pos) && response.clicked() {
-                    // Handle connection ending on this input
-                    if let Some((from_node_id, from_output)) = &editor_state.creating_connection.clone() {
-                        // Create connection from the previous output to this input
-                        let connection = MaterialConnection {
-                            from_node: *from_node_id,
-                            from_output: from_output.clone(),
-                            to_node: node_id,
-                            to_input: input_name.clone(),
-                        };
-
-                        // Remove any existing connection to this input
-                        graph.connections.retain(|c| !(c.to_node == node_id && c.to_input == *input_name));
-
-                        // Add the new connection
-                        graph.connections.push(connection);
-
-                        println!("Created connection from node {} output '{}' to node {} input '{}'",
-                            from_node_id, from_output, node_id, input_name);
-
-                        editor_state.creating_connection = None;
-                    }
-                }
-            }
-
-            input_y += 20.0;
-        }
-
-        // Check output socket interactions (if not MaterialOutput)
-        if node_type != MaterialNodeType::MaterialOutput {
-            let output_names = get_output_names_for_node_type(&node_type);
-            let mut output_y = node_pos.y + 25.0;
-            let node_width = 140.0;
-
-            for output_name in output_names {
-                let socket_pos = egui::pos2(node_pos.x + node_width + 5.0, output_y);
-                let socket_radius = 6.0;
-                let socket_rect = egui::Rect::from_center_size(socket_pos, egui::vec2(socket_radius * 2.0, socket_radius * 2.0));
-
-                if let Some(pointer_pos) = response.interact_pointer_pos() {
-                    if socket_rect.contains(pointer_pos) && response.clicked() {
-                        // Start creating a connection from this output
-                        editor_state.creating_connection = Some((node_id, output_name.clone()));
-                        println!("Starting connection from node {} output '{}'", node_id, output_name);
-                    }
-                }
-
-                output_y += 20.0;
-            }
-        }
+    // Handle node dragging, selection, connection creation, etc.
+    // This is a simplified version - a full implementation would be more complex
+    
+    if response.clicked() {
+        // Handle node selection
     }
-
-    // Handle node dragging
+    
     if response.dragged() {
-        if let Some(dragging_node_id) = editor_state.dragging_node {
-            if let Some(node) = graph.nodes.iter_mut().find(|n| n.id == dragging_node_id) {
-                node.position[0] += response.drag_delta().x;
-                node.position[1] += response.drag_delta().y;
-            }
-        }
-    }
-
-    // Handle clicking to start dragging
-    if response.drag_started() {
-        if let Some(pointer_pos) = response.interact_pointer_pos() {
-            // Convert pointer position to canvas coordinates
-            let canvas_pointer_pos = egui::pos2(
-                pointer_pos.x - canvas_rect.left(),
-                pointer_pos.y - canvas_rect.top(),
-            );
-
-            // Find which node was clicked
-            for node in &graph.nodes {
-                let node_pos = egui::pos2(node.position[0], node.position[1]);
-                let node_size = egui::vec2(140.0, 80.0); // Match the size from draw_node
-                let node_rect = egui::Rect::from_min_size(node_pos, node_size);
-
-                if node_rect.contains(canvas_pointer_pos) {
-                    editor_state.dragging_node = Some(node.id);
-                    editor_state.selected_node = Some(node.id);
-                    break;
-                }
-            }
-        }
-    }
-
-    // Stop dragging
-    if response.drag_released() {
-        editor_state.dragging_node = None;
-    }
-
-    // Cancel connection creation on right click or escape
-    if response.secondary_clicked() {
-        editor_state.creating_connection = None;
-    }
-}
-
-fn get_output_socket_pos(node: &MaterialNode, output_name: &str, canvas_rect: egui::Rect) -> egui::Pos2 {
-    let node_pos = egui::pos2(
-        canvas_rect.left() + node.position[0],
-        canvas_rect.top() + node.position[1],
-    );
-
-    let node_width = 140.0;
-    let output_names = get_output_names_for_node_type(&node.node_type);
-
-    for (i, name) in output_names.iter().enumerate() {
-        if name == output_name {
-            let output_y = node_pos.y + 25.0 + (i as f32 * 20.0);
-            return egui::pos2(node_pos.x + node_width + 5.0, output_y);
-        }
-    }
-
-    node_pos // fallback
-}
-
-fn draw_preview_connection(painter: &egui::Painter, from_pos: egui::Pos2, to_pos: egui::Pos2) {
-    let control_offset = (to_pos.x - from_pos.x).abs() * 0.5;
-    let control1 = egui::pos2(from_pos.x + control_offset, from_pos.y);
-    let control2 = egui::pos2(to_pos.x - control_offset, to_pos.y);
-
-    // Draw a dashed preview line
-    let segments = 10;
-    let color = egui::Color32::from_rgba_premultiplied(255, 255, 100, 150);
-
-    for i in 0..segments {
-        let t1 = i as f32 / segments as f32;
-        let t2 = (i + 1) as f32 / segments as f32;
-        let p1 = bezier_point(from_pos, control1, control2, to_pos, t1);
-        let p2 = bezier_point(from_pos, control1, control2, to_pos, t2);
-
-        painter.line_segment([p1, p2], egui::Stroke::new(2.0, color));
+        // Handle node dragging
     }
 }
 
@@ -855,26 +738,26 @@ fn compile_material_from_graph(material: &mut SproutMaterial) {
     // Find the Material Output node
     if let Some(output_node) = material.material_graph.nodes.iter()
         .find(|n| n.node_type == MaterialNodeType::MaterialOutput) {
-
+        
         // Extract values from the output node
         if let Some(base_color) = output_node.inputs.get("Base Color") {
             if let MaterialValue::Color(color) = base_color {
                 material.albedo_color = *color;
             }
         }
-
+        
         if let Some(metallic) = output_node.inputs.get("Metallic") {
             if let MaterialValue::Scalar(value) = metallic {
                 material.metallic = *value;
             }
         }
-
+        
         if let Some(roughness) = output_node.inputs.get("Roughness") {
             if let MaterialValue::Scalar(value) = roughness {
                 material.roughness = *value;
             }
         }
-
+        
         if let Some(emission) = output_node.inputs.get("Emission") {
             if let MaterialValue::Color(color) = emission {
                 material.emission = [color[0], color[1], color[2]];
@@ -882,60 +765,6 @@ fn compile_material_from_graph(material: &mut SproutMaterial) {
             }
         }
     }
-}
-
-fn create_bevy_material(sprout_material: &SproutMaterial, asset_server: &AssetServer) -> StandardMaterial {
-    let mut material = StandardMaterial {
-        base_color: Color::rgba(
-            sprout_material.albedo_color[0],
-            sprout_material.albedo_color[1],
-            sprout_material.albedo_color[2],
-            sprout_material.albedo_color[3],
-        ),
-        metallic: sprout_material.metallic,
-        perceptual_roughness: sprout_material.roughness,
-        emissive: Color::rgb(
-            sprout_material.emission[0] * sprout_material.emission_strength,
-            sprout_material.emission[1] * sprout_material.emission_strength,
-            sprout_material.emission[2] * sprout_material.emission_strength,
-        ),
-        ..default()
-    };
-
-    // Load textures if specified
-    if let Some(albedo_path) = &sprout_material.albedo_texture {
-        material.base_color_texture = Some(asset_server.load(albedo_path));
-    }
-
-    if let Some(normal_path) = &sprout_material.normal_texture {
-        material.normal_map_texture = Some(asset_server.load(normal_path));
-    }
-
-    if let Some(metallic_roughness_path) = &sprout_material.metallic_roughness_texture {
-        material.metallic_roughness_texture = Some(asset_server.load(metallic_roughness_path));
-    }
-
-    if let Some(emission_path) = &sprout_material.emission_texture {
-        material.emissive_texture = Some(asset_server.load(emission_path));
-    }
-
-    if let Some(occlusion_path) = &sprout_material.occlusion_texture {
-        material.occlusion_texture = Some(asset_server.load(occlusion_path));
-    }
-
-    material
-}
-
-pub fn save_material_library(material_library: &MaterialLibrary, path: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let json = serde_json::to_string_pretty(material_library)?;
-    std::fs::write(path, json)?;
-    Ok(())
-}
-
-pub fn load_material_library(path: &str) -> Result<MaterialLibrary, Box<dyn std::error::Error>> {
-    let json = std::fs::read_to_string(path)?;
-    let library = serde_json::from_str(&json)?;
-    Ok(library)
 }
 
 pub struct MaterialPlugin;

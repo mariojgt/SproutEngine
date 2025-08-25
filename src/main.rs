@@ -62,6 +62,7 @@ fn main() {
                 draw_gizmos,
                 handle_gizmo_drag,
                 picking_select,
+                apply_material_changes,
             ),
         )
         .run();
@@ -86,6 +87,32 @@ impl Default for ScriptOp {
 
 #[derive(Component, Default, Serialize, Deserialize, Clone)]
 struct VisualScript { enabled: bool, ops: Vec<ScriptOp> }
+
+// Material reference component - tracks which material an object uses
+#[derive(Component, Clone, Debug)]
+pub struct MaterialReference {
+    pub material_name: String,
+    pub bevy_material_handle: Option<Handle<StandardMaterial>>,
+    pub last_applied_material_name: Option<String>,  // Track what was last applied
+}
+
+impl Default for MaterialReference {
+    fn default() -> Self {
+        Self {
+            material_name: "Default".to_string(),
+            bevy_material_handle: None,
+            last_applied_material_name: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+enum PrimitiveType {
+    Cube,
+    Sphere,
+    Plane,
+    Cylinder,
+}
 
 #[derive(Clone, Serialize, Deserialize)]
 struct Node { id: u64, title: String, pos: [f32; 2], op: ScriptOp }
@@ -183,26 +210,45 @@ fn setup_scene(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    // Create default material
+    let default_material = materials.add(StandardMaterial {
+        base_color: Color::rgb(0.08, 0.1, 0.12),
+        perceptual_roughness: 1.0,
+        ..default()
+    });
+
     commands.spawn((
         Name::new("Ground"),
         PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0, subdivisions: 0 })),
-            material: materials.add(StandardMaterial {
-                base_color: Color::rgb(0.08, 0.1, 0.12),
-                perceptual_roughness: 1.0,
-                ..default()
-            }),
+            material: default_material.clone(),
             ..default()
         },
+        MaterialReference {
+            material_name: "Default".to_string(),
+            bevy_material_handle: Some(default_material.clone()),
+            last_applied_material_name: Some("Default".to_string()),
+        },
     ));
+
+    // Create cube with default material
+    let cube_material = materials.add(StandardMaterial {
+        base_color: Color::rgb(0.36, 0.72, 1.0),
+        ..default()
+    });
 
     commands.spawn((
         Name::new("Cube"),
         PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(StandardMaterial { base_color: Color::rgb(0.36, 0.72, 1.0), ..default() }),
+            material: cube_material.clone(),
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
+        },
+        MaterialReference {
+            material_name: "Default".to_string(),
+            bevy_material_handle: Some(cube_material),
+            last_applied_material_name: Some("Default".to_string()),
         },
         VisualScript { enabled: true, ops: vec![ScriptOp::RotateXYZ { deg_per_sec: [0.0,45.0,0.0] }] },
         NodeGraph { nodes: vec![], links: vec![], next_id: 1 },
@@ -436,13 +482,15 @@ fn ui_inspector(
     selection: Res<Selection>,
     mut transforms: Query<&mut Transform>,
     names: Query<&Name>,
+    mut material_refs: Query<&mut MaterialReference>,
+    material_library: Res<material::MaterialLibrary>,
     mut state: ResMut<EditorState>,
     keys: Res<Input<KeyCode>>,
     mouse: Res<Input<MouseButton>>,
 ) {
     // Check egui input state before UI rendering
     let wants_keyboard = contexts.ctx_mut().wants_keyboard_input();
-    
+
     if state.show_docking_window {
         egui::SidePanel::right("inspector_right")
             .default_width(320.0)
@@ -457,30 +505,35 @@ fn ui_inspector(
                     });
                 });
                 ui.separator();
-                ui.label("Shortcuts: W/E/R (Move/Rotate/Scale), X/Y/Z axis lock, F frame");
-                ui.label("WASD + Right Mouse: Fly camera, Shift: Speed boost");
-                ui.label("Click in viewport area to enable camera controls");
+                ui.label("🎮 Controls:");
+                ui.label("• G/R/T: Grab/Rotate/sTale (Transform modes)");
+                ui.label("• X/Y/Z: Lock to axis, C: Clear axis lock");
+                ui.label("• WASD + Right Mouse: Fly camera");
+                ui.label("• Shift: Speed boost, F: Frame selected");
+                ui.label("• Left click & drag: Transform selected object");
+                ui.label("💡 Click in viewport to enable camera controls");
 
                 if let Some(entity) = selection.entity {
                     if let Ok(name) = names.get(entity) {
                         ui.label(format!("Selected: {}", name));
                     }
                     if let Ok(mut t) = transforms.get_mut(entity) {
-                        // Allow shortcuts when not typing in UI OR when right mouse is pressed
-                        if !wants_keyboard || mouse.pressed(MouseButton::Right) {
-                            if keys.just_pressed(KeyCode::W) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
-                                state.gizmo = GizmoMode::Translate;
-                            }
-                            if keys.just_pressed(KeyCode::E) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
-                                state.gizmo = GizmoMode::Rotate;
-                            }
-                            if keys.just_pressed(KeyCode::R) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
-                                state.gizmo = GizmoMode::Scale;
-                            }
-                            if keys.just_pressed(KeyCode::X) { state.axis_lock = AxisLock::X; }
-                            if keys.just_pressed(KeyCode::Y) { state.axis_lock = AxisLock::Y; }
-                            if keys.just_pressed(KeyCode::Z) { state.axis_lock = AxisLock::Z; }
-                        }
+                        // Show current gizmo mode and axis lock
+                        ui.separator();
+                        ui.horizontal(|ui| {
+                            ui.label("Transform Mode:");
+                            ui.selectable_value(&mut state.gizmo, GizmoMode::Translate, "Grab (G)");
+                            ui.selectable_value(&mut state.gizmo, GizmoMode::Rotate, "Rotate (R)");
+                            ui.selectable_value(&mut state.gizmo, GizmoMode::Scale, "Scale (T)");
+                        });
+
+                        ui.horizontal(|ui| {
+                            ui.label("Axis Lock:");
+                            ui.selectable_value(&mut state.axis_lock, AxisLock::None, "Free (C)");
+                            ui.selectable_value(&mut state.axis_lock, AxisLock::X, "X");
+                            ui.selectable_value(&mut state.axis_lock, AxisLock::Y, "Y");
+                            ui.selectable_value(&mut state.axis_lock, AxisLock::Z, "Z");
+                        });
 
                         // Translation
                         let mut pos = t.translation.to_array();
@@ -513,6 +566,60 @@ fn ui_inspector(
                             ui.add(egui::DragValue::new(&mut scl[2]).speed(0.02));
                         });
                         t.scale = Vec3::new(scl[0].max(0.001), scl[1].max(0.001), scl[2].max(0.001));
+
+                        // Material section
+                        ui.separator();
+                        ui.heading("🎨 Material");
+
+                        if let Ok(mut material_ref) = material_refs.get_mut(entity) {
+                            ui.horizontal(|ui| {
+                                ui.label("Material:");
+
+                                egui::ComboBox::from_label("")
+                                    .selected_text(&material_ref.material_name)
+                                    .show_ui(ui, |ui| {
+                                        let mut material_names: Vec<String> = material_library.materials.keys().cloned().collect();
+                                        material_names.sort(); // Sort for consistent ordering
+
+                                        for material_name in material_names {
+                                            if ui.selectable_value(&mut material_ref.material_name, material_name.clone(), material_name.clone()).clicked() {
+                                                println!("UI: Material selection changed to: {}", material_name);
+                                                // No need to clear bevy_material_handle - the system will detect the name change
+                                            }
+                                        }
+                                    });
+                            });
+
+                            // Show current material properties (read-only preview)
+                            if let Some(sprout_material) = material_library.materials.get(&material_ref.material_name) {
+                                ui.indent("material_preview", |ui| {
+                                    ui.label("Preview:");
+                                    let color = sprout_material.albedo_color;
+                                    ui.horizontal(|ui| {
+                                        ui.label("Albedo:");
+                                        ui.colored_label(
+                                            egui::Color32::from_rgba_premultiplied(
+                                                (color[0] * 255.0) as u8,
+                                                (color[1] * 255.0) as u8,
+                                                (color[2] * 255.0) as u8,
+                                                (color[3] * 255.0) as u8,
+                                            ),
+                                            "█████"
+                                        );
+                                    });
+                                    ui.horizontal(|ui| {
+                                        ui.label(format!("Metallic: {:.2}", sprout_material.metallic));
+                                        ui.label(format!("Roughness: {:.2}", sprout_material.roughness));
+                                    });
+                                });
+                            }
+                        } else {
+                            ui.label("No material component found");
+                            if ui.button("Add Material Component").clicked() {
+                                // TODO: Add material component to entity
+                                ui.label("Feature coming soon!");
+                            }
+                        }
                     } else {
                         ui.label("No transform found.");
                     }
@@ -652,6 +759,8 @@ fn ui_content_browser(
     mut state: ResMut<EditorState>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     egui::TopBottomPanel::bottom("content_browser").default_height(150.0).resizable(true).show(contexts.ctx_mut(), |ui| {
         ui.horizontal(|ui| {
@@ -661,6 +770,26 @@ fn ui_content_browser(
             }
         });
         ui.separator();
+
+        // Add primitive creation section
+        ui.horizontal(|ui| {
+            ui.heading("Create Primitives:");
+            if ui.button("Cube").clicked() {
+                spawn_primitive(&mut commands, &mut meshes, &mut materials, PrimitiveType::Cube);
+            }
+            if ui.button("Sphere").clicked() {
+                spawn_primitive(&mut commands, &mut meshes, &mut materials, PrimitiveType::Sphere);
+            }
+            if ui.button("Plane").clicked() {
+                spawn_primitive(&mut commands, &mut meshes, &mut materials, PrimitiveType::Plane);
+            }
+            if ui.button("Cylinder").clicked() {
+                spawn_primitive(&mut commands, &mut meshes, &mut materials, PrimitiveType::Cylinder);
+            }
+        });
+
+        ui.separator();
+        ui.heading("Assets:");
         if state.assets_scan.is_empty() { state.assets_scan = scan_assets(&state.assets_root); }
         egui::ScrollArea::horizontal().show(ui, |ui| {
             for path in &state.assets_scan {
@@ -703,6 +832,7 @@ fn spawn_asset(commands: &mut Commands, asset_server: &AssetServer, path: &str) 
                 transform: Transform::from_xyz(0.0, 0.5, 0.0),
                 ..default()
             },
+            MaterialReference::default(), // Add default material reference
         ));
     } else if path.ends_with(".gltf") || path.ends_with(".glb") || path.ends_with(".fbx") {
         // load as scene
@@ -712,8 +842,64 @@ fn spawn_asset(commands: &mut Commands, asset_server: &AssetServer, path: &str) 
             SceneBundle { scene, transform: Transform::from_xyz(0.0, 0.0, 0.0), ..default() },
             Animator::default(),
             AnimationBindings { clips: vec![] },
+            MaterialReference::default(), // Add default material reference
         ));
     }
+}
+
+fn spawn_primitive(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<StandardMaterial>>,
+    primitive_type: PrimitiveType,
+) {
+    // Create default material for the primitive
+    let default_material = materials.add(StandardMaterial {
+        base_color: Color::rgb(0.8, 0.8, 0.8),
+        perceptual_roughness: 0.5,
+        metallic: 0.0,
+        ..default()
+    });
+
+    let (name, mesh, transform) = match primitive_type {
+        PrimitiveType::Cube => (
+            "Cube",
+            meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+            Transform::from_xyz(0.0, 0.5, 0.0),
+        ),
+        PrimitiveType::Sphere => (
+            "Sphere",
+            meshes.add(Mesh::from(shape::UVSphere { radius: 0.5, sectors: 36, stacks: 18 })),
+            Transform::from_xyz(0.0, 0.5, 0.0),
+        ),
+        PrimitiveType::Plane => (
+            "Plane",
+            meshes.add(Mesh::from(shape::Plane { size: 2.0, subdivisions: 0 })),
+            Transform::from_xyz(0.0, 0.0, 0.0),
+        ),
+        PrimitiveType::Cylinder => (
+            "Cylinder",
+            meshes.add(Mesh::from(shape::Cylinder { radius: 0.5, height: 1.0, resolution: 32, segments: 1 })),
+            Transform::from_xyz(0.0, 0.5, 0.0),
+        ),
+    };
+
+    commands.spawn((
+        Name::new(name.to_string()),
+        PbrBundle {
+            mesh,
+            material: default_material.clone(),
+            transform,
+            ..default()
+        },
+        MaterialReference {
+            material_name: "Default".to_string(),
+            bevy_material_handle: Some(default_material),
+            last_applied_material_name: Some("Default".to_string()),  // Initialize to Default since we just applied it
+        },
+    ));
+
+    println!("Spawned {} primitive with default material", name);
 }
 
 /* Animator Tab */
@@ -839,7 +1025,7 @@ fn camera_controls(
     mut camera_q: Query<&mut Transform, (With<Camera3d>, Without<DirectionalLight>)>,
     mut orbit: ResMut<CameraOrbit>,
     mut contexts: EguiContexts,
-    state: Res<EditorState>,
+    _state: Res<EditorState>,
     mouse: Res<Input<MouseButton>>,
     keys: Res<Input<KeyCode>>,
     mut motion_evr: EventReader<bevy::input::mouse::MouseMotion>,
@@ -848,25 +1034,27 @@ fn camera_controls(
 ) {
     let mut cam = if let Ok(c) = camera_q.get_single_mut() { c } else { return; };
 
-    // Check if egui wants keyboard or mouse input AND if mouse is over UI
+    // Check egui state - be more aggressive about allowing camera controls
     let ctx = contexts.ctx_mut();
     let wants_keyboard = ctx.wants_keyboard_input();
-    let wants_mouse = ctx.wants_pointer_input();
-    let mouse_over_ui = ctx.is_pointer_over_area();
+    let is_over_ui = ctx.is_pointer_over_area();
 
     let mut delta = Vec2::ZERO;
     for ev in motion_evr.iter() { delta += ev.delta; }
 
     let mut zoom = 0.0f32;
     for ev in wheel_evr.iter() { zoom += ev.y; }
-    
-    // Allow zoom when not over UI or when right mouse is pressed (viewport focus)
-    if zoom.abs() > 0.0 && (!mouse_over_ui || mouse.pressed(MouseButton::Right)) { 
-        orbit.distance = (orbit.distance * (1.0 - zoom * 0.1 * orbit.zoom_speed)).clamp(0.5, 100.0); 
+
+    // Mouse wheel zoom - always allow unless cursor is over UI elements
+    if zoom.abs() > 0.0 && !is_over_ui {
+        orbit.distance = (orbit.distance * (1.0 - zoom * 0.1 * orbit.zoom_speed)).clamp(0.5, 100.0);
     }
 
-    // WASD movement - allow when not typing in UI OR when right mouse is pressed (viewport focus)
-    if !wants_keyboard || mouse.pressed(MouseButton::Right) {
+    // WASD movement - more aggressive allowance for viewport control
+    // Allow when: not typing in text field OR right mouse pressed (viewport focus) OR not over UI
+    let allow_wasd = !wants_keyboard || mouse.pressed(MouseButton::Right) || !is_over_ui;
+
+    if allow_wasd {
         let move_speed = if keys.any_pressed([KeyCode::LShift, KeyCode::RShift]) { 20.0 } else { 5.0 };
         let dt = time.delta_seconds();
 
@@ -894,22 +1082,20 @@ fn camera_controls(
         }
     }
 
-    // Mouse controls - allow when not over UI OR when right mouse is pressed
-    if !mouse_over_ui || mouse.pressed(MouseButton::Right) {
-        // Mouse look (right mouse button)
-        if mouse.pressed(MouseButton::Right) && delta.length_squared() > 0.0 {
-            orbit.yaw   -= delta.x * orbit.orbit_speed;
-            orbit.pitch -= delta.y * orbit.orbit_speed;
-            orbit.pitch = orbit.pitch.clamp(-1.54, 1.54);
-        }
+    // Mouse controls - always allow right mouse button for camera look
+    // Mouse look (right mouse button) - always works
+    if mouse.pressed(MouseButton::Right) && delta.length_squared() > 0.0 {
+        orbit.yaw   -= delta.x * orbit.orbit_speed;
+        orbit.pitch -= delta.y * orbit.orbit_speed;
+        orbit.pitch = orbit.pitch.clamp(-1.54, 1.54);
+    }
 
-        // Pan with middle mouse or right+shift
-        if mouse.pressed(MouseButton::Middle) || (mouse.pressed(MouseButton::Right) && keys.any_pressed([KeyCode::LShift, KeyCode::RShift])) {
-            let right = cam.right(); let up = cam.up();
-            let pan_speed = orbit.pan_speed;
-            let distance = orbit.distance;
-            orbit.target += (-right * delta.x + up * delta.y) * pan_speed * distance.max(1.0);
-        }
+    // Pan with middle mouse or right+shift - allow when not over specific UI widgets
+    if mouse.pressed(MouseButton::Middle) || (mouse.pressed(MouseButton::Right) && keys.any_pressed([KeyCode::LShift, KeyCode::RShift])) {
+        let right = cam.right(); let up = cam.up();
+        let pan_speed = orbit.pan_speed;
+        let distance = orbit.distance;
+        orbit.target += (-right * delta.x + up * delta.y) * pan_speed * distance.max(1.0);
     }
 
     let rot = Quat::from_euler(EulerRot::ZYX, 0.0, orbit.yaw, orbit.pitch);
@@ -923,24 +1109,22 @@ fn camera_controls(
 }
 
 fn frame_selected_on_f_key(
-    selection: Res<Selection>, 
+    selection: Res<Selection>,
     keys: Res<Input<KeyCode>>,
     mut contexts: EguiContexts,
-    mouse: Res<Input<MouseButton>>,
-    mut orbit: ResMut<CameraOrbit>, 
+    mut orbit: ResMut<CameraOrbit>,
     transforms: Query<&Transform>,
 ) {
-    // Check if egui wants keyboard input and if mouse is over UI
+    // Check if egui wants keyboard input (typing in text field)
     let ctx = contexts.ctx_mut();
     let wants_keyboard = ctx.wants_keyboard_input();
-    let mouse_over_ui = ctx.is_pointer_over_area();
-    
-    // Allow F key when not typing in UI OR when right mouse is pressed (viewport focus)
-    if (!wants_keyboard || mouse.pressed(MouseButton::Right)) && keys.just_pressed(KeyCode::F) {
-        if let Some(e) = selection.entity { 
-            if let Ok(t) = transforms.get(e) { 
-                orbit.target = t.translation; 
-            } 
+
+    // Allow F key when not typing in text fields
+    if !wants_keyboard && keys.just_pressed(KeyCode::F) {
+        if let Some(e) = selection.entity {
+            if let Ok(t) = transforms.get(e) {
+                orbit.target = t.translation;
+            }
         }
     }
 }
@@ -962,80 +1146,266 @@ fn handle_gizmo_drag(
 ) {
     let cam_tf = if let Ok(c) = camera_q.get_single() { c } else { return; };
 
-    // Check if egui wants input and if mouse is over UI
+    // Check if egui wants input
     let ctx = contexts.ctx_mut();
     let wants_keyboard = ctx.wants_keyboard_input();
-    let wants_mouse = ctx.wants_pointer_input();
-    let mouse_over_ui = ctx.is_pointer_over_area();
+    let is_over_ui = ctx.is_pointer_over_area();
 
     let mut delta = Vec2::ZERO;
     for ev in motion_evr.iter() { delta += ev.delta; }
 
-    // Handle gizmo shortcuts when not typing in UI OR when right mouse is pressed (viewport focus)
-    if !wants_keyboard || buttons.pressed(MouseButton::Right) {
-        if keys.just_pressed(KeyCode::W) { state.gizmo = GizmoMode::Translate; }
-        if keys.just_pressed(KeyCode::E) { state.gizmo = GizmoMode::Rotate; }
-        if keys.just_pressed(KeyCode::R) { state.gizmo = GizmoMode::Scale; }
+    // Only handle gizmo shortcuts when not typing in text fields and not over UI
+    // Use different keys to avoid conflict with WASD camera movement
+    if !wants_keyboard && !is_over_ui {
+        if keys.just_pressed(KeyCode::G) { state.gizmo = GizmoMode::Translate; } // G for "Grab" like Blender
+        if keys.just_pressed(KeyCode::R) { state.gizmo = GizmoMode::Rotate; }    // R for "Rotate"
+        if keys.just_pressed(KeyCode::T) { state.gizmo = GizmoMode::Scale; }     // T for "sTale"/"Scale"
         if keys.just_pressed(KeyCode::X) { state.axis_lock = AxisLock::X; }
         if keys.just_pressed(KeyCode::Y) { state.axis_lock = AxisLock::Y; }
         if keys.just_pressed(KeyCode::Z) { state.axis_lock = AxisLock::Z; }
+        if keys.just_pressed(KeyCode::C) { state.axis_lock = AxisLock::None; }   // C for "Clear" axis lock
     }
 
-    // Handle mouse dragging when not over UI OR when dragging (already started)
-    if !mouse_over_ui || buttons.pressed(MouseButton::Left) {
-        if let Some(e) = selection.entity {
-            if let Ok(mut t) = transforms.get_mut(e) {
-                if buttons.pressed(MouseButton::Left) && delta.length_squared() > 0.0 {
-                    match state.gizmo {
-                        GizmoMode::Translate => {
-                            let mut d = Vec3::ZERO;
-                            match state.axis_lock {
-                                AxisLock::X => d.x = delta.x * 0.01,
-                                AxisLock::Y => d.y = delta.y * 0.01,
-                                AxisLock::Z => d.z = -delta.x * 0.01,
-                                AxisLock::None => {
-                                    let right = cam_tf.right(); let up = cam_tf.up();
-                                    let translation = t.translation;
-                                    let distance = translation.distance(cam_tf.translation());
-                                    t.translation += (-right * delta.x + up * delta.y) * 0.01 * distance;
-                                    return;
-                                }
+    // Mouse dragging - only when not over UI and left mouse pressed
+    if let Some(e) = selection.entity {
+        if let Ok(mut t) = transforms.get_mut(e) {
+            if buttons.pressed(MouseButton::Left) && delta.length_squared() > 0.0 && !is_over_ui {
+                let sensitivity = 0.01;
+                let rotation_sensitivity = 1.0_f32.to_radians();
+
+                match state.gizmo {
+                    GizmoMode::Translate => {
+                        match state.axis_lock {
+                            AxisLock::X => {
+                                // Move only along X axis
+                                t.translation.x += delta.x * sensitivity;
+                            },
+                            AxisLock::Y => {
+                                // Move only along Y axis (screen up/down becomes world Y)
+                                t.translation.y += -delta.y * sensitivity;
+                            },
+                            AxisLock::Z => {
+                                // Move only along Z axis (screen left/right becomes world Z)
+                                t.translation.z += -delta.x * sensitivity;
+                            },
+                            AxisLock::None => {
+                                // Free movement in screen space
+                                let right = cam_tf.right();
+                                let up = cam_tf.up();
+                                let distance = t.translation.distance(cam_tf.translation());
+                                let move_scale = sensitivity * distance.max(1.0);
+                                t.translation += (-right * delta.x + up * delta.y) * move_scale;
                             }
-                            t.translation += d;
                         }
-                        GizmoMode::Rotate => {
-                            let mut ang = Vec3::ZERO;
-                            match state.axis_lock {
-                                AxisLock::X => ang.x = delta.y * 0.3_f32.to_radians(),
-                                AxisLock::Y => ang.y = -delta.x * 0.3_f32.to_radians(),
-                                AxisLock::Z => ang.z = delta.x * 0.3_f32.to_radians(),
-                                AxisLock::None => ang.y = -delta.x * 0.3_f32.to_radians(),
+                    },
+                    GizmoMode::Rotate => {
+                        match state.axis_lock {
+                            AxisLock::X => {
+                                // Rotate around X axis
+                                let rotation = Quat::from_rotation_x(delta.y * rotation_sensitivity);
+                                t.rotation = rotation * t.rotation;
+                            },
+                            AxisLock::Y => {
+                                // Rotate around Y axis
+                                let rotation = Quat::from_rotation_y(-delta.x * rotation_sensitivity);
+                                t.rotation = rotation * t.rotation;
+                            },
+                            AxisLock::Z => {
+                                // Rotate around Z axis
+                                let rotation = Quat::from_rotation_z(delta.x * rotation_sensitivity);
+                                t.rotation = rotation * t.rotation;
+                            },
+                            AxisLock::None => {
+                                // Free rotation
+                                let rotation = Quat::from_rotation_y(-delta.x * rotation_sensitivity);
+                                t.rotation = rotation * t.rotation;
                             }
-                            t.rotation = Quat::from_euler(EulerRot::XYZ, ang.x, ang.y, ang.z) * t.rotation;
                         }
-                        GizmoMode::Scale => {
-                            let s = 1.0 + delta.y * -0.005;
-                            match state.axis_lock {
-                                AxisLock::X => t.scale.x = (t.scale.x * s).max(0.001),
-                                AxisLock::Y => t.scale.y = (t.scale.y * s).max(0.001),
-                                AxisLock::Z => t.scale.z = (t.scale.z * s).max(0.001),
-                                AxisLock::None => t.scale = (t.scale * s).max(Vec3::splat(0.001)),
+                    },
+                    GizmoMode::Scale => {
+                        let scale_factor = 1.0 + delta.y * -0.01;
+                        let clamped_scale = scale_factor.max(0.01);
+
+                        match state.axis_lock {
+                            AxisLock::X => {
+                                t.scale.x = (t.scale.x * clamped_scale).max(0.001);
+                            },
+                            AxisLock::Y => {
+                                t.scale.y = (t.scale.y * clamped_scale).max(0.001);
+                            },
+                            AxisLock::Z => {
+                                t.scale.z = (t.scale.z * clamped_scale).max(0.001);
+                            },
+                            AxisLock::None => {
+                                // Uniform scaling
+                                t.scale = (t.scale * clamped_scale).max(Vec3::splat(0.001));
                             }
                         }
                     }
                 }
             }
         }
-    } // Close the mouse_over_ui check
+    }
 }
 
-/* Picking (very simple AABB raycast against Transforms for primitives; for scenes we don't build meshes here, this is minimal) */
+/* Object Selection - Simple click-to-select system */
 fn picking_select(
-    _buttons: Res<Input<MouseButton>>,
+    buttons: Res<Input<MouseButton>>,
+    mut contexts: EguiContexts,
+    mut selection: ResMut<Selection>,
+    objects: Query<(Entity, &Transform, &Name), Without<Camera3d>>,
+    camera_q: Query<(&Camera, &GlobalTransform), With<Camera3d>>,
+    windows: Query<&Window, With<PrimaryWindow>>,
 ) {
-    // For brevity, selection is by UI list or prior systems; viewport ray-pick is non-trivial without rendering data.
-    // This stub keeps click-to-select logic minimal (handled elsewhere).
-    // if buttons.just_pressed(MouseButton::Left) {
-        // no-op; in a full editor you'd raycast scene and set selection.entity accordingly
-    // }
+    // Check if egui wants the mouse input
+    let ctx = contexts.ctx_mut();
+    let is_over_ui = ctx.is_pointer_over_area();
+
+    // Only handle clicking when not over UI and left mouse just pressed
+    if buttons.just_pressed(MouseButton::Left) && !is_over_ui {
+        if let Ok(window) = windows.get_single() {
+            if let Some(cursor_pos) = window.cursor_position() {
+                if let Ok((camera, camera_transform)) = camera_q.get_single() {
+                    // Convert screen position to world ray (simplified)
+                    let window_size = Vec2::new(window.width(), window.height());
+
+                    // Simple selection - find closest object to camera
+                    let mut closest_entity = None;
+                    let mut closest_distance = f32::INFINITY;
+
+                    let camera_pos = camera_transform.translation();
+
+                    for (entity, transform, _name) in objects.iter() {
+                        let distance = camera_pos.distance(transform.translation);
+
+                        // Simple screen-space check (very basic)
+                        if let Some(screen_pos) = camera.world_to_viewport(camera_transform, transform.translation) {
+                            let click_distance = cursor_pos.distance(screen_pos);
+
+                            // Select if clicked within 50 pixels and is closest
+                            if click_distance < 50.0 && distance < closest_distance {
+                                closest_distance = distance;
+                                closest_entity = Some(entity);
+                            }
+                        }
+                    }
+
+                    // Update selection
+                    if let Some(entity) = closest_entity {
+                        selection.entity = Some(entity);
+                        println!("Selected object at distance: {:.2}", closest_distance);
+                    } else {
+                        // Clicked on empty space - deselect
+                        selection.entity = None;
+                        println!("Deselected - clicked on empty space");
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Material application system - applies material changes to objects */
+fn apply_material_changes(
+    mut material_refs: Query<(&mut MaterialReference, &mut Handle<StandardMaterial>)>,
+    material_library: Res<material::MaterialLibrary>,
+    mut bevy_materials: ResMut<Assets<StandardMaterial>>,
+    asset_server: Res<AssetServer>,
+) {
+    let entity_count = material_refs.iter().count();
+
+    // Only print debug every 60 frames to reduce spam
+    static mut DEBUG_COUNTER: u32 = 0;
+    unsafe {
+        DEBUG_COUNTER += 1;
+        if DEBUG_COUNTER >= 60 {
+            DEBUG_COUNTER = 0;
+            if entity_count > 0 {
+                println!("apply_material_changes running, found {} entities with MaterialReference", entity_count);
+            }
+        }
+    }
+
+    for (mut material_ref, mut material_handle) in material_refs.iter_mut() {
+        // Check if we need to update: either no handle, or material name changed
+        let material_name_changed = material_ref.last_applied_material_name.as_ref() != Some(&material_ref.material_name);
+        let needs_update = material_ref.bevy_material_handle.is_none() || material_name_changed;
+
+        unsafe {
+            if DEBUG_COUNTER == 0 {
+                println!("Entity material_name: '{}', last_applied: '{:?}', needs_update: {}",
+                    material_ref.material_name,
+                    material_ref.last_applied_material_name,
+                    needs_update);
+            }
+        }
+
+        if needs_update {
+            if let Some(sprout_material) = material_library.materials.get(&material_ref.material_name) {
+                println!("Material changed from '{:?}' to '{}', creating new StandardMaterial",
+                    material_ref.last_applied_material_name,
+                    material_ref.material_name);
+
+                // Create new Bevy StandardMaterial from our SproutMaterial
+                let new_bevy_material = create_bevy_material_from_sprout(sprout_material, &asset_server);
+
+                // Add to Bevy's material assets and get handle
+                let new_handle = bevy_materials.add(new_bevy_material);
+
+                // Update the entity's material handle immediately
+                *material_handle = new_handle.clone();
+
+                // Update our reference to track the current handle and applied material
+                material_ref.bevy_material_handle = Some(new_handle);
+                material_ref.last_applied_material_name = Some(material_ref.material_name.clone());
+
+                println!("Successfully applied material '{}' to object", material_ref.material_name);
+            } else {
+                println!("ERROR: Material '{}' not found in material library!", material_ref.material_name);
+            }
+        }
+    }
+}
+
+/* Convert SproutMaterial to Bevy StandardMaterial */
+fn create_bevy_material_from_sprout(sprout_material: &material::SproutMaterial, asset_server: &AssetServer) -> StandardMaterial {
+    let mut material = StandardMaterial {
+        base_color: Color::rgba(
+            sprout_material.albedo_color[0],
+            sprout_material.albedo_color[1],
+            sprout_material.albedo_color[2],
+            sprout_material.albedo_color[3],
+        ),
+        metallic: sprout_material.metallic,
+        perceptual_roughness: sprout_material.roughness,
+        emissive: Color::rgb(
+            sprout_material.emission[0] * sprout_material.emission_strength,
+            sprout_material.emission[1] * sprout_material.emission_strength,
+            sprout_material.emission[2] * sprout_material.emission_strength,
+        ),
+        ..default()
+    };
+
+    // Load textures if specified
+    if let Some(albedo_path) = &sprout_material.albedo_texture {
+        material.base_color_texture = Some(asset_server.load(albedo_path));
+    }
+
+    if let Some(normal_path) = &sprout_material.normal_texture {
+        material.normal_map_texture = Some(asset_server.load(normal_path));
+    }
+
+    if let Some(metallic_roughness_path) = &sprout_material.metallic_roughness_texture {
+        material.metallic_roughness_texture = Some(asset_server.load(metallic_roughness_path));
+    }
+
+    if let Some(emission_path) = &sprout_material.emission_texture {
+        material.emissive_texture = Some(asset_server.load(emission_path));
+    }
+
+    if let Some(occlusion_path) = &sprout_material.occlusion_texture {
+        material.occlusion_texture = Some(asset_server.load(occlusion_path));
+    }
+
+    material
 }

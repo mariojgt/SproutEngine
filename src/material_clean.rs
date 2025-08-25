@@ -185,8 +185,8 @@ pub fn material_editor_ui(
     mut contexts: EguiContexts,
     mut material_library: ResMut<MaterialLibrary>,
     mut editor_state: ResMut<MaterialEditorState>,
-    _asset_server: Res<AssetServer>,
-    _bevy_materials: ResMut<Assets<StandardMaterial>>,
+    asset_server: Res<AssetServer>,
+    mut bevy_materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // Material Browser Window
     egui::Window::new("Material Browser")
@@ -343,22 +343,12 @@ pub fn material_node_editor_ui(
                         );
                     }
 
-                    // Draw preview connection line if creating a connection
-                    if let Some((from_node_id, from_output)) = &editor_state.creating_connection {
-                        if let Some(pointer_pos) = response.hover_pos() {
-                            if let Some(from_node) = material.material_graph.nodes.iter().find(|n| n.id == *from_node_id) {
-                                let from_pos = get_output_socket_pos(from_node, from_output, response.rect);
-                                draw_preview_connection(&painter, from_pos, pointer_pos);
-                            }
-                        }
-                    }
-
-                    // Handle node interactions - removed ctx parameter to fix borrowing issue
+                    // Handle node interactions
                     handle_node_interactions(
                         &mut material.material_graph,
                         editor_state,
                         &response,
-                        response.rect,
+                        ctx
                     );
 
                     // Compile material from graph
@@ -552,12 +542,7 @@ fn draw_node(
         canvas_rect.top() + node.position[1],
     );
 
-    let node_width = 140.0;
-    let input_count = node.inputs.len() as f32;
-    let output_count = get_output_count_for_node_type(&node.node_type) as f32;
-    let node_height = 30.0 + (input_count.max(output_count) * 20.0).max(50.0);
-
-    let node_size = egui::vec2(node_width, node_height);
+    let node_size = egui::vec2(120.0, 80.0);
     let node_rect = egui::Rect::from_min_size(node_pos, node_size);
 
     // Node background
@@ -581,273 +566,25 @@ fn draw_node(
         egui::Color32::WHITE,
     );
 
-    // Draw input sockets (left side)
-    let mut input_y = node_pos.y + 25.0;
-    for (input_name, _value) in &node.inputs {
-        let socket_pos = egui::pos2(node_pos.x - 5.0, input_y);
-        draw_input_socket(painter, ui, socket_pos, input_name, node.id, editor_state, response);
-
-        // Draw input label
-        painter.text(
-            egui::pos2(node_pos.x + 8.0, input_y - 6.0),
-            egui::Align2::LEFT_TOP,
-            input_name,
-            egui::FontId::proportional(10.0),
-            egui::Color32::WHITE,
-        );
-
-        input_y += 20.0;
-    }
-
-    // Draw output sockets (right side) - most nodes have one output
-    if node.node_type != MaterialNodeType::MaterialOutput {
-        let output_names = get_output_names_for_node_type(&node.node_type);
-        let mut output_y = node_pos.y + 25.0;
-
-        for output_name in output_names {
-            let socket_pos = egui::pos2(node_pos.x + node_width + 5.0, output_y);
-            draw_output_socket(painter, ui, socket_pos, &output_name, node.id, editor_state, response);
-
-            // Draw output label
-            painter.text(
-                egui::pos2(node_pos.x + node_width - 8.0, output_y - 6.0),
-                egui::Align2::RIGHT_TOP,
-                &output_name,
-                egui::FontId::proportional(10.0),
-                egui::Color32::WHITE,
-            );
-
-            output_y += 20.0;
-        }
-    }
-}
-
-fn get_output_count_for_node_type(node_type: &MaterialNodeType) -> usize {
-    match node_type {
-        MaterialNodeType::MaterialOutput => 0,
-        _ => 1, // Most nodes have one output
-    }
-}
-
-fn get_output_names_for_node_type(node_type: &MaterialNodeType) -> Vec<String> {
-    match node_type {
-        MaterialNodeType::ColorConstant => vec!["Color".to_string()],
-        MaterialNodeType::ScalarConstant => vec!["Value".to_string()],
-        MaterialNodeType::Vector3Constant => vec!["Vector".to_string()],
-        MaterialNodeType::TextureSample => vec!["RGB".to_string()],
-        MaterialNodeType::Multiply | MaterialNodeType::Add | MaterialNodeType::Subtract => vec!["Result".to_string()],
-        MaterialNodeType::Lerp => vec!["Result".to_string()],
-        MaterialNodeType::MaterialOutput => vec![], // No outputs
-    }
-}
-
-fn draw_input_socket(
-    painter: &egui::Painter,
-    ui: &mut egui::Ui,
-    socket_pos: egui::Pos2,
-    input_name: &str,
-    node_id: u32,
-    editor_state: &mut MaterialEditorState,
-    response: &egui::Response,
-) {
-    let socket_radius = 6.0;
-    let socket_rect = egui::Rect::from_center_size(socket_pos, egui::vec2(socket_radius * 2.0, socket_radius * 2.0));
-
-    // Socket color - different colors for different types
-    let socket_color = match input_name {
-        "Base Color" | "Color" | "A" | "B" if input_name.contains("Color") => egui::Color32::from_rgb(255, 100, 100),
-        "Metallic" | "Roughness" | "Value" | "Alpha" => egui::Color32::from_rgb(100, 255, 100),
-        "Texture" => egui::Color32::from_rgb(255, 255, 100),
-        _ => egui::Color32::from_rgb(200, 200, 200),
-    };
-
-    painter.circle_filled(socket_pos, socket_radius, socket_color);
-    painter.circle_stroke(socket_pos, socket_radius, egui::Stroke::new(1.0, egui::Color32::WHITE));
-}
-
-fn draw_output_socket(
-    painter: &egui::Painter,
-    ui: &mut egui::Ui,
-    socket_pos: egui::Pos2,
-    output_name: &str,
-    node_id: u32,
-    editor_state: &mut MaterialEditorState,
-    response: &egui::Response,
-) {
-    let socket_radius = 6.0;
-    let socket_rect = egui::Rect::from_center_size(socket_pos, egui::vec2(socket_radius * 2.0, socket_radius * 2.0));
-
-    // Socket color - different colors for different types
-    let socket_color = match output_name {
-        "Color" | "RGB" => egui::Color32::from_rgb(255, 100, 100),
-        "Value" | "Result" => egui::Color32::from_rgb(100, 255, 100),
-        "Vector" => egui::Color32::from_rgb(100, 100, 255),
-        _ => egui::Color32::from_rgb(200, 200, 200),
-    };
-
-    painter.circle_filled(socket_pos, socket_radius, socket_color);
-    painter.circle_stroke(socket_pos, socket_radius, egui::Stroke::new(1.0, egui::Color32::WHITE));
+    // Input/Output connectors would go here in a full implementation
+    // For now, just show the node structure
 }
 
 fn handle_node_interactions(
     graph: &mut MaterialGraph,
     editor_state: &mut MaterialEditorState,
     response: &egui::Response,
-    canvas_rect: egui::Rect,
+    ctx: &mut egui::Context,
 ) {
-    // Handle socket interactions for each node - need to collect node data first to avoid borrowing issues
-    let node_count = graph.nodes.len();
-    for i in 0..node_count {
-        let node_id = graph.nodes[i].id;
-        let node_position = graph.nodes[i].position;
-        let node_type = graph.nodes[i].node_type.clone();
-        let node_inputs: Vec<(String, MaterialValue)> = graph.nodes[i].inputs.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+    // Handle node dragging, selection, connection creation, etc.
+    // This is a simplified version - a full implementation would be more complex
 
-        // Check input socket interactions
-        let node_pos = egui::pos2(
-            canvas_rect.left() + node_position[0],
-            canvas_rect.top() + node_position[1],
-        );
-
-        let mut input_y = node_pos.y + 25.0;
-        for (input_name, _value) in &node_inputs {
-            let socket_pos = egui::pos2(node_pos.x - 5.0, input_y);
-            let socket_radius = 6.0;
-            let socket_rect = egui::Rect::from_center_size(socket_pos, egui::vec2(socket_radius * 2.0, socket_radius * 2.0));
-
-            if let Some(pointer_pos) = response.interact_pointer_pos() {
-                if socket_rect.contains(pointer_pos) && response.clicked() {
-                    // Handle connection ending on this input
-                    if let Some((from_node_id, from_output)) = &editor_state.creating_connection.clone() {
-                        // Create connection from the previous output to this input
-                        let connection = MaterialConnection {
-                            from_node: *from_node_id,
-                            from_output: from_output.clone(),
-                            to_node: node_id,
-                            to_input: input_name.clone(),
-                        };
-
-                        // Remove any existing connection to this input
-                        graph.connections.retain(|c| !(c.to_node == node_id && c.to_input == *input_name));
-
-                        // Add the new connection
-                        graph.connections.push(connection);
-
-                        println!("Created connection from node {} output '{}' to node {} input '{}'",
-                            from_node_id, from_output, node_id, input_name);
-
-                        editor_state.creating_connection = None;
-                    }
-                }
-            }
-
-            input_y += 20.0;
-        }
-
-        // Check output socket interactions (if not MaterialOutput)
-        if node_type != MaterialNodeType::MaterialOutput {
-            let output_names = get_output_names_for_node_type(&node_type);
-            let mut output_y = node_pos.y + 25.0;
-            let node_width = 140.0;
-
-            for output_name in output_names {
-                let socket_pos = egui::pos2(node_pos.x + node_width + 5.0, output_y);
-                let socket_radius = 6.0;
-                let socket_rect = egui::Rect::from_center_size(socket_pos, egui::vec2(socket_radius * 2.0, socket_radius * 2.0));
-
-                if let Some(pointer_pos) = response.interact_pointer_pos() {
-                    if socket_rect.contains(pointer_pos) && response.clicked() {
-                        // Start creating a connection from this output
-                        editor_state.creating_connection = Some((node_id, output_name.clone()));
-                        println!("Starting connection from node {} output '{}'", node_id, output_name);
-                    }
-                }
-
-                output_y += 20.0;
-            }
-        }
+    if response.clicked() {
+        // Handle node selection
     }
 
-    // Handle node dragging
     if response.dragged() {
-        if let Some(dragging_node_id) = editor_state.dragging_node {
-            if let Some(node) = graph.nodes.iter_mut().find(|n| n.id == dragging_node_id) {
-                node.position[0] += response.drag_delta().x;
-                node.position[1] += response.drag_delta().y;
-            }
-        }
-    }
-
-    // Handle clicking to start dragging
-    if response.drag_started() {
-        if let Some(pointer_pos) = response.interact_pointer_pos() {
-            // Convert pointer position to canvas coordinates
-            let canvas_pointer_pos = egui::pos2(
-                pointer_pos.x - canvas_rect.left(),
-                pointer_pos.y - canvas_rect.top(),
-            );
-
-            // Find which node was clicked
-            for node in &graph.nodes {
-                let node_pos = egui::pos2(node.position[0], node.position[1]);
-                let node_size = egui::vec2(140.0, 80.0); // Match the size from draw_node
-                let node_rect = egui::Rect::from_min_size(node_pos, node_size);
-
-                if node_rect.contains(canvas_pointer_pos) {
-                    editor_state.dragging_node = Some(node.id);
-                    editor_state.selected_node = Some(node.id);
-                    break;
-                }
-            }
-        }
-    }
-
-    // Stop dragging
-    if response.drag_released() {
-        editor_state.dragging_node = None;
-    }
-
-    // Cancel connection creation on right click or escape
-    if response.secondary_clicked() {
-        editor_state.creating_connection = None;
-    }
-}
-
-fn get_output_socket_pos(node: &MaterialNode, output_name: &str, canvas_rect: egui::Rect) -> egui::Pos2 {
-    let node_pos = egui::pos2(
-        canvas_rect.left() + node.position[0],
-        canvas_rect.top() + node.position[1],
-    );
-
-    let node_width = 140.0;
-    let output_names = get_output_names_for_node_type(&node.node_type);
-
-    for (i, name) in output_names.iter().enumerate() {
-        if name == output_name {
-            let output_y = node_pos.y + 25.0 + (i as f32 * 20.0);
-            return egui::pos2(node_pos.x + node_width + 5.0, output_y);
-        }
-    }
-
-    node_pos // fallback
-}
-
-fn draw_preview_connection(painter: &egui::Painter, from_pos: egui::Pos2, to_pos: egui::Pos2) {
-    let control_offset = (to_pos.x - from_pos.x).abs() * 0.5;
-    let control1 = egui::pos2(from_pos.x + control_offset, from_pos.y);
-    let control2 = egui::pos2(to_pos.x - control_offset, to_pos.y);
-
-    // Draw a dashed preview line
-    let segments = 10;
-    let color = egui::Color32::from_rgba_premultiplied(255, 255, 100, 150);
-
-    for i in 0..segments {
-        let t1 = i as f32 / segments as f32;
-        let t2 = (i + 1) as f32 / segments as f32;
-        let p1 = bezier_point(from_pos, control1, control2, to_pos, t1);
-        let p2 = bezier_point(from_pos, control1, control2, to_pos, t2);
-
-        painter.line_segment([p1, p2], egui::Stroke::new(2.0, color));
+        // Handle node dragging
     }
 }
 
