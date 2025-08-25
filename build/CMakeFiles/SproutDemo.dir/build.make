@@ -96,11 +96,7 @@ SproutDemo_EXTERNAL_OBJECTS =
 bin/SproutDemo: CMakeFiles/SproutDemo.dir/samples/Triangle/main.cpp.o
 bin/SproutDemo: CMakeFiles/SproutDemo.dir/build.make
 bin/SproutDemo: lib/libSproutEngine.a
-bin/SproutDemo: vcpkg_installed/arm64-osx/debug/lib/libSDL2d.a
-bin/SproutDemo: vcpkg_installed/arm64-osx/debug/lib/libbgfx.a
-bin/SproutDemo: vcpkg_installed/arm64-osx/debug/lib/libbimg.a
-bin/SproutDemo: vcpkg_installed/arm64-osx/debug/lib/libbx.a
-bin/SproutDemo: vcpkg_installed/arm64-osx/debug/lib/libminiz.a
+bin/SproutDemo: /opt/homebrew/Cellar/sdl2/2.32.8/lib/libSDL2.dylib
 bin/SproutDemo: CMakeFiles/SproutDemo.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/mariotarosso/Downloads/SproutEngine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable bin/SproutDemo"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/SproutDemo.dir/link.txt --verbose=$(VERBOSE)

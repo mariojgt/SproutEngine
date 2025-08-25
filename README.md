@@ -84,3 +84,64 @@ The **next steps** are to add ECS, a camera, and mesh loading via glTF. The skel
 ## 5) License
 
 MIT.
+
+---
+
+## Update v0.2.0 — ECS + Camera + glTF loader
+
+- Added **EnTT** (ECS) and **glm** (math).
+- Added **tinygltf** loader and a sample asset: `assets/Box.gltf`.
+- Demo creates a Scene with a Camera and loads `Box.gltf` (prints mesh stats in console).
+
+> Rendering the mesh will come next (requires bgfx shader program setup). For now, Sprout initializes bgfx, sets up ECS, loads mesh data, and runs a frame loop.
+
+### Run the demo
+
+Use the same build instructions as before, then run `SproutDemo`. Check your terminal output for something like:
+
+```
+[Sprout] Loaded glTF: assets/Box.gltf (vertices: ####, indices: ####)
+```
+
+
+---
+
+## Update v0.3.0 — Mesh Rendering
+
+- Adds a minimal bgfx shader pipeline (solid color) compiled via **bgfx shaderc**.
+- Renders any `ECS::Mesh` using transient vertex/index buffers.
+- Uses the primary camera's view/projection.
+- Sample scene loads `assets/Box.gltf` and draws it.
+
+### Shader compilation (automatic if `shaderc` is found)
+
+CMake tries to locate `shaderc` (from bgfx tools via vcpkg) and compiles:
+- `shaders/vs_solid.sc` (vertex)
+- `shaders/fs_solid.sc` (fragment)
+
+Artifacts are placed under `build/shaders/<backend>/`. At runtime, Sprout loads the matching backend folder:
+- Windows → `d3d11`
+- macOS → `metal`
+- Linux → `glsl` (GL 4.3)
+
+If CMake can’t find `shaderc`, the build still succeeds but meshes won't draw; you’ll only see a clear color and debug text. Install `shaderc` from vcpkg or ensure it’s on PATH.
+
+
+---
+
+## Update v0.4.0 — Fly Cam, Light, Lua Scripts
+
+**New features**
+- **Fly camera**: Hold Right Mouse to capture the mouse, use **W/A/S/D** to move, **Q/E** to move down/up. Scroll to change speed.
+- **Directional light** and a **lit shader** (Lambert) replacing solid color.
+- **Lua scripting** with **sol2**:
+  - Add a Script component with a file path (e.g., `scripts/rotator.lua`).
+  - Engine calls `OnStart(entity)` once and `OnUpdate(entity, dt)` every frame.
+  - Scripts can read/write Transform (`position`, `rotation`, `scale`) via bindings.
+
+**Code editor**
+- For now, Sprout offers a simple action to open a script file in your OS default editor.
+  - Press **F2** to open `scripts/rotator.lua` (if attached) in your editor (`open` on macOS, `start` on Windows, `xdg-open` on Linux).
+
+> Note: A full in-engine text editor UI (ImGui) can be added later.
+

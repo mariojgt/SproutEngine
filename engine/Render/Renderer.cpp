@@ -2,48 +2,15 @@
 #include "../Platform/Window.h"
 
 #include <SDL.h>
-#include <SDL_syswm.h>
-
-#include <bgfx/bgfx.h>
-#include <bgfx/platform.h>
-
-#include <cstdio>
+#include <iostream>
 
 using namespace Sprout;
-
-static void set_platform_data_from_sdl(SDL_Window* window)
-{
-    SDL_SysWMinfo wmi;
-    SDL_VERSION(&wmi.version);
-
-    if (!SDL_GetWindowWMInfo(window, &wmi)) {
-        printf("SDL_GetWindowWMInfo failed: %s\n", SDL_GetError());
-        return;
-    }
-
-    bgfx::PlatformData pd{};
-
-#if defined(_WIN32)
-    pd.nwh = wmi.info.win.window;
-#elif defined(__APPLE__)
-    pd.nwh = wmi.info.cocoa.window;
-    printf("Setting Cocoa window handle: %p\n", pd.nwh);
-    printf("Window subsystem: %d\n", wmi.subsystem);
-#else
-    // X11
-    pd.nwh = (void*)(uintptr_t)wmi.info.x11.window;
-    pd.ndt = wmi.info.x11.display;
-#endif
-
-    bgfx::setPlatformData(pd);
-    printf("Platform data set successfully\n");
-}
 
 bool Renderer::init(Window& window, bool vsync)
 {
     SDL_Window* sdlWin = window.native();
     if (!sdlWin) {
-        printf("SDL Window is null!\n");
+        std::cerr << "SDL Window is null!\n";
         return false;
     }
 
@@ -51,55 +18,48 @@ bool Renderer::init(Window& window, bool vsync)
     SDL_GetWindowSize(sdlWin, &w, &h);
     m_width = (uint32_t)w;
     m_height = (uint32_t)h;
-    printf("Window size: %dx%d\n", w, h);
 
-    // Try headless mode first to test if bgfx works at all
-    bgfx::Init init{};
-    init.type = bgfx::RendererType::Noop; // Headless renderer
-    init.resolution.width  = m_width;
-    init.resolution.height = m_height;
-    init.resolution.reset  = BGFX_RESET_NONE;
-
-    printf("Attempting bgfx::init with Noop renderer (headless)...\n");
-    if (!bgfx::init(init)) {
-        printf("Even headless bgfx::init failed\n");
+    // For now, just create a simple software renderer to get things working
+    m_renderer = SDL_CreateRenderer(sdlWin, -1, SDL_RENDERER_ACCELERATED | (vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
+    if (!m_renderer) {
+        std::cerr << "Failed to create SDL renderer: " << SDL_GetError() << "\n";
         return false;
     }
 
-    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x303030ff, 1.0f, 0);
-    bgfx::setViewRect(0, 0, 0, m_width, m_height);
-
     m_initialized = true;
-    printf("bgfx initialization successful with headless renderer!\n");
+    std::cout << "Basic SDL renderer initialized successfully!\n";
     return true;
 }
 
 void Renderer::resize(uint32_t w, uint32_t h)
 {
-    if (!m_initialized) return;
-    m_width = w; m_height = h;
-    bgfx::reset(w, h, BGFX_RESET_VSYNC);
-    bgfx::setViewRect(0, 0, 0, w, h);
+    m_width = w;
+    m_height = h;
+    // SDL renderer handles resize automatically
 }
 
 void Renderer::frame()
 {
-    if (!m_initialized) return;
+    if (!m_initialized || !m_renderer) return;
 
-    // Keep view 0 alive & cleared
-    bgfx::touch(0);
+    // Clear the screen with a dark grey color
+    SDL_SetRenderDrawColor(m_renderer, 0x30, 0x30, 0x30, 0xFF);
+    SDL_RenderClear(m_renderer);
 
-    // Optional: draw debug text in the corner
-    bgfx::dbgTextClear();
-    bgfx::dbgTextPrintf(2, 1, 0x0f, "Sprout Engine running");
+    // Draw a simple colored rectangle as a placeholder
+    SDL_SetRenderDrawColor(m_renderer, 0x60, 0x80, 0xFF, 0xFF);
+    SDL_Rect rect = {100, 100, 200, 150};
+    SDL_RenderFillRect(m_renderer, &rect);
 
-    bgfx::frame();
+    // Present the frame
+    SDL_RenderPresent(m_renderer);
 }
 
 void Renderer::shutdown()
 {
-    if (m_initialized) {
-        bgfx::shutdown();
-        m_initialized = false;
+    if (m_renderer) {
+        SDL_DestroyRenderer(m_renderer);
+        m_renderer = nullptr;
     }
+    m_initialized = false;
 }

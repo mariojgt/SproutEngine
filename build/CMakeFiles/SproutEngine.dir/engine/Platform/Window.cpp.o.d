@@ -773,15 +773,15 @@ CMakeFiles/SproutEngine.dir/engine/Platform/Window.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/bit_width.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/endian.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/has_single_bit.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_main.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_stdinc.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_config.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_platform.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_main.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_stdinc.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_config.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_platform.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/begin_code.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/close_code.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/begin_code.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/close_code.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/types.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_u_char.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_u_short.h \
@@ -815,52 +815,52 @@ CMakeFiles/SproutEngine.dir/engine/Platform/Window.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/float.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/17/include/float.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/float.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_assert.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_atomic.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_audio.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_error.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_endian.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_mutex.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_thread.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_rwops.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_clipboard.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_cpuinfo.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_assert.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_atomic.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_audio.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_error.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_endian.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_mutex.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_thread.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_rwops.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_clipboard.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_cpuinfo.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/17/include/arm_neon.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/17/include/arm_bf16.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/17/include/arm_vector_types.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_events.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_video.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_pixels.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_rect.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_surface.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_blendmode.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_keyboard.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_keycode.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_scancode.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_mouse.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_joystick.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_guid.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_gamecontroller.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_sensor.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_quit.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_gesture.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_touch.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_filesystem.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_haptic.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_hidapi.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_hints.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_loadso.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_log.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_messagebox.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_metal.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_power.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_render.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_shape.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_system.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_timer.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_version.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_locale.h \
-  /Users/mariotarosso/Downloads/SproutEngine/build/vcpkg_installed/arm64-osx/include/SDL2/SDL_misc.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_events.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_video.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_pixels.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_rect.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_surface.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_blendmode.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_keyboard.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_keycode.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_scancode.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_mouse.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_joystick.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_guid.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_gamecontroller.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_sensor.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_quit.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_gesture.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_touch.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_filesystem.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_haptic.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_hidapi.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_hints.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_loadso.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_log.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_messagebox.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_metal.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_power.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_render.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_shape.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_system.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_timer.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_version.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_locale.h \
+  /opt/homebrew/Cellar/sdl2/2.32.8/include/SDL2/SDL_misc.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iostream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/ios \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__locale \
