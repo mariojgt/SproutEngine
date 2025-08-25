@@ -1,6 +1,6 @@
 [package]
-name = "sprout_engine"
-version = "0.1.0"
+name = "sprout_engine_unified"
+version = "0.3.0"
 edition = "2021"
 
 [profile.dev]
@@ -10,6 +10,7 @@ opt-level = 1
 opt-level = "s"
 
 [dependencies]
-# Stable as of 2025-08; if you hit version conflicts, run `cargo update` or check the crates for the latest.
 bevy = { version = "0.15", default-features = true }
 bevy_egui = "0.31"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

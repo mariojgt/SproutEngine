@@ -1,54 +1,24 @@
-# Sprout Engine (minimal)
+# Sprout Engine (Unified)
 
-A tiny, cross‑platform game editor skeleton inspired by Unreal — built on **Rust + Bevy**.
-It gives you:
-- A 3D viewport with camera controls
-- A Hierarchy panel (select entities)
-- An Inspector (edit position/rotation/scale)
-- A super-simple **Visual Scripting** panel: add "blocks" like Rotate/Translate/Scale that run every frame
+Cross‑platform minimal editor starter with:
+- File: **New / Save / Load** (JSON)
+- **Gizmos**: W/E/R + X/Y/Z, drag to move/rotate/scale
+- **Click-to-select in viewport**
+- **Node Graph** (basic) + list-based visual script
+- **Content Browser** scans `/assets` for `.gltf/.glb/.png/.jpg` and spawns them
 
-> Goal: keep it **simple** and hackable so you can grow features over time.
-
-## Build & Run
-
-### Prereqs
-- Rust toolchain: https://rustup.rs
-- On Linux: `sudo apt install libasound2-dev libudev-dev pkg-config` (or equivalents)
-- On macOS: `xcode-select --install` (Command Line Tools)
-- On Windows: install Rust + build tools (MSVC).
-
-### Run
-```bash
+## Run
+```
 cargo run
 ```
+If crates whine: `cargo update`
 
-If you get errors about crate versions, try:
-```bash
-cargo update
-```
-
-## Controls
-
-**Viewport camera (orbit-style)**
-- Right Mouse Drag: orbit
-- Middle Mouse / Shift + Right Drag: pan
-- Mouse Wheel: zoom
-- F: frame selected entity
-
-**UI**
-- Left panel: Hierarchy (click to select)
-- Right panel: Inspector (edit transform numerically)
-- Bottom panel: Visual Script (add/remove/reorder simple ops)
-
-## Project Layout
-
-```
-sprout_engine/
-  ├─ Cargo.toml
-  └─ src/
-     └─ main.rs
-```
+## Usage
+- Drop files into the `assets/` folder (next to Cargo.toml).
+- Open the app → **Content Browser** (bottom) → select a file → **Spawn**.
+- Left‑click an object in the viewport to **select** it, then use gizmos (W/E/R + X/Y/Z), or edit in Inspector.
+- Save/Load scene via **File** menu (JSON path field).
 
 ## Notes
-- This is intentionally minimal. Rendering, assets, gizmos, and node-graph scripting can be added later.
-- For transform gizmos (move/rotate/scale handles), consider integrating ImGuizmo with an ImGui bridge or building one in egui.
+- Picking uses simple ray‑sphere tests (fast, good enough for prototypes). For perfect picking per‑mesh triangles, integrate a picking plugin later.
+- glTF spawns the default scene of the file at origin; images spawn as unlit quads.
