@@ -13,6 +13,10 @@
 bool Editor::init(GLFWwindow* window){
     (void)window;
     IMGUI_CHECKVERSION();
+    // Enable docking so panels can be attached to screen corners
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
     // Theme
     Theme::SetupImGuiTheme();
     imnodes::Initialize();
@@ -25,7 +29,8 @@ void Editor::shutdown(GLFWwindow* window){
 }
 
 void Editor::drawDockspace(){
-    ImGui::Begin("Main"); ImGui::TextUnformatted("SproutEngine"); ImGui::End();
+    // Create a full-screen dock space allowing windows to dock to all sides
+    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 }
 
 static void Vec3Control(const char* label, glm::vec3& v){
