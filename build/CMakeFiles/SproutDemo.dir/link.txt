@@ -1,1 +1,0 @@
-/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/SproutDemo.dir/samples/Triangle/main.cpp.o -o bin/SproutDemo   -L/opt/homebrew/Cellar/sdl2/2.32.8/lib  -Wl,-rpath,/opt/homebrew/Cellar/sdl2/2.32.8/lib lib/libSproutEngine.a /opt/homebrew/Cellar/sdl2/2.32.8/lib/libSDL2.dylib -framework Cocoa -framework QuartzCore -framework Metal
