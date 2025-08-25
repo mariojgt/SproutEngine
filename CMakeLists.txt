@@ -48,6 +48,7 @@ set(ENGINE_SOURCES
     src/Engine/ModernTheme.h
     src/Engine/widgets/SpCodeEditor.cpp
     src/Engine/widgets/SpCodeEditor.h
+    external/ImGuizmo/ImGuizmo.cpp
     # New Actor system files (temporarily disabled until compilation issues are resolved)
     # src/Engine/Actor.cpp
     # src/Engine/Actor.h
@@ -66,7 +67,7 @@ set(ENGINE_SOURCES
 add_executable(SproutEngine ${ENGINE_SOURCES})
 
 # Include dirs
-target_include_directories(SproutEngine PRIVATE src external/imnodes_stub)
+target_include_directories(SproutEngine PRIVATE src external/imnodes_stub external/ImGuizmo)
 
 # Assets path macro
 target_compile_definitions(SproutEngine PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD SE_ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")
