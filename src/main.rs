@@ -438,7 +438,11 @@ fn ui_inspector(
     names: Query<&Name>,
     mut state: ResMut<EditorState>,
     keys: Res<Input<KeyCode>>,
+    mouse: Res<Input<MouseButton>>,
 ) {
+    // Check egui input state before UI rendering
+    let wants_keyboard = contexts.ctx_mut().wants_keyboard_input();
+    
     if state.show_docking_window {
         egui::SidePanel::right("inspector_right")
             .default_width(320.0)
@@ -455,24 +459,28 @@ fn ui_inspector(
                 ui.separator();
                 ui.label("Shortcuts: W/E/R (Move/Rotate/Scale), X/Y/Z axis lock, F frame");
                 ui.label("WASD + Right Mouse: Fly camera, Shift: Speed boost");
+                ui.label("Click in viewport area to enable camera controls");
 
                 if let Some(entity) = selection.entity {
                     if let Ok(name) = names.get(entity) {
                         ui.label(format!("Selected: {}", name));
                     }
                     if let Ok(mut t) = transforms.get_mut(entity) {
-                        if keys.just_pressed(KeyCode::W) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
-                            state.gizmo = GizmoMode::Translate;
+                        // Allow shortcuts when not typing in UI OR when right mouse is pressed
+                        if !wants_keyboard || mouse.pressed(MouseButton::Right) {
+                            if keys.just_pressed(KeyCode::W) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
+                                state.gizmo = GizmoMode::Translate;
+                            }
+                            if keys.just_pressed(KeyCode::E) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
+                                state.gizmo = GizmoMode::Rotate;
+                            }
+                            if keys.just_pressed(KeyCode::R) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
+                                state.gizmo = GizmoMode::Scale;
+                            }
+                            if keys.just_pressed(KeyCode::X) { state.axis_lock = AxisLock::X; }
+                            if keys.just_pressed(KeyCode::Y) { state.axis_lock = AxisLock::Y; }
+                            if keys.just_pressed(KeyCode::Z) { state.axis_lock = AxisLock::Z; }
                         }
-                        if keys.just_pressed(KeyCode::E) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
-                            state.gizmo = GizmoMode::Rotate;
-                        }
-                        if keys.just_pressed(KeyCode::R) && !keys.any_pressed([KeyCode::LControl, KeyCode::RControl]) {
-                            state.gizmo = GizmoMode::Scale;
-                        }
-                        if keys.just_pressed(KeyCode::X) { state.axis_lock = AxisLock::X; }
-                        if keys.just_pressed(KeyCode::Y) { state.axis_lock = AxisLock::Y; }
-                        if keys.just_pressed(KeyCode::Z) { state.axis_lock = AxisLock::Z; }
 
                         // Translation
                         let mut pos = t.translation.to_array();
@@ -830,6 +838,7 @@ fn camera_controls(
     mut windows: Query<&mut Window, With<PrimaryWindow>>,
     mut camera_q: Query<&mut Transform, (With<Camera3d>, Without<DirectionalLight>)>,
     mut orbit: ResMut<CameraOrbit>,
+    mut contexts: EguiContexts,
     state: Res<EditorState>,
     mouse: Res<Input<MouseButton>>,
     keys: Res<Input<KeyCode>>,
@@ -839,53 +848,68 @@ fn camera_controls(
 ) {
     let mut cam = if let Ok(c) = camera_q.get_single_mut() { c } else { return; };
 
+    // Check if egui wants keyboard or mouse input AND if mouse is over UI
+    let ctx = contexts.ctx_mut();
+    let wants_keyboard = ctx.wants_keyboard_input();
+    let wants_mouse = ctx.wants_pointer_input();
+    let mouse_over_ui = ctx.is_pointer_over_area();
+
     let mut delta = Vec2::ZERO;
     for ev in motion_evr.iter() { delta += ev.delta; }
 
     let mut zoom = 0.0f32;
     for ev in wheel_evr.iter() { zoom += ev.y; }
-    if zoom.abs() > 0.0 { orbit.distance = (orbit.distance * (1.0 - zoom * 0.1 * orbit.zoom_speed)).clamp(0.5, 100.0); }
-
-    // WASD movement (like Unreal Engine viewport controls)
-    let move_speed = if keys.any_pressed([KeyCode::LShift, KeyCode::RShift]) { 20.0 } else { 5.0 };
-    let dt = time.delta_seconds();
-
-    if keys.pressed(KeyCode::W) {
-        let forward = cam.forward();
-        orbit.target += forward * move_speed * dt;
-    }
-    if keys.pressed(KeyCode::S) {
-        let forward = cam.forward();
-        orbit.target -= forward * move_speed * dt;
-    }
-    if keys.pressed(KeyCode::A) {
-        let right = cam.right();
-        orbit.target -= right * move_speed * dt;
-    }
-    if keys.pressed(KeyCode::D) {
-        let right = cam.right();
-        orbit.target += right * move_speed * dt;
-    }
-    if keys.pressed(KeyCode::Q) {
-        orbit.target.y -= move_speed * dt;
-    }
-    if keys.pressed(KeyCode::E) {
-        orbit.target.y += move_speed * dt;
+    
+    // Allow zoom when not over UI or when right mouse is pressed (viewport focus)
+    if zoom.abs() > 0.0 && (!mouse_over_ui || mouse.pressed(MouseButton::Right)) { 
+        orbit.distance = (orbit.distance * (1.0 - zoom * 0.1 * orbit.zoom_speed)).clamp(0.5, 100.0); 
     }
 
-    // Mouse look (right mouse button)
-    if mouse.pressed(MouseButton::Right) && delta.length_squared() > 0.0 {
-        orbit.yaw   -= delta.x * orbit.orbit_speed;
-        orbit.pitch -= delta.y * orbit.orbit_speed;
-        orbit.pitch = orbit.pitch.clamp(-1.54, 1.54);
+    // WASD movement - allow when not typing in UI OR when right mouse is pressed (viewport focus)
+    if !wants_keyboard || mouse.pressed(MouseButton::Right) {
+        let move_speed = if keys.any_pressed([KeyCode::LShift, KeyCode::RShift]) { 20.0 } else { 5.0 };
+        let dt = time.delta_seconds();
+
+        if keys.pressed(KeyCode::W) {
+            let forward = cam.forward();
+            orbit.target += forward * move_speed * dt;
+        }
+        if keys.pressed(KeyCode::S) {
+            let forward = cam.forward();
+            orbit.target -= forward * move_speed * dt;
+        }
+        if keys.pressed(KeyCode::A) {
+            let right = cam.right();
+            orbit.target -= right * move_speed * dt;
+        }
+        if keys.pressed(KeyCode::D) {
+            let right = cam.right();
+            orbit.target += right * move_speed * dt;
+        }
+        if keys.pressed(KeyCode::Q) {
+            orbit.target.y -= move_speed * dt;
+        }
+        if keys.pressed(KeyCode::E) {
+            orbit.target.y += move_speed * dt;
+        }
     }
 
-    // Pan with middle mouse or right+shift
-    if mouse.pressed(MouseButton::Middle) || (mouse.pressed(MouseButton::Right) && keys.any_pressed([KeyCode::LShift, KeyCode::RShift])) {
-        let right = cam.right(); let up = cam.up();
-        let pan_speed = orbit.pan_speed;
-        let distance = orbit.distance;
-        orbit.target += (-right * delta.x + up * delta.y) * pan_speed * distance.max(1.0);
+    // Mouse controls - allow when not over UI OR when right mouse is pressed
+    if !mouse_over_ui || mouse.pressed(MouseButton::Right) {
+        // Mouse look (right mouse button)
+        if mouse.pressed(MouseButton::Right) && delta.length_squared() > 0.0 {
+            orbit.yaw   -= delta.x * orbit.orbit_speed;
+            orbit.pitch -= delta.y * orbit.orbit_speed;
+            orbit.pitch = orbit.pitch.clamp(-1.54, 1.54);
+        }
+
+        // Pan with middle mouse or right+shift
+        if mouse.pressed(MouseButton::Middle) || (mouse.pressed(MouseButton::Right) && keys.any_pressed([KeyCode::LShift, KeyCode::RShift])) {
+            let right = cam.right(); let up = cam.up();
+            let pan_speed = orbit.pan_speed;
+            let distance = orbit.distance;
+            orbit.target += (-right * delta.x + up * delta.y) * pan_speed * distance.max(1.0);
+        }
     }
 
     let rot = Quat::from_euler(EulerRot::ZYX, 0.0, orbit.yaw, orbit.pitch);
@@ -899,11 +923,25 @@ fn camera_controls(
 }
 
 fn frame_selected_on_f_key(
-    selection: Res<Selection>, keys: Res<Input<KeyCode>>,
-    mut orbit: ResMut<CameraOrbit>, transforms: Query<&Transform>,
+    selection: Res<Selection>, 
+    keys: Res<Input<KeyCode>>,
+    mut contexts: EguiContexts,
+    mouse: Res<Input<MouseButton>>,
+    mut orbit: ResMut<CameraOrbit>, 
+    transforms: Query<&Transform>,
 ) {
-    if keys.just_pressed(KeyCode::F) {
-        if let Some(e) = selection.entity { if let Ok(t) = transforms.get(e) { orbit.target = t.translation; } }
+    // Check if egui wants keyboard input and if mouse is over UI
+    let ctx = contexts.ctx_mut();
+    let wants_keyboard = ctx.wants_keyboard_input();
+    let mouse_over_ui = ctx.is_pointer_over_area();
+    
+    // Allow F key when not typing in UI OR when right mouse is pressed (viewport focus)
+    if (!wants_keyboard || mouse.pressed(MouseButton::Right)) && keys.just_pressed(KeyCode::F) {
+        if let Some(e) = selection.entity { 
+            if let Ok(t) = transforms.get(e) { 
+                orbit.target = t.translation; 
+            } 
+        }
     }
 }
 
@@ -916,6 +954,7 @@ fn handle_gizmo_drag(
     mut state: ResMut<EditorState>,
     selection: Res<Selection>,
     mut transforms: Query<&mut Transform>,
+    mut contexts: EguiContexts,
     buttons: Res<Input<MouseButton>>,
     keys: Res<Input<KeyCode>>,
     mut motion_evr: EventReader<bevy::input::mouse::MouseMotion>,
@@ -923,59 +962,71 @@ fn handle_gizmo_drag(
 ) {
     let cam_tf = if let Ok(c) = camera_q.get_single() { c } else { return; };
 
+    // Check if egui wants input and if mouse is over UI
+    let ctx = contexts.ctx_mut();
+    let wants_keyboard = ctx.wants_keyboard_input();
+    let wants_mouse = ctx.wants_pointer_input();
+    let mouse_over_ui = ctx.is_pointer_over_area();
+
     let mut delta = Vec2::ZERO;
     for ev in motion_evr.iter() { delta += ev.delta; }
 
-    if keys.just_pressed(KeyCode::W) { state.gizmo = GizmoMode::Translate; }
-    if keys.just_pressed(KeyCode::E) { state.gizmo = GizmoMode::Rotate; }
-    if keys.just_pressed(KeyCode::R) { state.gizmo = GizmoMode::Scale; }
-    if keys.just_pressed(KeyCode::X) { state.axis_lock = AxisLock::X; }
-    if keys.just_pressed(KeyCode::Y) { state.axis_lock = AxisLock::Y; }
-    if keys.just_pressed(KeyCode::Z) { state.axis_lock = AxisLock::Z; }
+    // Handle gizmo shortcuts when not typing in UI OR when right mouse is pressed (viewport focus)
+    if !wants_keyboard || buttons.pressed(MouseButton::Right) {
+        if keys.just_pressed(KeyCode::W) { state.gizmo = GizmoMode::Translate; }
+        if keys.just_pressed(KeyCode::E) { state.gizmo = GizmoMode::Rotate; }
+        if keys.just_pressed(KeyCode::R) { state.gizmo = GizmoMode::Scale; }
+        if keys.just_pressed(KeyCode::X) { state.axis_lock = AxisLock::X; }
+        if keys.just_pressed(KeyCode::Y) { state.axis_lock = AxisLock::Y; }
+        if keys.just_pressed(KeyCode::Z) { state.axis_lock = AxisLock::Z; }
+    }
 
-    if let Some(e) = selection.entity {
-        if let Ok(mut t) = transforms.get_mut(e) {
-            if buttons.pressed(MouseButton::Left) && delta.length_squared() > 0.0 {
-                match state.gizmo {
-                    GizmoMode::Translate => {
-                        let mut d = Vec3::ZERO;
-                        match state.axis_lock {
-                            AxisLock::X => d.x = delta.x * 0.01,
-                            AxisLock::Y => d.y = delta.y * 0.01,
-                            AxisLock::Z => d.z = -delta.x * 0.01,
-                            AxisLock::None => {
-                                let right = cam_tf.right(); let up = cam_tf.up();
-                                let translation = t.translation;
-                                let distance = translation.distance(cam_tf.translation());
-                                t.translation += (-right * delta.x + up * delta.y) * 0.01 * distance;
-                                return;
+    // Handle mouse dragging when not over UI OR when dragging (already started)
+    if !mouse_over_ui || buttons.pressed(MouseButton::Left) {
+        if let Some(e) = selection.entity {
+            if let Ok(mut t) = transforms.get_mut(e) {
+                if buttons.pressed(MouseButton::Left) && delta.length_squared() > 0.0 {
+                    match state.gizmo {
+                        GizmoMode::Translate => {
+                            let mut d = Vec3::ZERO;
+                            match state.axis_lock {
+                                AxisLock::X => d.x = delta.x * 0.01,
+                                AxisLock::Y => d.y = delta.y * 0.01,
+                                AxisLock::Z => d.z = -delta.x * 0.01,
+                                AxisLock::None => {
+                                    let right = cam_tf.right(); let up = cam_tf.up();
+                                    let translation = t.translation;
+                                    let distance = translation.distance(cam_tf.translation());
+                                    t.translation += (-right * delta.x + up * delta.y) * 0.01 * distance;
+                                    return;
+                                }
                             }
+                            t.translation += d;
                         }
-                        t.translation += d;
-                    }
-                    GizmoMode::Rotate => {
-                        let mut ang = Vec3::ZERO;
-                        match state.axis_lock {
-                            AxisLock::X => ang.x = delta.y * 0.3_f32.to_radians(),
-                            AxisLock::Y => ang.y = -delta.x * 0.3_f32.to_radians(),
-                            AxisLock::Z => ang.z = delta.x * 0.3_f32.to_radians(),
-                            AxisLock::None => ang.y = -delta.x * 0.3_f32.to_radians(),
+                        GizmoMode::Rotate => {
+                            let mut ang = Vec3::ZERO;
+                            match state.axis_lock {
+                                AxisLock::X => ang.x = delta.y * 0.3_f32.to_radians(),
+                                AxisLock::Y => ang.y = -delta.x * 0.3_f32.to_radians(),
+                                AxisLock::Z => ang.z = delta.x * 0.3_f32.to_radians(),
+                                AxisLock::None => ang.y = -delta.x * 0.3_f32.to_radians(),
+                            }
+                            t.rotation = Quat::from_euler(EulerRot::XYZ, ang.x, ang.y, ang.z) * t.rotation;
                         }
-                        t.rotation = Quat::from_euler(EulerRot::XYZ, ang.x, ang.y, ang.z) * t.rotation;
-                    }
-                    GizmoMode::Scale => {
-                        let s = 1.0 + delta.y * -0.005;
-                        match state.axis_lock {
-                            AxisLock::X => t.scale.x = (t.scale.x * s).max(0.001),
-                            AxisLock::Y => t.scale.y = (t.scale.y * s).max(0.001),
-                            AxisLock::Z => t.scale.z = (t.scale.z * s).max(0.001),
-                            AxisLock::None => t.scale = (t.scale * s).max(Vec3::splat(0.001)),
+                        GizmoMode::Scale => {
+                            let s = 1.0 + delta.y * -0.005;
+                            match state.axis_lock {
+                                AxisLock::X => t.scale.x = (t.scale.x * s).max(0.001),
+                                AxisLock::Y => t.scale.y = (t.scale.y * s).max(0.001),
+                                AxisLock::Z => t.scale.z = (t.scale.z * s).max(0.001),
+                                AxisLock::None => t.scale = (t.scale * s).max(Vec3::splat(0.001)),
+                            }
                         }
                     }
                 }
             }
         }
-    }
+    } // Close the mouse_over_ui check
 }
 
 /* Picking (very simple AABB raycast against Transforms for primitives; for scenes we don't build meshes here, this is minimal) */
