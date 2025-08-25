@@ -18,10 +18,10 @@ Window::Window(const char* title, int width, int height)
         std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << "\n";
     } else {
         printf("SDL Window created successfully\n");
-        
+
         // Show the window to ensure it's properly initialized
         SDL_ShowWindow(m_window);
-        
+
         // Pump events to ensure the window is fully created
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
