@@ -9,6 +9,7 @@
 #include <functional>
 #include "TinyImGui.h"
 #include "ModernTheme.h"
+#include <ImGuizmo.h>
 
 class Renderer;
 class Scripting;
@@ -91,6 +92,8 @@ private:
         bool isOrbiting = false;
         glm::vec2 lastMousePos{0, 0};
     } viewportCamera;
+
+    ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
 
     // Content browser state
     struct ContentBrowserState {
