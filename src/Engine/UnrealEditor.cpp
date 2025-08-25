@@ -591,6 +591,7 @@ void UnrealEditor::DrawInspector(entt::registry& registry, Scripting& scripting)
             }
 
             // Blueprint component support: show attached blueprint file and button to open editor
+#if defined(BLUEPRINTS_ENABLED)
             if (registry.any_of<BlueprintComponent>(selectedEntity)) {
                 ImGui::Separator();
                 auto& bp = registry.get<BlueprintComponent>(selectedEntity);
@@ -613,6 +614,7 @@ void UnrealEditor::DrawInspector(entt::registry& registry, Scripting& scripting)
                     }
                 }
             }
+#endif // BLUEPRINTS_ENABLED
 
             // Add component button
             DrawAddComponentButton(registry, selectedEntity);
@@ -1158,6 +1160,14 @@ void UnrealEditor::DrawAddComponentButton(entt::registry& registry, entt::entity
                 AddLog("Added Light Component", "Info");
             }
         }
+#if defined(BLUEPRINTS_ENABLED)
+        if (ImGui::MenuItem("Blueprint Component")) {
+            if (!registry.any_of<BlueprintComponent>(entity)) {
+                registry.emplace<BlueprintComponent>(entity);
+                AddLog("Added Blueprint Component", "Info");
+            }
+        }
+#endif // BLUEPRINTS_ENABLED
         ImGui::EndPopup();
     }
 }

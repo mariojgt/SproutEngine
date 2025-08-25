@@ -42,6 +42,7 @@ public:
     // Whether this editor initialized ImGui backends
     bool ownsImGuiBackends = false;
 
+#if defined(BLUEPRINTS_ENABLED)
     // Blueprint node system
     struct BlueprintNode {
         int id;
@@ -54,6 +55,7 @@ public:
     std::vector<BlueprintNode> blueprintNodes;
     std::vector<std::pair<int, int>> blueprintLinks; // pin connections
     int nextNodeId = 1;
+#endif
 
 private:
     // Core editor state
@@ -67,7 +69,9 @@ private:
     bool showContentBrowser = true;
     bool showWorldOutliner = true;
     bool showInspector = true;
+#if defined(BLUEPRINTS_ENABLED)
     bool showBlueprintGraph = false;
+#endif
     bool showConsole = true;
     bool showMaterialEditor = false;
     bool showRoadmap = true;
@@ -115,7 +119,9 @@ private:
     void DrawContentBrowser();
     void DrawWorldOutliner(entt::registry& registry);
     void DrawInspector(entt::registry& registry, Scripting& scripting);
+#if defined(BLUEPRINTS_ENABLED)
     void DrawBlueprintGraph(entt::registry& registry, Scripting& scripting);
+#endif
     void DrawConsole(entt::registry& registry, Scripting& scripting);
     void DrawMaterialEditor();
     void DrawToolbar(bool& playMode);

@@ -4,6 +4,8 @@ project(SproutEngine LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(BLUEPRINTS_ENABLED "Enable experimental Blueprint system" OFF)
+
 # Use vcpkg manifest mode; pass -DCMAKE_TOOLCHAIN_FILE=... when configuring
 
 find_package(glfw3 REQUIRED)
@@ -64,6 +66,12 @@ target_include_directories(SproutEngine PRIVATE src external/imnodes_stub)
 
 # Assets path macro
 target_compile_definitions(SproutEngine PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD SE_ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")
+
+if(BLUEPRINTS_ENABLED)
+  target_compile_definitions(SproutEngine PRIVATE BLUEPRINTS_ENABLED=1)
+else()
+  target_compile_definitions(SproutEngine PRIVATE BLUEPRINTS_ENABLED=0)
+endif()
 
 # Link libraries (handle different target names)
 if(TARGET glad::glad)

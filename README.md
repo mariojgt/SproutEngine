@@ -93,6 +93,9 @@ After build, run the produced binary. A window opens with a spinning cube.
 - imnodes-based graph → compiled to Lua file under `assets/scripts/generated/`.
 - Attach generated script to the entity’s `Script` component.
 - Node palette: Tick, OnBeginPlay, Transform ops, Math, Branch, Variables.
+  
+> **Note**: A new CMake option `BLUEPRINTS_ENABLED` gates the upcoming
+> experimental Blueprint system. The flag is off by default.
 
 ### HUD / Widgets
 - UI canvas rendered after 3D pass.

@@ -1,6 +1,8 @@
 #include "UnrealEditorSimple.h"
 #include "Components.h"
+#if defined(BLUEPRINTS_ENABLED)
 #include "BlueprintEditor.cpp"
+#endif
 #include "Renderer.h"
 #include "Scripting.h"
 #include <imgui.h>
@@ -70,7 +72,9 @@ void UnrealEditor::Render(entt::registry& registry, Renderer& renderer, Scriptin
     if (showContentBrowser) DrawContentBrowser();
     if (showWorldOutliner) DrawWorldOutliner(registry);
     if (showInspector) DrawInspector(registry, scripting);
+#if defined(BLUEPRINTS_ENABLED)
     if (showBlueprintGraph) DrawBlueprintGraph(registry, scripting);
+#endif
     if (showConsole) DrawConsole(registry, scripting);
     if (showMaterialEditor) DrawMaterialEditor();
     if (showRoadmap) DrawRoadmap();
@@ -146,8 +150,10 @@ void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scriptin
             ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Settings) + " Inspector").c_str(), nullptr, showInspector);
             if (ImGui::IsItemClicked()) showInspector = !showInspector;
 
+#if defined(BLUEPRINTS_ENABLED)
             ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Blueprint) + " Blueprint Editor").c_str(), nullptr, showBlueprintGraph);
             if (ImGui::IsItemClicked()) showBlueprintGraph = !showBlueprintGraph;
+#endif
 
             ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Console) + " Console").c_str(), nullptr, showConsole);
             if (ImGui::IsItemClicked()) showConsole = !showConsole;
@@ -182,6 +188,7 @@ void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scriptin
         }
 
         // Blueprint Menu
+#if defined(BLUEPRINTS_ENABLED)
         if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Blueprint) + " Blueprint").c_str())) {
             if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Add) + " New Blueprint").c_str(), "Ctrl+B")) {
                 if (selectedEntity != entt::null && IsEntityValid(registry, selectedEntity)) {
@@ -261,6 +268,7 @@ void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scriptin
             
             ModernTheme::EndModernMenu();
         }
+#endif
 
         // Tools Menu
         if (ModernTheme::BeginModernMenu((std::string(ModernTheme::Icons::Settings) + " Tools").c_str())) {
@@ -673,6 +681,7 @@ void UnrealEditor::DrawInspector(entt::registry& registry, Scripting& scripting)
                         AddLog("Added Script Component", "Info");
                     }
                 }
+#if defined(BLUEPRINTS_ENABLED)
                 if (ImGui::MenuItem("Blueprint")) {
                     if (!registry.any_of<BlueprintComponent>(selectedEntity)) {
                         // create generated folder if needed
@@ -695,6 +704,7 @@ void UnrealEditor::DrawInspector(entt::registry& registry, Scripting& scripting)
                         AddLog("Added Blueprint Component and opened editor: " + out, "Info");
                     }
                 }
+#endif
                 if (ImGui::MenuItem("Code")) {
                     // Create a raw Lua script and open code editor
                     std::filesystem::create_directories("assets/scripts/generated");
