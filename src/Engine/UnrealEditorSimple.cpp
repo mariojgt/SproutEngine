@@ -195,7 +195,7 @@ void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scriptin
                         }
                         registry.emplace<BlueprintComponent>(selectedEntity, BlueprintComponent{out});
                         currentBlueprintPath = out;
-                        
+
                         currentBlueprintCode.clear();
                         std::ifstream ifs(out);
                         if (ifs.is_open()) {
@@ -213,14 +213,14 @@ void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scriptin
                     AddLog("Please select an entity first to create a blueprint", "Warning");
                 }
             }
-            
+
             if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Open) + " Open Blueprint").c_str(), "Ctrl+Shift+B")) {
                 if (selectedEntity != entt::null && IsEntityValid(registry, selectedEntity)) {
                     if (registry.any_of<BlueprintComponent>(selectedEntity)) {
                         // Open existing blueprint
                         auto& blueprint = registry.get<BlueprintComponent>(selectedEntity);
                         currentBlueprintPath = blueprint.filePath;
-                        
+
                         currentBlueprintCode.clear();
                         std::ifstream ifs(blueprint.filePath);
                         if (ifs.is_open()) {
@@ -240,13 +240,13 @@ void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scriptin
             }
 
             ModernTheme::ModernSeparator();
-            
+
             if (ModernTheme::ModernMenuItem((std::string(ModernTheme::Icons::Blueprint) + " Show Blueprint Editor").c_str(), "F4")) {
                 showBlueprintGraph = !showBlueprintGraph;
                 showBlueprintEditor = showBlueprintGraph;
                 AddLog(showBlueprintGraph ? "Opened Blueprint Editor" : "Closed Blueprint Editor", "Info");
             }
-            
+
             if (ModernTheme::ModernMenuItem("🔄 Reload All Blueprints")) {
                 // Reload all blueprint components
                 auto view = registry.view<BlueprintComponent>();
@@ -258,7 +258,7 @@ void UnrealEditor::DrawMainMenuBar(entt::registry& registry, Scripting& scriptin
                 }
                 AddLog("Reloaded " + std::to_string(reloadedCount) + " blueprints", "Info");
             }
-            
+
             ModernTheme::EndModernMenu();
         }
 

@@ -30,7 +30,7 @@ void Editor::shutdown(GLFWwindow* window){
 
 void Editor::drawDockspace(){
     // Create a full-screen dock space allowing windows to dock to all sides
-    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 }
 
 static void Vec3Control(const char* label, glm::vec3& v){
