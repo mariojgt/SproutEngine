@@ -1,0 +1,136 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/opt/homebrew/bin/"
+      - "/opt/homebrew/sbin/"
+      - "/usr/local/bin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/usr/local/share/dotnet/"
+      - "/Users/mariotarosso/.dotnet/tools/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "/opt/homebrew/bin/uname"
+      - "/opt/homebrew/sbin/uname"
+      - "/usr/local/bin/uname"
+      - "/System/Cryptexes/App/usr/bin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      ENV{PATH}:
+        - "/opt/homebrew/bin"
+        - "/opt/homebrew/sbin"
+        - "/usr/local/bin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/usr/local/share/dotnet"
+        - "~/.dotnet/tools"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+        - "/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "vcpkg/scripts/buildsystems/vcpkg.cmake:305 (find_program)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineSystem.cmake:152 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "Z_VCPKG_CL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cl"
+    candidate_directories:
+      - "/opt/homebrew/bin/"
+      - "/opt/homebrew/sbin/"
+      - "/usr/local/bin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/usr/local/share/dotnet/"
+      - "/Users/mariotarosso/.dotnet/tools/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+    searched_directories:
+      - "/opt/homebrew/bin/cl"
+      - "/opt/homebrew/sbin/cl"
+      - "/usr/local/bin/cl"
+      - "/System/Cryptexes/App/usr/bin/cl"
+      - "/usr/bin/cl"
+      - "/bin/cl"
+      - "/usr/sbin/cl"
+      - "/sbin/cl"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/cl"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/cl"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/cl"
+      - "/usr/local/share/dotnet/cl"
+      - "/Users/mariotarosso/.dotnet/tools/cl"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/cl"
+      - "/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand/cl"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/opt/homebrew/bin"
+        - "/opt/homebrew/sbin"
+        - "/usr/local/bin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/usr/local/share/dotnet"
+        - "~/.dotnet/tools"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+        - "/Users/mariotarosso/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+...

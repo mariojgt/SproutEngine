@@ -1,0 +1,138 @@
+{
+  "$schema": "https://raw.githubusercontent.com/spdx/spdx-spec/v2.2.1/schemas/spdx-schema.json",
+  "spdxVersion": "SPDX-2.2",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "documentNamespace": "https://spdx.org/spdxdocs/bgfx-arm64-osx-1.129.8866-491-a6cd7b81-edbc-443a-bc50-803b85fb5b31",
+  "name": "bgfx:arm64-osx@1.129.8866-491 5e6b201b6a276563d05f513c6b67da2b01b572f98e1927fc91fc5c6f90d5fe2f",
+  "creationInfo": {
+    "creators": [
+      "Tool: vcpkg-2025-07-21-d4b65a2b83ae6c3526acd1c6f3b51aff2a884533"
+    ],
+    "created": "2025-08-25T15:50:10Z"
+  },
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "GENERATES",
+      "relatedSpdxElement": "SPDXRef-binary"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-0"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-1"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-2"
+    },
+    {
+      "spdxElementId": "SPDXRef-binary",
+      "relationshipType": "GENERATED_FROM",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-0",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-1",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-2",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-2",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    }
+  ],
+  "packages": [
+    {
+      "name": "bgfx",
+      "SPDXID": "SPDXRef-port",
+      "versionInfo": "1.129.8866-491",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/bgfx",
+      "homepage": "https://bkaradzic.github.io/bgfx/overview.html",
+      "licenseConcluded": "BSD-2-Clause AND CC0-1.0",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "description": "Cross-platform, graphics API agnostic, Bring Your Own Engine/Framework style rendering library.",
+      "comment": "This is the port (recipe) consumed by vcpkg."
+    },
+    {
+      "name": "bgfx:arm64-osx",
+      "SPDXID": "SPDXRef-binary",
+      "versionInfo": "5e6b201b6a276563d05f513c6b67da2b01b572f98e1927fc91fc5c6f90d5fe2f",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "BSD-2-Clause AND CC0-1.0",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "comment": "This is a binary package built by vcpkg."
+    },
+    {
+      "SPDXID": "SPDXRef-resource-0",
+      "name": "bgfx.cmake.v1.129.8866-491.tar.gz",
+      "packageFileName": "bgfx.cmake.v1.129.8866-491.tar.gz",
+      "downloadLocation": "https://github.com/bkaradzic/bgfx.cmake/releases/download/v1.129.8866-491/bgfx.cmake.v1.129.8866-491.tar.gz",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "503f31965f7be5631f0952a1e1bcc6484cb8b1a28261ae949f367317cf7432950c52f4363f4ad55d3ae0bc73302edafe2ca8ac5e817b6e09d886c7760ff8ce60"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "fileName": "./vcpkg-inject-packages.cmake",
+      "SPDXID": "SPDXRef-file-0",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "655e586fa2b66628a364fe4055741bddcdca24c8146dc25a0bdd4c79e425bf30"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./portfile.cmake",
+      "SPDXID": "SPDXRef-file-1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a00a701a8fe0dcc8044b8600d232ffd71f4e36e848fba56022be3cc3ae9e3514"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./vcpkg.json",
+      "SPDXID": "SPDXRef-file-2",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "49749d78a96649582f6f35338aa494dbacd2c499977945e5e36d87bdd27e1127"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    }
+  ]
+}

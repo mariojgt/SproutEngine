@@ -1,0 +1,6 @@
+Package: bgfx
+Feature: multithreaded
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Encode and render on different threads
+Status: install ok half-installed

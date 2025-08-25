@@ -1,0 +1,17 @@
+arm64-osx/
+arm64-osx/debug/
+arm64-osx/debug/lib/
+arm64-osx/debug/lib/libtinyexr.a
+arm64-osx/include/
+arm64-osx/include/tinyexr.h
+arm64-osx/lib/
+arm64-osx/lib/libtinyexr.a
+arm64-osx/share/
+arm64-osx/share/tinyexr/
+arm64-osx/share/tinyexr/copyright
+arm64-osx/share/tinyexr/tinyexrConfig.cmake
+arm64-osx/share/tinyexr/tinyexrTargets-debug.cmake
+arm64-osx/share/tinyexr/tinyexrTargets-release.cmake
+arm64-osx/share/tinyexr/tinyexrTargets.cmake
+arm64-osx/share/tinyexr/vcpkg.spdx.json
+arm64-osx/share/tinyexr/vcpkg_abi_info.txt
