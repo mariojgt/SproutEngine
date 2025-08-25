@@ -1,8 +1,0 @@
-Package: tinyexr
-Version: 1.0.9
-Depends: miniz, vcpkg-cmake, vcpkg-cmake-config
-Architecture: arm64-osx
-Multi-Arch: same
-Abi: 6684d6faed06632c2a2820dcdbfbc28e6997d1a1fe086d4d99dc472f455436b1
-Description: Library to load and save OpenEXR(.exr) images
-Status: install ok installed

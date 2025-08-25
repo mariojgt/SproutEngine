@@ -1,0 +1,69 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 6b90b8f7add9691552d06700958d52a228ab8793d44ce739ce248a76e43c7987
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 7d97346adce299254adc2d830906e70d4b10f9a5fbe1cfb085b959c9fe9507c9
+Status: install ok installed
+
+Package: miniz
+Version: 3.1.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 6d486ec1d04982e5af7f09edd1b5a80b3d827e33d1bc2645d5e4ed477f1a30f7
+Description: Single C source file zlib-replacement library
+Status: install ok installed
+
+Package: tinyexr
+Version: 1.0.9
+Depends: miniz, vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 6684d6faed06632c2a2820dcdbfbc28e6997d1a1fe086d4d99dc472f455436b1
+Description: Library to load and save OpenEXR(.exr) images
+Status: install ok installed
+
+Package: libsquish
+Version: 1.15
+Port-Version: 14
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 2be3fc747667d5c583814b7b9a54291b3349b51324509a92a1c2bd4cb1dbdc71
+Description: Open source DXT compression library.
+Status: install ok installed
+
+Package: bgfx
+Version: 1.129.8866-491
+Depends: libsquish, miniz, tinyexr, vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Maintainer: Sandy Carter <bwrsandman@users.noreply.github.com>
+Abi: 5e6b201b6a276563d05f513c6b67da2b01b572f98e1927fc91fc5c6f90d5fe2f
+Description: Cross-platform, graphics API agnostic, Bring Your Own Engine/Framework style rendering library.
+Default-Features: multithreaded
+Status: install ok installed
+
+Package: bgfx
+Feature: multithreaded
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Encode and render on different threads
+Status: install ok installed
+
+Package: sdl2
+Version: 2.32.8
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: c351b6fde2ea2b95faf455e2b3496407b2409d990010b00b9240de4eaf51acb2
+Description: Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
+Status: install ok installed
+

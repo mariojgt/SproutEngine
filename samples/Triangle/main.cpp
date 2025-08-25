@@ -1,4 +1,3 @@
-\
 #include "../../engine/Core/Application.h"
 
 int main(int, char**)

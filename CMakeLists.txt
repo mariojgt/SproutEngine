@@ -31,6 +31,8 @@ target_include_directories(SproutEngine PUBLIC
 target_link_libraries(SproutEngine PUBLIC
     SDL2::SDL2
     bgfx::bgfx
+    bgfx::bx
+    bgfx::bimg
 )
 
 # On Windows, also link SDL2main for the entry point

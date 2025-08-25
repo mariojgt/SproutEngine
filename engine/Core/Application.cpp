@@ -1,4 +1,3 @@
-\
 #include "Application.h"
 #include "../Platform/Window.h"
 #include "../Render/Renderer.h"
@@ -30,14 +29,14 @@ void Application::handleEvents()
 int Application::run()
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0) {
-        std::cerr << "SDL_Init failed: " << SDL_GetError() << "\\n";
+        std::cerr << "SDL_Init failed: " << SDL_GetError() << "\n";
         return 1;
     }
 
     m_window  = std::make_unique<Window>(m_cfg.title.c_str(), m_cfg.width, m_cfg.height);
     m_renderer = std::make_unique<Renderer>();
     if (!m_renderer->init(*m_window, m_cfg.vsync)) {
-        std::cerr << "Renderer init failed.\\n";
+        std::cerr << "Renderer init failed.\n";
         return 2;
     }
 

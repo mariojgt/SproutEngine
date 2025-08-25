@@ -1,0 +1,2 @@
+/usr/bin/ar qc lib/libSproutEngine.a CMakeFiles/SproutEngine.dir/engine/Core/Application.cpp.o CMakeFiles/SproutEngine.dir/engine/Platform/Window.cpp.o CMakeFiles/SproutEngine.dir/engine/Render/Renderer.cpp.o
+/usr/bin/ranlib lib/libSproutEngine.a

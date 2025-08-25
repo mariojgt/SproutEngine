@@ -1,9 +1,0 @@
-Package: libsquish
-Version: 1.15
-Port-Version: 14
-Depends: vcpkg-cmake, vcpkg-cmake-config
-Architecture: arm64-osx
-Multi-Arch: same
-Abi: 2be3fc747667d5c583814b7b9a54291b3349b51324509a92a1c2bd4cb1dbdc71
-Description: Open source DXT compression library.
-Status: install ok installed
